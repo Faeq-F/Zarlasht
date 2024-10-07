@@ -1,0 +1,11 @@
+*.log
+*.dvi
+*.aux
+*.bbl
+*.blg
+*.brf
+*.out
+*.gz
+fyp_plan.pdf
+faeq_faisal_signature.png
+wordcount.txt
