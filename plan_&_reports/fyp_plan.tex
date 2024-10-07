@@ -1,0 +1,259 @@
+\documentclass[]{project_plan}
+\bibliographystyle{apalike}
+\bibstyle{apalike}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{cite}
+
+\newcommand{\bulletPoint}{\hspace{-3.1pt}$\bullet$ \hspace{5pt}}
+
+%---
+
+\def\studentname{Faeq Faisal}
+\def\reportyear{2024}
+\def\projecttitle{A concurrency based game environment}
+\def\supervisorname{Dr Julien Lange}
+\def\degree{BSc (Hons) in Computer Science (Software Engineering)}
+\def\fullOrHalfUnit{CS3821 Full Unit}
+\def\finalOrInterim{Project Plan}
+
+%---
+
+\begin{document}
+\maketitle
+
+%---
+
+\chapter*{Declaration}
+This plan has been prepared on the basis of my own work. Where other published
+and unpublished source materials have been used, these have been acknowledged.
+\vskip3em
+Word Count: \input{wordcount.txt}words
+\vskip3em
+Student Name: \studentname
+\vskip3em
+Date of Submission: October 11, 2024
+\vskip3em
+Signature:
+\vskip0em
+\includegraphics[width=3cm]{FaeqFaisalSignature}
+
+\newpage
+
+%---
+
+\tableofcontents\pdfbookmark[0]{Table of Contents}{toc}\newpage
+
+%---
+
+\begin{abstract}
+  Playing games has become an integral part of modern society, offering not only entertainment but
+  also serving as a tool for relaxation and stress relief, while simultaneously fostering critical thinking,
+  and problem-solving skills. For certain demographics, such as individuals with disabilities who may have
+  limited social interactions, or children still developing, games can provide unique benefits. These include
+  learning important social skills like turn-taking, developing emotional intelligence, and building
+  resilience~\cite{garaigordobil_developing_2022}. To add, the interactive nature of games, particularly those
+  that provided multiplayer experiences, can foster social connections and enhance enjoyment for players;
+  "fun experienced when interacting with others is more positive than solitary fun"~\cite{reis_fun_2017}.
+
+  Within multiplayer games, particularly those that support simultaneous play across
+  multiple game instances, there is a critical need for leveraging concurrency mechanisms.
+  These can be provided by programming languages, runtime environments or other technologies.
+  Java, for instance, offers threads that enable resource sharing while maintaining independent execution
+  of instructions. An alternative approach is exemplified by the BEAM, a component of the ERTS. The BEAM
+  implements concurrency by running schedulers on OS threads, which pull processes from programs - these are
+  essentially a set of light-weight processes communicating with each other - making these processes execute in
+  \textit{strong isolation} ~\cite{stenman_erlang_2024, armstrong_making_2003, debenedetto_elixir_2019}.
+  This abstracts the feature of concurrency from programming languages like Erlang.
+
+  Multiplayer games significantly increase gamers' immersion and enjoyment~\cite{berladean_effect_2016}.
+  These concurrency mechanisms enable this by providing a wide range of features crucial for modern
+  multiplayer games. These include facilitating simultaneous actions in board games, providing real-time
+  error reporting, support for real-time chat systems that run alongside gameplay and dynamic world
+  updates across multiple clients. These capabilities, among others, enhance the responsiveness and
+  interactivity of multiplayer game environments.
+
+  For implementing the concurrent game environments themselves, there are various architectural approaches.
+  To start, there is the choice between the peer-to-peer model or client-server model.
+  The peer-to-peer model eliminates the need for a central server, simplifying setup and
+  reducing costs. While this model is resilient to server failures, it presents challenges
+  in managing peer disconnections and potential cheating through data manipulation~\cite{franchetti_coping_2020}.
+  Conversely, the client-server model allows the server to act as a neutral authority to govern the game,
+  validating players' actions. The model does introduce more upfront challenges though, including cost,
+  latency, and scaling. Mitigations exist, for example, using a load balancer with multiple servers,
+  "so that if a server goes down, another one can take its place without causing significant
+  disruption for clients", or by having auto-scaling so that servers "can spin up or down
+  based on usage" \cite{pandey_peer--peer_2022}.
+
+  To continue, many technologies need to be considered for use in a concurrent environment. For
+  real-time communication, solutions include, polling, long polling and websockets. In polling,
+  clients send requests to the server regularly, with the server responding with a new message, or
+  an empty response, if there isn't one. This has the obvious drawback of keeping load on the server,
+  and consuming network bandwidth while there are no new messages. To prevent receiving client requests
+  while there are no new messages, in long polling, the server does not send an empty response. Instead,
+  it holds the current request until a new message is available or a timeout expires. An issue still remains,
+  a connection still has to be kept alive and saved locally on the server. Websockets are a
+  solution to both issues. "With web sockets, we can reduce the metadata (HTTP headers) that are sent in
+  every request (a shortcoming of Polling) and we can also provide full–duplex communication through a
+  single socket (a shortcoming of Long Polling)". This would make websockets the choice for real-time
+  communication, however they are not perfect, for e.g., they are still susceptible to DoS attacks
+  \cite{gupta_overview_2018}. This is just one of the many use-cases that require an in-depth consideration
+  of suitable technologies.
+
+  To produce this project, I will start with exploring different concurrent environment technologies,
+  architectures, etc., and make relevant decisions on these. From there I will develop multiple
+  proof-of-concept programs to experiment with the modularity of my chosen technologies, and how they
+  can fit together. I will aim to create an engaging and relaxing multiplayer game and an
+  environment capable of hosting multiple games simultaneously. It will explore innovative features
+  that leverage concurrency to provide experimental gameplay mechanics, such as non-turn-based play.
+  Additionally, the project will investigate techniques to mitigate issues like server errors and
+  overall system reliability.
+\end{abstract}
+\newpage
+
+%---
+
+\chapter{Timeline}
+
+For the first term, I will primarily concentrate on research and implementing the core features of the concurrent
+environment. It will involve developing the fundamental architecture, integrating various concurrency mechanisms,
+and implementing basic gameplay features. The second term will focus on refining the system,
+optimizing performance and enhancing user experience. I will try to conduct thorough testing throughout
+the project to ensure reliability and scalability of the environment.
+
+\section{Term 1}
+
+\scalebox{1}{
+  \begin{tabular}{r |@{\bulletPoint} l}
+    Week 1 - 2   & Produce this project plan \& research on viable technologies for use          \\
+    Week 3       & Plan final game screens, structure, features, etc.                            \\
+    Week 4       & Build the fundamental architecture                                            \\
+    Week 5       & Build a proof of concept that exhibits the behaviour of concurrent execution. \\
+    Week 6 - 7   & Build a proof of concept board game                                           \\
+    Week 8 - 9   & Evaluate proof of concepts \& build the basis of the final game               \\
+    Week 10 - 11 & Implement the foundational concurrent features for the final game                              \\
+  \end{tabular}
+}
+
+\section{Term 2}
+
+\scalebox{1}{
+  \begin{tabular}{r |@{\bulletPoint} l}
+    Week 1 - 2 & Refine and optimize the concurrent features implemented at the end of the first term \\
+    Week 3 - 4 & Implement additional game features and polish the user interface                     \\
+    Week 5 - 6 & Conduct thorough performance testing and optimize for scalability                    \\
+    Week 7 - 8 & Implement improvements to reliability and error handling                             \\
+    Week 9     & User testing and gathering feedback                                                  \\
+    Week 10    & Address feedback and make final adjustments                                          \\
+    Week 11    & Prepare final documentation and project report                                       \\
+  \end{tabular}
+}
+
+%---
+
+\chapter{Risks and Mitigations}
+A concurrent environment introduces unique challenges such as race conditions, deadlocks,
+and synchronization issues. These concurrent-specific risks, combined with general project
+risks like hardware failures, require careful consideration and mitigation strategies to
+ensure the project's success.
+
+\subsubsection{Technical debt}
+This is a significant risk, especially when producing a concurrent environment since
+the complexity of managing multiple threads / processes can lead to suboptimal
+code fairly easily. Quick fixes or improper use of techniques can add up quickly,
+resulting in code that is difficult to maintain, debug, or scale. To mitigate this, I
+will try to carry out a strict code review process, focusing on concurrent design patterns
+and best practices, making sure I refactor any code that needs it.
+
+\subsubsection{Concurrency overhead}
+Concurrency can lead to performance issues due to overhead from
+context switching, synchronization, and potential bottlenecks, which may
+negate the benefits of parallelism, especially due to any lack of knowledge in
+concurrent techniques. To mitigate this, I could profile the application to identify
+performance bottlenecks and focus on optimizing critical sections.
+
+\subsubsection{Resource Contention}
+When multiple processes or threads compete for limited resources, it leads to
+performance issues and potential deadlocks that prohibit project continuation.
+To mitigate this, I should use efficient data structures and minimize shared resources
+to reduce synchronization needs.
+
+\subsubsection{Hardware Failure}
+This is a general risk where the main hardware, used whilst building the project, fails,
+resulting in a loss in data and progress. Since I cannot predict when certain hardware will fail, I
+will mitigate the risk of data loss by keeping all my code and reports under Git version control, using the
+GitHub (private) and GitLab (private - CIM RHUL) platforms as remotes and ensure that I push my progress
+regularly. This means that my work on this project will be unaffected by hardware failure.
+
+\subsubsection{Poor Estimation of Tasks}
+Underestimating the time required for tasks can lead to unrealistic timelines, rushed work and / or failure of
+completing all of the planned features, especially when implementing concurrent techniques, which I may
+be unfamiliar with. I will try to mitigate this by breaking down the tasks into smaller, manageable components
+and use historical data from similar projects online to inform estimates.
+
+\subsubsection{Uneven Balance Between Report/Code}
+An imbalance between producing the report and code can lead to them hindering each other, making me fall behind
+on one or both of them. To mitigate this, I will try to focus on the code first, keeping notes for the write-up, and
+then start to produce the report later, giving myself extra time between the change to wrap up unfinished parts.
+
+\subsubsection{Inadequate testing}
+Overlooking critical bugs or edge cases due to limited time or resources, can significantly impact the quality
+and reliability of the final game. This can lead to risks in progressing on the project like technical debt and overhead
+of knowledge in concurrency techniques. To mitigate this, I will conduct thorough testing throughout
+the project to ensure it's reliability.
+
+
+%-----
+\chapter{Acronyms \& Glossary}
+
+Threads
+
+The smallest unit of processing that can be performed in a Java program. Implemented by extending the
+Thread class or by implementing the runnable interface.
+
+BEAM
+
+Bogdan's Erlang Abstract Machine / Björn's Erlang Abstract Machine - a virtual machine, built into the OTP
+distribution, that executes user code in the ERTS.
+
+OTP
+
+Open Telecom Platform - a framework that provides an abstraction of common uses of / interactions with
+certain types of processes. It provides modules and behaviours that represent standard implementations of
+common practices like process supervision, message passing, spawning tasks, etc.
+
+ERTS
+
+Erlang Run Time System - the system that contains functionality necessary to run the Erlang system.
+
+OS
+
+Operating System - system software that manages computer hardware and software resources, and
+provides common services for computer programs.
+
+Websockets
+
+A computer communications protocol, providing a simultaneous two-way communication channel
+over a single TCP connection.
+
+TCP
+
+Transmission Control Protocol - one of the main protocols of the Internet protocol suite. TCP provides
+reliable, ordered, and error-checked delivery of a stream of bytes between applications over a IP network.
+
+HTTP
+
+HyperText Transfer Protocol - an application layer protocol in the Internet protocol suite.
+It is used for transferring data between clients and servers.
+
+DoS
+
+Denial of Service - An attack where the perpetrator seeks to make a machine or network resource unavailable
+to its intended users
+
+%---
+
+
+\bibliography{plan_refs}
+\end{document}
+\end{article}

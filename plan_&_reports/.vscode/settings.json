@@ -1,0 +1,32 @@
+{
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "texify",
+      "tools": ["texify"]
+    }
+  ],
+  "latex-workshop.latex.tools": [
+    {
+      "name": "texify",
+      "command": "texify",
+      "args": [
+        "--pdf",
+        "--synctex=1",
+        "--clean",
+        "--tex-option=\"-interaction=nonstopmode\"",
+        "--tex-option=\"-file-line-error\"",
+        "%DOC_EXT%"
+      ],
+      "env": {}
+    }
+  ],
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "FYP_Plan.tex",
+        "isAsync": true,
+        "cmd": "texcount -sum -1 FYP_Plan.tex > wordcount.txt"
+      }
+    ]
+  }
+}
