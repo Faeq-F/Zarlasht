@@ -36,7 +36,7 @@ Date of Submission: October 11, 2024
 \vskip3em
 Signature:
 \vskip0em
-\includegraphics[width=3cm]{FaeqFaisalSignature}
+\includegraphics[width=3cm]{faeq_faisal_signature}
 
 \newpage
 
@@ -101,7 +101,7 @@ Signature:
   of suitable technologies.
 
   To produce this project, I will start with exploring different concurrent environment technologies,
-  architectures, etc., and make relevant decisions on these. From there I will develop multiple
+  architectures, etc., and make relevant decisions on these. From there, I will develop multiple
   proof-of-concept programs to experiment with the modularity of my chosen technologies, and how they
   can fit together. I will aim to create an engaging and relaxing multiplayer game and an
   environment capable of hosting multiple games simultaneously. It will explore innovative features
@@ -131,7 +131,7 @@ the project to ensure reliability and scalability of the environment.
     Week 5       & Build a proof of concept that exhibits the behaviour of concurrent execution. \\
     Week 6 - 7   & Build a proof of concept board game                                           \\
     Week 8 - 9   & Evaluate proof of concepts \& build the basis of the final game               \\
-    Week 10 - 11 & Implement the foundational concurrent features for the final game                              \\
+    Week 10 - 11 & Implement the foundational concurrent features for the final game             \\
   \end{tabular}
 }
 
@@ -161,46 +161,57 @@ ensure the project's success.
 This is a significant risk, especially when producing a concurrent environment since
 the complexity of managing multiple threads / processes can lead to suboptimal
 code fairly easily. Quick fixes or improper use of techniques can add up quickly,
-resulting in code that is difficult to maintain, debug, or scale. To mitigate this, I
-will try to carry out a strict code review process, focusing on concurrent design patterns
-and best practices, making sure I refactor any code that needs it.
+resulting in code that is difficult to maintain, debug, or scale. As a result, this risk's
+likelihood is high. To mitigate this, I will try to carry out a strict code review process,
+focusing on concurrent design patterns and best practices, making sure I refactor any code that needs it.
 
 \subsubsection{Concurrency overhead}
 Concurrency can lead to performance issues due to overhead from
 context switching, synchronization, and potential bottlenecks, which may
 negate the benefits of parallelism, especially due to any lack of knowledge in
 concurrent techniques. To mitigate this, I could profile the application to identify
-performance bottlenecks and focus on optimizing critical sections.
+performance bottlenecks and focus on optimizing critical sections. The significance and likelihood
+of this risk depends on the technologies I use and their implementations.
 
 \subsubsection{Resource Contention}
-When multiple processes or threads compete for limited resources, it leads to
-performance issues and potential deadlocks that prohibit project continuation.
-To mitigate this, I should use efficient data structures and minimize shared resources
-to reduce synchronization needs.
+This is a large risk since it can prohibit project continuation. When multiple processes
+or threads compete for limited resources, it leads to performance issues and potential
+deadlocks that prevent the program from continuing. This issue can be difficult to solve,
+but it's likelihood is low, especially if I try to mitigate this from the start. I should use
+efficient data structures and minimize shared resources to reduce synchronization needs.
 
 \subsubsection{Hardware Failure}
-This is a general risk where the main hardware, used whilst building the project, fails,
-resulting in a loss in data and progress. Since I cannot predict when certain hardware will fail, I
-will mitigate the risk of data loss by keeping all my code and reports under Git version control, using the
-GitHub (private) and GitLab (private - CIM RHUL) platforms as remotes and ensure that I push my progress
-regularly. This means that my work on this project will be unaffected by hardware failure.
+This is a general, low risk where the main hardware, used whilst building the project, fails,
+resulting in a loss in data and progress. Since I cannot predict when certain hardware will fail, making
+it's likelihood uncertain, I will mitigate the risk of data loss by keeping all my code and reports
+under Git version control, using the GitHub (private) and GitLab (private - CIM RHUL) platforms as
+remotes and ensure that I push my progress regularly. This means that my work on this project will
+be unaffected by hardware failure.
 
 \subsubsection{Poor Estimation of Tasks}
 Underestimating the time required for tasks can lead to unrealistic timelines, rushed work and / or failure of
 completing all of the planned features, especially when implementing concurrent techniques, which I may
 be unfamiliar with. I will try to mitigate this by breaking down the tasks into smaller, manageable components
-and use historical data from similar projects online to inform estimates.
+and use historical data from similar projects online to inform estimates. This is a significant risk with
+a high likelihood, especially when taking into consideration the fact that I am a single individual working
+on the project, I have multiple other courseworks and deliverables for other modules I take as a student,
+that need to be worked on during this project, some of which have deadlines on the same days as this
+'final year project' module, and that I also have other personal considerations like how many hours
+I wish to work for, during my job.
 
 \subsubsection{Uneven Balance Between Report/Code}
 An imbalance between producing the report and code can lead to them hindering each other, making me fall behind
-on one or both of them. To mitigate this, I will try to focus on the code first, keeping notes for the write-up, and
-then start to produce the report later, giving myself extra time between the change to wrap up unfinished parts.
+on one or both of them. This is not very likely and has moderate risk, as long as I keep notes as I work. To
+mitigate this, I will try to focus on the code first, keeping notes for the write-up, and then start to produce
+the report later, giving myself extra time between the change to wrap up unfinished parts.
 
 \subsubsection{Inadequate testing}
 Overlooking critical bugs or edge cases due to limited time or resources, can significantly impact the quality
-and reliability of the final game. This can lead to risks in progressing on the project like technical debt and overhead
-of knowledge in concurrency techniques. To mitigate this, I will conduct thorough testing throughout
-the project to ensure it's reliability.
+and reliability of the final game. This can lead to risks in progressing on the project like technical debt
+and overhead of knowledge in concurrency techniques. This risk is highly likely and has great risk, especially
+if I estimate my tasks poorly. To mitigate this, I will conduct thorough testing throughout
+the project to ensure it's reliability, as well as carry out the mitigations mentioned for a poor estimation
+of tasks.
 
 
 %-----
