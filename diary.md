@@ -9,3 +9,6 @@ Drew the screen designs and program architecture diagrams for the final game.
 ### 02/10/2024 - 07/10/2024
 Began digitizing the screen designs and started to learn how to use Valkey & radish (database & client) for the final game.<br>
 Also, after a meeting with my supervisor, I am improving my project plan.
+
+### 07/10/2024 - 08/10/2024
+Finished improving the project plan. I have also setup hosting for the final program and all of the proof of concepts that will be produced. This includes deno deploy for the websocket servers and aiven for the Valkey database.
