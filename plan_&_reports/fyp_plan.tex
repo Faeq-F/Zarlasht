@@ -125,13 +125,23 @@ the project to ensure reliability and scalability of the environment.
 
 \scalebox{1}{
   \begin{tabular}{r |@{\bulletPoint} l}
-    Week 1 - 2   & Produce this project plan \& research on viable technologies for use          \\
-    Week 3       & Plan final game screens, structure, features, etc.                            \\
-    Week 4       & Build the fundamental architecture                                            \\
-    Week 5       & Build a proof of concept that exhibits the behaviour of concurrent execution. \\
-    Week 6 - 7   & Build a proof of concept board game                                           \\
-    Week 8 - 9   & Evaluate proof of concepts \& build the basis of the final game               \\
-    Week 10 - 11 & Implement the foundational concurrent features for the final game             \\
+    Week 1 - 2   & Produce this project plan \& research on viable technologies for use             \\
+    Week 3       & Plan final game screens, structure, features, etc.                               \\
+    Week 4       & Decide on the technologies to use and build the fundamental architecture         \\
+    Week 5       & Online chat                                                                      \\
+                 & Build a proof of concept that exhibits the behaviour of concurrent execution     \\
+    Week 6       & Tic-Tac-Toe                                                                      \\
+                 & Build a proof of concept board game that can have multiple games played at once  \\
+    Week 7       & Pong                                                                             \\
+                 & Build another proof of concept game to test the modularity of my technologies    \\
+    Week 8       & Evaluate the proof of concepts \& build the basis of the final game              \\
+    Week 9       & Produce a survey report on game environments                                     \\
+                 & Produce a report describing the implementations of the proof of concepts         \\
+    Week 10 - 11 & Implement the foundational concurrent features for the final game;               \\
+                 & Ensure multiple games can be played at the same time                             \\
+                 & Ensure multiple players can play a game together                                 \\
+                 & Ensure the players, within a game, can trigger multiple actions at the same time \\
+                 & Ensure error reporting procedures are provided                                   \\
   \end{tabular}
 }
 
@@ -139,13 +149,19 @@ the project to ensure reliability and scalability of the environment.
 
 \scalebox{1}{
   \begin{tabular}{r |@{\bulletPoint} l}
-    Week 1 - 2 & Refine and optimize the concurrent features implemented at the end of the first term \\
-    Week 3 - 4 & Implement additional game features and polish the user interface                     \\
-    Week 5 - 6 & Conduct thorough performance testing and optimize for scalability                    \\
-    Week 7 - 8 & Implement improvements to reliability and error handling                             \\
-    Week 9     & User testing and gathering feedback                                                  \\
-    Week 10    & Address feedback and make final adjustments                                          \\
-    Week 11    & Prepare final documentation and project report                                       \\
+    Week 1 - 2   & Refine and optimize the features implemented at the end of the first term   \\
+                 & Week 1 - Client-side improvements                                           \\
+                 & Week 2 - Server-side improvements                                           \\
+    Week 3 - 4   & Implement additional game features (niceties) and polish the user interface \\
+                 & Implement the chat room (real-time communication)                           \\
+                 & Implement the map (real-time dynamic world updates)                         \\
+                 & Implement an information section in the game (real-time updates)            \\
+                 & (Content set individually, for each player, based on alliances, etc.)       \\
+    Week 5 - 6   & Conduct thorough performance testing and optimize for scalability           \\
+    Week 7       & Implement improvements to reliability and error handling                    \\
+    Week 8       & User testing and gathering feedback                                         \\
+    Week 9       & Address feedback and make final adjustments                                 \\
+    Week 10 - 11 & Prepare the final documentation, presentation and project report            \\
   \end{tabular}
 }
 
@@ -158,57 +174,83 @@ risks like hardware failures, require careful consideration and mitigation strat
 ensure the project's success.
 
 \subsubsection{Technical debt}
-This is a significant risk, especially when producing a concurrent environment since
+Importance: high\\
+Likelihood: high
+
+This is a \textit{significant risk}, especially when producing a concurrent environment since
 the complexity of managing multiple threads / processes can lead to suboptimal
 code fairly easily. Quick fixes or improper use of techniques can add up quickly,
 resulting in code that is difficult to maintain, debug, or scale. As a result, this risk's
-likelihood is high. To mitigate this, I will try to carry out a strict code review process,
+\textit{likelihood is high}. To mitigate this, I will try to carry out a strict code review process,
 focusing on concurrent design patterns and best practices, making sure I refactor any code that needs it.
 
 \subsubsection{Concurrency overhead}
+Importance: medium\\
+Likelihood: high
+
 Concurrency can lead to performance issues due to overhead from
 context switching, synchronization, and potential bottlenecks, which may
 negate the benefits of parallelism, especially due to any lack of knowledge in
 concurrent techniques. To mitigate this, I could profile the application to identify
-performance bottlenecks and focus on optimizing critical sections. The significance and likelihood
-of this risk depends on the technologies I use and their implementations.
+performance bottlenecks and focus on optimizing critical sections. \textit{The significance and likelihood
+  of this risk} depends on the technologies I use and their implementations.
+It is most likely to be \textit{highly likely} due to my lack of knowledge of certain
+concurrent techniques, and be of \textit{moderate importance} since I am a fast learner,
+and can adapt to new concepts fairly quickly.
 
 \subsubsection{Resource Contention}
-This is a large risk since it can prohibit project continuation. When multiple processes
+Importance: high\\
+Likelihood: low
+
+This is a \textit{large risk} since it can prohibit project continuation. When multiple processes
 or threads compete for limited resources, it leads to performance issues and potential
 deadlocks that prevent the program from continuing. This issue can be difficult to solve,
-but it's likelihood is low, especially if I try to mitigate this from the start. I should use
+but it's \textit{likelihood is low}, especially if I try to mitigate this from the start. I should use
 efficient data structures and minimize shared resources to reduce synchronization needs.
 
+\newpage
+
 \subsubsection{Hardware Failure}
-This is a general, low risk where the main hardware, used whilst building the project, fails,
+Importance: high\\
+Likelihood: uncertain (relatively low)
+
+This is a general, \textit{low risk} where the main hardware, used whilst building the project, fails,
 resulting in a loss in data and progress. Since I cannot predict when certain hardware will fail, making
-it's likelihood uncertain, I will mitigate the risk of data loss by keeping all my code and reports
+it's \textit{likelihood uncertain}, I will mitigate the risk of data loss by keeping all my code and reports
 under Git version control, using the GitHub (private) and GitLab (private - CIM RHUL) platforms as
 remotes and ensure that I push my progress regularly. This means that my work on this project will
 be unaffected by hardware failure.
 
 \subsubsection{Poor Estimation of Tasks}
+Importance: high\\
+Likelihood: high
+
 Underestimating the time required for tasks can lead to unrealistic timelines, rushed work and / or failure of
 completing all of the planned features, especially when implementing concurrent techniques, which I may
 be unfamiliar with. I will try to mitigate this by breaking down the tasks into smaller, manageable components
-and use historical data from similar projects online to inform estimates. This is a significant risk with
-a high likelihood, especially when taking into consideration the fact that I am a single individual working
+and use historical data from similar projects online to inform estimates. This is a \textit{significant risk} with
+a \textit{high likelihood}, especially when taking into consideration the fact that I am a single individual working
 on the project, I have multiple other courseworks and deliverables for other modules I take as a student,
 that need to be worked on during this project, some of which have deadlines on the same days as this
 'final year project' module, and that I also have other personal considerations like how many hours
 I wish to work for, during my job.
 
 \subsubsection{Uneven Balance Between Report/Code}
+Importance: medium\\
+Likelihood: low
+
 An imbalance between producing the report and code can lead to them hindering each other, making me fall behind
-on one or both of them. This is not very likely and has moderate risk, as long as I keep notes as I work. To
+on one or both of them. This is \textit{not very likely} and has \textit{moderate risk}, as long as I keep notes as I work. To
 mitigate this, I will try to focus on the code first, keeping notes for the write-up, and then start to produce
 the report later, giving myself extra time between the change to wrap up unfinished parts.
 
 \subsubsection{Inadequate testing}
-Overlooking critical bugs or edge cases due to limited time or resources, can significantly impact the quality
+Importance: high\\
+Likelihood: high
+
+Overlooking critical bugs or edge cases due to limited time or resources, can \textit{significantly impact} the quality
 and reliability of the final game. This can lead to risks in progressing on the project like technical debt
-and overhead of knowledge in concurrency techniques. This risk is highly likely and has great risk, especially
+and overhead of knowledge in concurrency techniques. This risk is \textit{highly likely} and has \textit{great risk}, especially
 if I estimate my tasks poorly. To mitigate this, I will conduct thorough testing throughout
 the project to ensure it's reliability, as well as carry out the mitigations mentioned for a poor estimation
 of tasks.
