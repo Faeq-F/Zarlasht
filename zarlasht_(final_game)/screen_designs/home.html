@@ -19,9 +19,21 @@
   </style>
   <script>
     tailwind.config = {
+      darkMode: 'selector',
       daisyui: {
         darkTheme: 'forest',
       }
+    }
+    window.onload = () => {
+      const body = document.getElementsByTagName("body")[0];
+      const themeController = document.getElementsByClassName("theme-controller")[0];
+      themeController.addEventListener("click", () => {
+        if (body.classList.contains("dark")) {
+          body.classList.remove("dark")
+        } else {
+          body.classList.add("dark")
+        }
+      })
     }
   </script>
 </head>
@@ -60,42 +72,89 @@
       class="btn bg-transparent hover:bg-transparent border-0 text-3xl font-header">i</button>
     <dialog id="SiteInfo" class="modal">
       <div class="modal-box">
-        <h3 class="text-2xl font-bold">Acknowledgments</h3>
-        <div class="text-xl">
-          <p class="py-4">
-            Game created by <a class="text-accent"
+        <h3 class="text-4xl font-bold font-header">Acknowledgments</h3>
+        <div class="text-2xl py-4">
+          <p class="">
+            Game created by <a
+              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
               href="https://faeq-f.github.io/" rel="noopener noreferrer"
               target="_blank">Faeq</a>
           </p>
-          <p>
-            <a class="text-accent" rel="noopener noreferrer" target="_blank"
-              href="https://unsplash.com/photos/a-black-and-white-photo-of-a-mountain-0QzFognB6bY">Background
-              image</a> by <a rel="noopener noreferrer" target="_blank"
-              class="text-accent"
-              href="https://unsplash.com/@cameron_visuals">Cameron
-              Mourot</a>
-          </p>
-          <p>
-            <a class="text-accent" rel="noopener noreferrer" target="_blank"
-              href="https://www.1001fonts.com/requiem-font.html">Headers
-              font</a> by <a rel="noopener noreferrer" target="_blank"
-              class="text-accent"
-              href="https://www.1001fonts.com/users/chrisx/">Chris Hansen</a>
-          </p>
-          <p>
-            <a class="text-accent" rel="noopener noreferrer" target="_blank"
-              href="https://www.1001fonts.com/chancery-cursive-font.html">Text
-              font</a> by <a rel="noopener noreferrer" target="_blank"
-              class="text-accent"
-              href="https://www.1001fonts.com/users/digitalgraphiclabs/">Digital
-              Graphic
-              Labs</a>
-          </p>
+          <ul class="tree ml-[-5rem]">
+            <li>
+              <details open>
+                <summary>
+                  <p></p>
+                </summary>
+                <ul>
+                  <li>
+                    <details open>
+                      <summary>Images</summary>
+                      <ul>
+                        <li>
+                          <p>
+                            <a class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              rel="noopener noreferrer" target="_blank"
+                              href="https://unsplash.com/photos/a-black-and-white-photo-of-a-mountain-0QzFognB6bY">Background
+                              image</a> by <a rel="noopener noreferrer"
+                              target="_blank"
+                              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              href="https://unsplash.com/@cameron_visuals">Cameron
+                              Mourot</a>
+                          </p>
+                        </li>
+                      </ul>
+                    </details>
+                  </li>
+                  <li>
+                    <details open>
+                      <summary>Fonts</summary>
+                      <ul>
+                        <li>
+                          <p>
+                            <a class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              rel="noopener noreferrer" target="_blank"
+                              href="https://www.1001fonts.com/requiem-font.html">Headers
+                              font</a> by <a rel="noopener noreferrer"
+                              target="_blank"
+                              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              href="https://www.1001fonts.com/users/chrisx/">Chris
+                              Hansen</a>
+                          </p>
+                        </li>
+                        <li>
+                          <p>
+                            <a class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              rel="noopener noreferrer" target="_blank"
+                              href="https://www.1001fonts.com/chancery-cursive-font.html">Text
+                              font</a> by <a rel="noopener noreferrer"
+                              target="_blank"
+                              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              href="https://www.1001fonts.com/users/digitalgraphiclabs/">Digital
+                              Graphic
+                              Labs</a>
+                          </p>
+                        </li>
+                      </ul>
+                    </details>
+                  </li>
+                  <li>
+                    <p>
+                      Icons by <a href="https://fontawesome.com/"
+                        class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                        rel="noopener noreferrer" target="_blank">Font
+                        Awesome</a>
+                    </p>
+                  </li>
+                </ul>
+              </details>
+            </li>
+          </ul>
         </div>
         <div class="modal-action">
           <form method="dialog">
             <button
-              class="btn bg-transparent hover:bg-transparent border-0">Close</button>
+              class="text-2xl dark:hover:text-shadow  dark:text-slate-400 text-zinc-700 hover:text-secondary py-2 px-6 duration-700 font-bold  border-t border-b border-gray-600 rounded-lg bg-transparent">Close</button>
           </form>
         </div>
       </div>
@@ -104,16 +163,18 @@
   <!-- end layout-->
   <div id="app">
     <div id="page" class="hero bg-base-100 min-h-full">
-      <div class="hero-content text-center absolute top-1/2 -translate-y-1/2">
-        <div class="max-w-md">
-          <h1 class="text-7xl font-bold mb-3 font-header ">
+      <div
+        class="hero-content text-left absolute top-1/2 -translate-y-1/2 w-full">
+        <div class="w-full">
+          <h1 class="text-9xl font-bold mb-3 font-header ">
             Zarlasht</h1>
-          <div class="w-full">
-            <button data-theme="forest"
-              class="btn join-item bg-transparent hover:bg-transparent border-0  text-secondary-content hover:text-secondary text-xl hover:text-shadow ">Create
-              a game</button>
-            <button data-theme="forest"
-              class="btn join-item bg-transparent hover:bg-transparent  border-0 hover:text-accent  text-secondary-content text-xl hover:text-shadow">
+          <div class="w-full join">
+            <button
+              class="text-2xl dark:hover:text-shadow join-item dark:text-slate-400 text-zinc-700 hover:text-secondary py-2 px-6 duration-700 font-bold bg-[#ffffff44] dark:bg-[#00000044]  border-r border-t border-b border-gray-600 rounded-lg bg-gradient-to-r from-transparent via-[#ffffff44] to-transparent">
+              Create a game
+            </button>
+            <button
+              class="text-2xl dark:hover:text-shadow join-item dark:text-slate-400 text-zinc-700 hover:text-secondary py-2 px-6 duration-700 font-bold  dark:bg-[#00000044]  border-l border-t border-b border-gray-600 rounded-lg bg-gradient-to-r from-transparent via-[#ffffff44] to-transparent">
               Join a game
             </button>
           </div>
