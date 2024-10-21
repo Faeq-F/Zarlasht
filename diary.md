@@ -31,8 +31,17 @@ Got more feedback from my supervisor for my project plan & made the improvements
 
 <details><summary>Week 4</summary>
 
-### 14/10/2024
+### 14/10/2024 - 16/10/2024
 Setting up the technologies for my project on my machine (WSL, Deno, Gleam, etc.). Finishing off my screen designs.
+
+### 17/10/2024 - 21/10/2024
+Making screen designs something that will be worked on during the work on the rest of the goals on the timeline (this will help with understanding how to build what I want with my technologies).
+
+Having a look at concurrency testing programs and a means to do TDD & documentation with my chosen technologies (I know you can do so (and well), but I just need to learn how).
+
+</details>
+
+<details><summary>Week 5</summary>
 
 </details>
 
