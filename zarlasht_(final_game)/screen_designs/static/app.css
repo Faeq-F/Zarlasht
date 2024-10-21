@@ -196,3 +196,9 @@ body.dark .dark\:hover\:text-shadow:hover {
 .tree details[open]>summary::before {
   background-position: calc(-2 * var(--radius)) 0;
 }
+
+.chat-end .chat-bubble::before,
+.chat-start .chat-bubble::before {
+  border-color: var(--chat-border-color);
+  border-width: 5px;
+}
