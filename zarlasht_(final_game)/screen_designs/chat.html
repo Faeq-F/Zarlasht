@@ -12,8 +12,6 @@
   <link rel="stylesheet" href="./static/app.css">
   <script src="./static/libraries/tailwind.min.js"></script>
   <link rel="stylesheet" href="./static/libraries/daisyui.min.css">
-  <script
-    src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
   <style type="text/tailwindcss">
     .btn {
             @apply rounded-full;
@@ -21,9 +19,21 @@
   </style>
   <script>
     tailwind.config = {
+      darkMode: 'selector',
       daisyui: {
         darkTheme: 'forest',
       }
+    }
+    window.onload = () => {
+      const body = document.getElementsByTagName("body")[0];
+      const themeController = document.getElementsByClassName("theme-controller")[0];
+      themeController.addEventListener("click", () => {
+        if (body.classList.contains("dark")) {
+          body.classList.remove("dark")
+        } else {
+          body.classList.add("dark")
+        }
+      })
     }
   </script>
 </head>
@@ -62,42 +72,89 @@
       class="btn bg-transparent hover:bg-transparent border-0 text-3xl font-header">i</button>
     <dialog id="SiteInfo" class="modal">
       <div class="modal-box">
-        <h3 class="text-2xl font-bold">Acknowledgments</h3>
-        <div class="text-xl">
-          <p class="py-4">
-            Game created by <a class="text-accent"
+        <h3 class="text-4xl font-bold font-header">Acknowledgments</h3>
+        <div class="text-2xl py-4">
+          <p class="">
+            Game created by <a
+              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
               href="https://faeq-f.github.io/" rel="noopener noreferrer"
               target="_blank">Faeq</a>
           </p>
-          <p>
-            <a class="text-accent" rel="noopener noreferrer" target="_blank"
-              href="https://unsplash.com/photos/a-black-and-white-photo-of-a-mountain-0QzFognB6bY">Background
-              image</a> by <a rel="noopener noreferrer" target="_blank"
-              class="text-accent"
-              href="https://unsplash.com/@cameron_visuals">Cameron
-              Mourot</a>
-          </p>
-          <p>
-            <a class="text-accent" rel="noopener noreferrer" target="_blank"
-              href="https://www.1001fonts.com/requiem-font.html">Headers
-              font</a> by <a rel="noopener noreferrer" target="_blank"
-              class="text-accent"
-              href="https://www.1001fonts.com/users/chrisx/">Chris Hansen</a>
-          </p>
-          <p>
-            <a class="text-accent" rel="noopener noreferrer" target="_blank"
-              href="https://www.1001fonts.com/chancery-cursive-font.html">Text
-              font</a> by <a rel="noopener noreferrer" target="_blank"
-              class="text-accent"
-              href="https://www.1001fonts.com/users/digitalgraphiclabs/">Digital
-              Graphic
-              Labs</a>
-          </p>
+          <ul class="tree ml-[-5rem]">
+            <li>
+              <details open>
+                <summary>
+                  <p></p>
+                </summary>
+                <ul>
+                  <li>
+                    <details open>
+                      <summary>Images</summary>
+                      <ul>
+                        <li>
+                          <p>
+                            <a class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              rel="noopener noreferrer" target="_blank"
+                              href="https://unsplash.com/photos/a-black-and-white-photo-of-a-mountain-0QzFognB6bY">Background
+                              image</a> by <a rel="noopener noreferrer"
+                              target="_blank"
+                              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              href="https://unsplash.com/@cameron_visuals">Cameron
+                              Mourot</a>
+                          </p>
+                        </li>
+                      </ul>
+                    </details>
+                  </li>
+                  <li>
+                    <details open>
+                      <summary>Fonts</summary>
+                      <ul>
+                        <li>
+                          <p>
+                            <a class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              rel="noopener noreferrer" target="_blank"
+                              href="https://www.1001fonts.com/requiem-font.html">Headers
+                              font</a> by <a rel="noopener noreferrer"
+                              target="_blank"
+                              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              href="https://www.1001fonts.com/users/chrisx/">Chris
+                              Hansen</a>
+                          </p>
+                        </li>
+                        <li>
+                          <p>
+                            <a class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              rel="noopener noreferrer" target="_blank"
+                              href="https://www.1001fonts.com/chancery-cursive-font.html">Text
+                              font</a> by <a rel="noopener noreferrer"
+                              target="_blank"
+                              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              href="https://www.1001fonts.com/users/digitalgraphiclabs/">Digital
+                              Graphic
+                              Labs</a>
+                          </p>
+                        </li>
+                      </ul>
+                    </details>
+                  </li>
+                  <li>
+                    <p>
+                      Icons by <a href="https://fontawesome.com/"
+                        class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                        rel="noopener noreferrer" target="_blank">Font
+                        Awesome</a>
+                    </p>
+                  </li>
+                </ul>
+              </details>
+            </li>
+          </ul>
         </div>
         <div class="modal-action">
           <form method="dialog">
             <button
-              class="btn bg-transparent hover:bg-transparent border-0">Close</button>
+              class="text-2xl dark:hover:text-shadow  dark:text-slate-400 text-zinc-700 hover:text-secondary py-2 px-6 duration-700 font-bold  border-t border-b border-gray-600 rounded-lg bg-transparent">Close</button>
           </form>
         </div>
       </div>
@@ -108,162 +165,306 @@
     <div id="page" class="hero bg-transparent min-h-full">
       <h1 class="text-5xl mt-4 font-header">ZARLASHT</h1>
       <div class="hero-content text-center absolute top-1/2 -translate-y-1/2 ">
-        <div>
+        <div
+          class="isolate p-12 rounded-xl dark:bg-black/40 bg-white/40 shadow-lg ring-1 ring-black/5">
           <div class="container">
-            <div class="Name text-3xl">John Doe</div>
+            <div class="Name text-3xl font-header">Allies</div>
             <div class="Chat-Button"><button
-                class="btn nav-btn text-shadow drop-shadow-xl text-accent hover:text-secondary hover:fill-[oklch(var(--s))] fill-[oklch(var(--a))]">
-
-                <svg xmlns="http://www.w3.org/2000/svg"
-                  class="fill-current h-12 w-full mt-6"
-                  viewBox="0 0 640 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-                  <path
-                    d="M208 352c114.9 0 208-78.8 208-176S322.9 0 208 0S0 78.8 0 176c0 38.6 14.7 74.3 39.6 103.4c-3.5 9.4-8.7 17.7-14.2 24.7c-4.8 6.2-9.7 11-13.3 14.3c-1.8 1.6-3.3 2.9-4.3 3.7c-.5 .4-.9 .7-1.1 .8l-.2 .2s0 0 0 0s0 0 0 0C1 327.2-1.4 334.4 .8 340.9S9.1 352 16 352c21.8 0 43.8-5.6 62.1-12.5c9.2-3.5 17.8-7.4 25.2-11.4C134.1 343.3 169.8 352 208 352zM448 176c0 112.3-99.1 196.9-216.5 207C255.8 457.4 336.4 512 432 512c38.2 0 73.9-8.7 104.7-23.9c7.5 4 16 7.9 25.2 11.4c18.3 6.9 40.3 12.5 62.1 12.5c6.9 0 13.1-4.5 15.2-11.1c2.1-6.6-.2-13.8-5.8-17.9c0 0 0 0 0 0s0 0 0 0l-.2-.2c-.2-.2-.6-.4-1.1-.8c-1-.8-2.5-2-4.3-3.7c-3.6-3.3-8.5-8.1-13.3-14.3c-5.5-7-10.7-15.4-14.2-24.7c24.9-29 39.6-64.7 39.6-103.4c0-92.8-84.9-168.9-192.6-175.5c.4 5.1 .6 10.3 .6 15.5z" />
+                class="w-full  text-shadow drop-shadow-xl text-accent hover:text-secondary hover:fill-[oklch(var(--s))] fill-[oklch(var(--a))] border-t border-b border-gray-600 rounded-lg duration-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class="size-6  h-12 w-full mt-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
                 </svg>
-                <br><br>
-                <p>Chat</p>
+                <br>
+                <p class="text-2xl">Chat</p>
               </button>
             </div>
-            <div class="Me"><button
-                class="btn nav-btn text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                  class=" h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl"
-                  viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-                  <path
-                    d="M320 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM125.7 175.5c9.9-9.9 23.4-15.5 37.5-15.5c1.9 0 3.8 .1 5.6 .3L137.6 254c-9.3 28 1.7 58.8 26.8 74.5l86.2 53.9-25.4 88.8c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l28.7-100.4c5.9-20.6-2.6-42.6-20.7-53.9L238 299l30.9-82.4 5.1 12.3C289 264.7 323.9 288 362.7 288l21.3 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-21.3 0c-12.9 0-24.6-7.8-29.5-19.7l-6.3-15c-14.6-35.1-44.1-61.9-80.5-73.1l-48.7-15c-11.1-3.4-22.7-5.2-34.4-5.2c-31 0-60.8 12.3-82.7 34.3L57.4 153.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l23.1-23.1zM91.2 352L32 352c-17.7 0-32 14.3-32 32s14.3 32 32 32l69.6 0c19 0 36.2-11.2 43.9-28.5L157 361.6l-9.5-6c-17.5-10.9-30.5-26.8-37.9-44.9L91.2 352z" />
+            <div class="Me pt-4"><button
+                class=" text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current border-t border-b border-gray-600 rounded-lg w-full ">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class="size-6 h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                 </svg>
-                <br><br>
-                <p>Me</p>
+                <br>
+                <p class="text-2xl">Me</p>
               </button></div>
-            <div class="Close"><button
-                class="btn nav-btn text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-error hover:fill-[oklch(var(--er))]">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                  class=" h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl"
-                  viewBox="0 0 384 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-                  <path
-                    d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+            <div class="Close pt-4"><button
+                class=" text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-error hover:fill-[oklch(var(--er))] border-t border-b border-gray-600 rounded-lg w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class=" h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6 18 18 6M6 6l12 12" />
                 </svg>
-                <br><br>
-                <p>Close</p>
+                <br>
+                <p class="text-2xl">Close</p>
               </button></div>
-            <div class="Map"><button
-                class="btn nav-btn text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                  class=" h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl"
-                  viewBox="0 0 512 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-                  <path
-                    d="M224 32L64 32C46.3 32 32 46.3 32 64l0 64c0 17.7 14.3 32 32 32l377.4 0c4.2 0 8.3-1.7 11.3-4.7l48-48c6.2-6.2 6.2-16.4 0-22.6l-48-48c-3-3-7.1-4.7-11.3-4.7L288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32zM480 256c0-17.7-14.3-32-32-32l-160 0 0-32-64 0 0 32L70.6 224c-4.2 0-8.3 1.7-11.3 4.7l-48 48c-6.2 6.2-6.2 16.4 0 22.6l48 48c3 3 7.1 4.7 11.3 4.7L448 352c17.7 0 32-14.3 32-32l0-64zM288 480l0-96-64 0 0 96c0 17.7 14.3 32 32 32s32-14.3 32-32z" />
+            <div class="Map pt-4"><button
+                class=" text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current border-t border-b border-gray-600 rounded-lg w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class="size-6 h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
                 </svg>
-                <br><br>
-                <p>Map</p>
+                <br>
+                <p class="text-2xl">Map</p>
               </button></div>
-            <div class="Roll-die"><button
-                class="btn nav-btn text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                  class=" h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl"
-                  viewBox="0 0 512 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-                  <path
-                    d="M48.7 125.8l53.2 31.9c7.8 4.7 17.8 2 22.2-5.9L201.6 12.1c3-5.4-.9-12.1-7.1-12.1c-1.6 0-3.2 .5-4.6 1.4L47.9 98.8c-9.6 6.6-9.2 20.9 .8 26.9zM16 171.7l0 123.5c0 8 10.4 11 14.7 4.4l60-92c5-7.6 2.6-17.8-5.2-22.5L40.2 158C29.6 151.6 16 159.3 16 171.7zM310.4 12.1l77.6 139.6c4.4 7.9 14.5 10.6 22.2 5.9l53.2-31.9c10-6 10.4-20.3 .8-26.9L322.1 1.4c-1.4-.9-3-1.4-4.6-1.4c-6.2 0-10.1 6.7-7.1 12.1zM496 171.7c0-12.4-13.6-20.1-24.2-13.7l-45.3 27.2c-7.8 4.7-10.1 14.9-5.2 22.5l60 92c4.3 6.7 14.7 3.6 14.7-4.4l0-123.5zm-49.3 246L286.1 436.6c-8.1 .9-14.1 7.8-14.1 15.9l0 52.8c0 3.7 3 6.8 6.8 6.8c.8 0 1.6-.1 2.4-.4l172.7-64c6.1-2.2 10.1-8 10.1-14.5c0-9.3-8.1-16.5-17.3-15.4zM233.2 512c3.7 0 6.8-3 6.8-6.8l0-52.6c0-8.1-6.1-14.9-14.1-15.9l-160.6-19c-9.2-1.1-17.3 6.1-17.3 15.4c0 6.5 4 12.3 10.1 14.5l172.7 64c.8 .3 1.6 .4 2.4 .4zM41.7 382.9l170.9 20.2c7.8 .9 13.4-7.5 9.5-14.3l-85.7-150c-5.9-10.4-20.7-10.8-27.3-.8L30.2 358.2c-6.5 9.9-.3 23.3 11.5 24.7zm439.6-24.8L402.9 238.1c-6.5-10-21.4-9.6-27.3 .8L290.2 388.5c-3.9 6.8 1.6 15.2 9.5 14.3l170.1-20c11.8-1.4 18-14.7 11.5-24.6zm-216.9 11l78.4-137.2c6.1-10.7-1.6-23.9-13.9-23.9l-145.7 0c-12.3 0-20 13.3-13.9 23.9l78.4 137.2c3.7 6.4 13 6.4 16.7 0zM174.4 176l163.2 0c12.2 0 19.9-13.1 14-23.8l-80-144c-2.8-5.1-8.2-8.2-14-8.2l-3.2 0c-5.8 0-11.2 3.2-14 8.2l-80 144c-5.9 10.7 1.8 23.8 14 23.8z" />
+            <div class="Roll-die pt-4"><button
+                class=" text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current border-t border-b border-gray-600 rounded-lg w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class="size-6 h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672Zm-7.518-.267A8.25 8.25 0 1 1 20.25 10.5M8.288 14.212A5.25 5.25 0 1 1 17.25 10.5" />
                 </svg>
-                <br><br>
-                <p>Roll die</p>
+                <br>
+                <p class="text-2xl">Roll die</p>
               </button>
             </div>
             <div class="Chat overflowy-scroll">
               <div
-                class="mx-12 px-2 overflow-y-scroll max-h-full mt-10 border rounded-box border-gray-600">
-                <div class="chat chat-start">
-                  <div class="chat-bubble chat-bubble-primary text-lg">What kind
-                    of
-                    nonsense is this
+                class="mx-12 px-2 overflow-y-scroll max-h-full h-full mt-10 border rounded-box border-gray-600">
+                <!--Messages start here-->
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--p));">
+                  <div
+                    class="chat-header  text-primary text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-primary bg-base-100 text-base-content text-lg">
+                    What kind
+                    of nonsense is this
                   </div>
                 </div>
-                <div class="chat chat-start">
-                  <div class="chat-bubble chat-bubble-secondary text-lg">
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--s));">
+                  <div
+                    class="chat-header  text-secondary text-shadow font-header">
+                    Picard
+                  </div>
+                  <div
+                    class="chat-bubble border border-secondary bg-base-100 text-base-content text-lg">
                     Put me on the Council and not make me a Master!??
                   </div>
                 </div>
-                <div class="chat chat-start">
-                  <div class="chat-bubble chat-bubble-accent text-lg">
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--a));">
+                  <div class="chat-header  text-accent text-shadow font-header">
+                    Catherine Halsey
+                  </div>
+                  <div
+                    class="chat-bubble border border-accent bg-base-100 text-base-content text-lg">
                     That's never been done in the history of the Jedi. It's
                     insulting!
                   </div>
                 </div>
-                <div class="chat chat-end">
-                  <div class="chat-bubble chat-bubble-info text-lg">Calm down,
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--in));">
+                  <div class="chat-header  text-info text-shadow font-header">
+                    Someone's name
+                  </div>
+                  <div
+                    class="chat-bubble border border-info bg-base-100 text-base-content text-lg">
+                    Calm down,
                     Anakin.
                   </div>
                 </div>
-                <div class="chat chat-end">
-                  <div class="chat-bubble chat-bubble-success text-lg">You have
-                    been
-                    given
-                    a great
-                    honor.</div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--su));">
+                  <div
+                    class="chat-header  text-success text-shadow font-header">
+                    John Doe
+                  </div>
+                  <div
+                    class="chat-bubble border border-success bg-base-100 text-base-content text-lg">
+                    You have
+                    been given a great honor.</div>
                 </div>
-                <div class="chat chat-end">
-                  <div class="chat-bubble chat-bubble-warning text-lg">To be on
-                    the
-                    Council at your age.
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--wa));">
+                  <div
+                    class="chat-header  text-warning text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-warning bg-base-100 text-base-content text-lg">
+                    To be on
+                    the Council at your age.
                   </div>
                 </div>
-                <div class="chat chat-end">
-                  <div class="chat-bubble chat-bubble-error text-lg">It's never
-                    happened
-                    before.</div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--er));">
+                  <div class="chat-header text-error text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-error bg-base-100 text-base-content text-lg">
+                    It's never
+                    happened before.</div>
                 </div>
-                <div class="chat chat-start">
-                  <div class="chat-bubble chat-bubble-primary text-lg">What kind
-                    of
-                    nonsense is this
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--p));">
+                  <div
+                    class="chat-header  text-primary text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-primary bg-base-100 text-base-content text-lg">
+                    What kind
+                    of nonsense is this
                   </div>
                 </div>
-                <div class="chat chat-start">
-                  <div class="chat-bubble chat-bubble-primary text-lg">What kind
-                    of
-                    nonsense is this
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--s));">
+                  <div
+                    class="chat-header  text-secondary text-shadow font-header">
+                    Picard
                   </div>
-                </div>
-                <div class="chat chat-start">
-                  <div class="chat-bubble chat-bubble-secondary text-lg">
+                  <div
+                    class="chat-bubble border border-secondary bg-base-100 text-base-content text-lg">
                     Put me on the Council and not make me a Master!??
                   </div>
                 </div>
-                <div class="chat chat-start">
-                  <div class="chat-bubble chat-bubble-accent text-lg">
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--a));">
+                  <div class="chat-header  text-accent text-shadow font-header">
+                    Catherine Halsey
+                  </div>
+                  <div
+                    class="chat-bubble border border-accent bg-base-100 text-base-content text-lg">
                     That's never been done in the history of the Jedi. It's
                     insulting!
                   </div>
                 </div>
-                <div class="chat chat-end">
-                  <div class="chat-bubble chat-bubble-info text-lg">Calm down,
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--in));">
+                  <div class="chat-header  text-info text-shadow font-header">
+                    Someone's name
+                  </div>
+                  <div
+                    class="chat-bubble border border-info bg-base-100 text-base-content text-lg">
+                    Calm down,
                     Anakin.
                   </div>
                 </div>
-                <div class="chat chat-end">
-                  <div class="chat-bubble chat-bubble-success text-lg">You have
-                    been
-                    given
-                    a great
-                    honor.</div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--su));">
+                  <div
+                    class="chat-header  text-success text-shadow font-header">
+                    John Doe
+                  </div>
+                  <div
+                    class="chat-bubble border border-success bg-base-100 text-base-content text-lg">
+                    You have
+                    been given a great honor.</div>
                 </div>
-                <div class="chat chat-end">
-                  <div class="chat-bubble chat-bubble-warning text-lg">To be on
-                    the
-                    Council at your age.
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--wa));">
+                  <div
+                    class="chat-header  text-warning text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-warning bg-base-100 text-base-content text-lg">
+                    To be on
+                    the Council at your age.
                   </div>
                 </div>
-                <div class="chat chat-end">
-                  <div class="chat-bubble chat-bubble-error text-lg">It's never
-                    happened
-                    before.</div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--er));">
+                  <div class="chat-header text-error text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-error bg-base-100 text-base-content text-lg">
+                    It's never
+                    happened before.</div>
                 </div>
-                <div class="chat chat-start">
-                  <div class="chat-bubble chat-bubble-primary text-lg">What kind
-                    of
-                    nonsense is this
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--p));">
+                  <div
+                    class="chat-header  text-primary text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-primary bg-base-100 text-base-content text-lg">
+                    What kind
+                    of nonsense is this
                   </div>
                 </div>
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--s));">
+                  <div
+                    class="chat-header  text-secondary text-shadow font-header">
+                    Picard
+                  </div>
+                  <div
+                    class="chat-bubble border border-secondary bg-base-100 text-base-content text-lg">
+                    Put me on the Council and not make me a Master!??
+                  </div>
+                </div>
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--a));">
+                  <div class="chat-header  text-accent text-shadow font-header">
+                    Catherine Halsey
+                  </div>
+                  <div
+                    class="chat-bubble border border-accent bg-base-100 text-base-content text-lg">
+                    That's never been done in the history of the Jedi. It's
+                    insulting!
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--in));">
+                  <div class="chat-header  text-info text-shadow font-header">
+                    Someone's name
+                  </div>
+                  <div
+                    class="chat-bubble border border-info bg-base-100 text-base-content text-lg">
+                    Calm down,
+                    Anakin.
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--su));">
+                  <div
+                    class="chat-header  text-success text-shadow font-header">
+                    John Doe
+                  </div>
+                  <div
+                    class="chat-bubble border border-success bg-base-100 text-base-content text-lg">
+                    You have
+                    been given a great honor.</div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--wa));">
+                  <div
+                    class="chat-header  text-warning text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-warning bg-base-100 text-base-content text-lg">
+                    To be on
+                    the Council at your age.
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--er));">
+                  <div class="chat-header text-error text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-error bg-base-100 text-base-content text-lg">
+                    It's never
+                    happened before.</div>
+                </div>
+                <!--Messages end here-->
               </div>
             </div>
             <div class="message join mt-12 mx-12 ">
@@ -275,21 +476,21 @@
                   class=" font-header text-4xl sendIcon  ">L</span></button>
             </div>
             <div class="Allies"><button
-                class="btn nav-btn text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                  class=" h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl"
-                  viewBox="0 0 640 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-                  <path
-                    d="M72 88a56 56 0 1 1 112 0A56 56 0 1 1 72 88zM64 245.7C54 256.9 48 271.8 48 288s6 31.1 16 42.3l0-84.7zm144.4-49.3C178.7 222.7 160 261.2 160 304c0 34.3 12 65.8 32 90.5l0 21.5c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32l0-26.8C26.2 371.2 0 332.7 0 288c0-61.9 50.1-112 112-112l32 0c24 0 46.2 7.5 64.4 20.3zM448 416l0-21.5c20-24.7 32-56.2 32-90.5c0-42.8-18.7-81.3-48.4-107.7C449.8 183.5 472 176 496 176l32 0c61.9 0 112 50.1 112 112c0 44.7-26.2 83.2-64 101.2l0 26.8c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32zm8-328a56 56 0 1 1 112 0A56 56 0 1 1 456 88zM576 245.7l0 84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM320 32a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM240 304c0 16.2 6 31 16 42.3l0-84.7c-10 11.3-16 26.1-16 42.3zm144-42.3l0 84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM448 304c0 44.7-26.2 83.2-64 101.2l0 42.8c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32l0-42.8c-37.8-18-64-56.5-64-101.2c0-61.9 50.1-112 112-112l32 0c61.9 0 112 50.1 112 112z" />
+                class=" text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current border-t border-b border-gray-600 rounded-lg w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class=" h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
                 </svg>
                 <br><br>
-                <p>Allies</p>
+                <p class="text-2xl">Allies</p>
               </button>
             </div>
             <div class="people">
               <details class="dropdown">
                 <summary
-                  class="btn mb-1 bg-transparent hover:bg-transparent text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary  w-full text-2xl">
+                  class="mt-4 px-6 border-0 !border-l !border-r border-gray-600 rounded-lg w-full btn mb-1 bg-transparent hover:bg-transparent text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary  w-full text-2xl">
                   Direct
                   Message
                 </summary>
