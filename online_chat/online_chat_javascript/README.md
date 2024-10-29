@@ -8,7 +8,17 @@ Within the `static` folder, you will need a `libraries` folder with the followin
 
 ## Development
 
+Please run in a linux environment (WSL works), as there are known [issues on Windows](https://github.com/MystPi/glen/issues/5)
+
 ```sh
-gleam run                                                   # Run the project
-gleam test --target javascript --runtime deno -- --glacier  # Run the tests
+# Run the project
+gleam run
+# Run all tests
+gleam test --target javascript --runtime deno -- test/* ; gleam run & cd automated_browser_tests/ && gleam test ; cd .. ; pkill deno
+# Run just the unit tests
+gleam test --target javascript --runtime deno -- test/*
+# Run just the unit tests with watching
+gleam test --target javascript --runtime deno -- --glacier
+# Run just the browser automated tests
+gleam run & cd automated_browser_tests/ && gleam test ; cd .. ; pkill deno
 ```

@@ -1,9 +1,19 @@
 name = "online_chat_javascript"
 version = "1.0.0"
+description = "PoC program for concurrency in gleam utilizing the javascript target"
+licences = ["GPL-3.0-only"]
+# repository = { type = "github", user = "", repo = "" }
 
 target = "javascript"
 [javascript]
 runtime = "deno"
+
+[javascript.deno]
+allow_read = ["./"]
+allow_net = true
+allow_run = ["gleam", "javascript"]
+allow_sys = true
+allow_ffi = true
 
 [dependencies]
 gleam_stdlib = ">= 0.34.0 and < 2.0.0"
@@ -16,8 +26,4 @@ gleam_fetch = ">= 1.0.1 and < 2.0.0"
 
 [dev-dependencies]
 glacier = ">= 1.1.0 and < 2.0.0"
-
-[javascript.deno]
-allow_read = ["./"]
-allow_net = ["deno.land"]
-allow_run = ["gleam"]
+chrobot = ">= 3.0.2 and < 4.0.0"
