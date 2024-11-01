@@ -4,11 +4,9 @@ import chrobot/protocol/network
 import chrobot/protocol/runtime
 import glacier
 import glacier/should
-import gleam/dict
 import gleam/dynamic
 import gleam/io
 import gleam/option.{Some}
-import gleam/result
 
 pub fn main() {
   let assert Ok(_) = automated_browser_tests.main()
@@ -115,5 +113,33 @@ pub fn sent_websocket_messages_test() {
   value
   |> should.equal(
     "{\"HEADERS\":{\"HX-Request\":\"true\",\"HX-Trigger\":\"join\",\"HX-Trigger-Name\":null,\"HX-Target\":\"join\",\"HX-Current-URL\":\"http://localhost:8000/\"}}",
+  )
+
+  //click on the create button and check the message it sends
+  let assert Ok(create_input) = chrobot.await_selector(page, "#create")
+  let assert Ok(_) = chrobot.click(page, create_input)
+
+  let assert Ok(message) =
+    runtime.evaluate(
+      callback,
+      "window.gleamWebSocketMessage",
+      option.None,
+      option.None,
+      option.None,
+      option.None,
+      //option.None,
+      Some(True),
+      option.None,
+      option.None,
+    )
+
+  let assert Ok(message_value) =
+    option.to_result(message.result.value, "Could not obtain message value")
+  let assert Ok(value) =
+    message_value
+    |> dynamic.string
+  value
+  |> should.equal(
+    "{\"HEADERS\":{\"HX-Request\":\"true\",\"HX-Trigger\":\"create\",\"HX-Trigger-Name\":null,\"HX-Target\":\"create\",\"HX-Current-URL\":\"http://localhost:8000/\"}}",
   )
 }
