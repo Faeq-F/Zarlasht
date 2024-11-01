@@ -9,7 +9,8 @@ target = "javascript"
 runtime = "deno"
 
 [javascript.deno]
-allow_read = ["./"]
+# add env for db & fix modules
+allow_read = ["./", "/home/faeq/.cache/deno/node_modules"]
 allow_net = true
 allow_run = ["gleam", "javascript"]
 allow_sys = true
