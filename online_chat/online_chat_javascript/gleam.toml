@@ -9,12 +9,10 @@ target = "javascript"
 runtime = "deno"
 
 [javascript.deno]
-# add env for db & fix modules
-allow_read = ["./", "/home/faeq/.cache/deno/node_modules"]
+allow_read = true
 allow_net = true
 allow_run = ["gleam", "javascript"]
-allow_sys = true
-allow_ffi = true
+allow_env = true
 
 [dependencies]
 gleam_stdlib = ">= 0.34.0 and < 2.0.0"

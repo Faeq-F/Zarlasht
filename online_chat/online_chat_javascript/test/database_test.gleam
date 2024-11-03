@@ -10,7 +10,6 @@ pub fn hello_world_test() {
   promise.await(db_get("key"), fn(result: String) {
     result
     |> should.equal(int.to_string(value))
-
-    promise.resolve(result)
+    |> promise.resolve
   })
 }
