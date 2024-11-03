@@ -3,7 +3,6 @@ import "jsr:@std/dotenv/load";
 
 const valkey = new Valkey(Deno.env.get("SERVICE_URI"));
 
-//need to test this & await all
 function ffi_get_json_value(json_string, key) {
   const val = JSON.parse(json_string)[key] + "";
   if (val === "[object Object]") {
@@ -18,13 +17,7 @@ async function ffi_db_set(key, value) {
 }
 
 async function ffi_db_get(key) {
-  let value;
-  await valkey.get(key).then(function (result) {
-    value = result
-  });
-  return value;
+  return await valkey.get(key);
 }
 
-export {
-  ffi_get_json_value, ffi_db_set, ffi_db_get
-};
+export { ffi_db_get, ffi_db_set, ffi_get_json_value };
