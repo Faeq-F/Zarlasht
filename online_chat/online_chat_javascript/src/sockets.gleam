@@ -7,7 +7,7 @@ import glen/ws
 import lib/create_chat.{on_create_chat}
 import lib/join_chat.{on_to_join_chat}
 import socket_state.{type Event, type State, State}
-import utils.{get_json_value}
+import utils.{get_json_value, valkey_publish, valkey_subscribe}
 
 /// Establishes a WebSocket connection for the client on the `/init_socket` endpoint
 ///
@@ -25,8 +25,9 @@ pub fn init_socket(req: Request) -> Promise(Response) {
 ///
 /// Logs `"A Socket Connected"` & sets the Socket's state to `-1` for the `chat_code` and `""` for the `username`
 ///
-fn open_socket(_conn: ws.WebsocketConn(Event)) -> State {
+fn open_socket(conn: ws.WebsocketConn(Event)) -> State {
   io.debug("A Socket Connected")
+  valkey_subscribe("Test", conn)
   State(-1, "")
 }
 
@@ -57,6 +58,7 @@ fn event_socket(
     }
 
     ws.Text(text_message) -> {
+      valkey_publish("Test", "Detected another connection to the app")
       case
         get_json_value(get_json_value(text_message, "HEADERS"), "HX-Trigger")
       {
