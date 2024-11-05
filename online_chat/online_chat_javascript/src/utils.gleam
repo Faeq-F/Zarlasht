@@ -2,6 +2,8 @@
 
 import gleam/dynamic.{type Dynamic}
 import gleam/javascript/promise.{type Promise}
+import glen/ws
+import socket_state.{type Event}
 
 /// Helper function that returns the value for a key in some stringified JSON
 ///
@@ -19,3 +21,19 @@ pub fn db_set(key: String, value: Dynamic) -> Nil
 ///
 @external(javascript, "./utils.ffi.mjs", "ffi_db_get")
 pub fn db_get(key: String) -> Promise(String)
+
+/// Publish a message to a channel in Valkey
+///
+/// The channel should be the chat_code
+///
+@external(javascript, "./utils.ffi.mjs", "ffi_valkey_publish")
+pub fn valkey_publish(channel: String, meessage: String) -> Nil
+
+/// Subscribe to a channel in Valkey
+///
+/// The channel should be the chat_code
+///
+/// If the channel was already subscribed to, the subscription is skipped. The socket is added to the server's buffer regardless of this.
+///
+@external(javascript, "./utils.ffi.mjs", "ffi_valkey_subscribe")
+pub fn valkey_subscribe(channel: String, socket: ws.WebsocketConn(Event)) -> Nil
