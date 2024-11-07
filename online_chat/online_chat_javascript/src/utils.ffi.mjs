@@ -14,10 +14,12 @@ const valkeySub = new Valkey(Deno.env.get("SERVICE_URI")); // connection for sub
 const valkeyPub = new Valkey(Deno.env.get("SERVICE_URI")); // connection for publishing to channels
 
 valkeySub.on("message", (channel, message) => {
-  console.log(`Received ${message} from ${channel}`);
+  console.log(`Received \"${message}\" from \"${channel}\"`);
   const chat_sockets = sockets.get(channel);
-  for (socket in chat_sockets) {
-    console.log(`Socket used message`);
+  if (chat_sockets != undefined) {
+    for (socket in chat_sockets) {
+      console.log(`Socket used message`);
+    }
   }
 });
 
@@ -42,7 +44,7 @@ async function ffi_valkey_subscribe(channel, socket) {
         console.error("Failed to subscribe: %s", err.message);
       } else {
         console.log(
-          `Subscribed successfully! This client is currently subscribed to ${count} channels (chats).`,
+          `Subscribed successfully! This client is currently subscribed to ${count} channels (chats);`,
         );
       }
     });
@@ -51,9 +53,16 @@ async function ffi_valkey_subscribe(channel, socket) {
   const old_sockets = sockets.get(channel);
   if (old_sockets === undefined) {
     sockets.set(channel, [socket]);
+    console.log(
+      `Currently subscribed to ${[...sockets.keys()]}.`,
+    );
   } else {
     sockets.set(channel, [...old_sockets, socket]);
   }
+}
+
+function ffi_chat_exists(chat_code) {
+  return sockets.has(chat_code);
 }
 
 // Other Utils ═════════════════════════════════════════════════════════════════
@@ -70,6 +79,7 @@ function ffi_get_json_value(json_string, key) {
 // ═════════════════════════════════════════════════════════════════════════════
 
 export {
+  ffi_chat_exists,
   ffi_db_get,
   ffi_db_set,
   ffi_get_json_value,
