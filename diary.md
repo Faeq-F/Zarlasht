@@ -43,6 +43,32 @@ Having a look at concurrency testing programs and a means to do TDD & documentat
 
 <details><summary>Week 5</summary>
 
+### 21/10/2024 - 23/10/2024
+Setup the gleam project for online chat (targeting javascript) and created the home page with websocket messaging
+
+### 23/10/2024 - 25/10/2024
+Setup Incremental Interactive Unit Testing in the gleam project and tested use of the server request handler
+
+</details>
+
+<details><summary>Week 6</summary>
+
+### 28/10/2024 - 30/10/2024
+Research into testing web frontends and middleware. Setup automated-browser testing through Chrobot
+
+### 30/10/2024 - 01/11/2024
+Looked into the Chrobot documentation and learnt how to write the automated-browser tests (was a little confused on using the Chrome DevTools protocols)
+
+</details>
+
+<details><summary>Week 7</summary>
+
+### 04/11/2024 - 06/11/2024
+Researched into and implemented FFI functions for the Pub / Sub design pattern
+
+### 07/11/2024 - 08/11/2024
+Testing the Pub / Sub functions and interactions with websockets. Ensuring all relevant end-to-end communications can be made
+
 </details>
 
 </details>
