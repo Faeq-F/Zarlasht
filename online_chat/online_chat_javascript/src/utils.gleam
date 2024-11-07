@@ -37,3 +37,8 @@ pub fn valkey_publish(channel: String, meessage: String) -> Nil
 ///
 @external(javascript, "./utils.ffi.mjs", "ffi_valkey_subscribe")
 pub fn valkey_subscribe(channel: String, socket: ws.WebsocketConn(Event)) -> Nil
+
+/// Checks if the chat already exists
+///
+@external(javascript, "./utils.ffi.mjs", "ffi_chat_exists")
+pub fn chat_exists(chat_code: Int) -> Bool
