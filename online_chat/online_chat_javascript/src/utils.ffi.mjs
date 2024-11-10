@@ -13,13 +13,16 @@ const valkey = new Valkey(Deno.env.get("SERVICE_URI")); // connection for standa
 const valkeySub = new Valkey(Deno.env.get("SERVICE_URI")); // connection for subscribing to channels
 const valkeyPub = new Valkey(Deno.env.get("SERVICE_URI")); // connection for publishing to channels
 
+valkey.flushdb(); // wipe the db on server start - ensures server state is same as db state
+
 valkeySub.on("message", (channel, message) => {
   console.log(`Received \"${message}\" from \"${channel}\"`);
   const chat_sockets = sockets.get(channel);
   if (chat_sockets != undefined) {
-    for (socket in chat_sockets) {
-      console.log(`Socket used message`);
-    }
+    // relay to update clients' chat
+    chat_sockets.forEach((conn) => {
+      //conn.socket.send("UPDATE"); sends to client - need local to be aware
+    });
   }
 });
 

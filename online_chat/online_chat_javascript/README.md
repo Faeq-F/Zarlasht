@@ -1,14 +1,29 @@
 ## Setup
 
-Within the `static` folder, you will need a `libraries` folder with the following:
+Within the `static` folder, you will need a `libraries` folder with the
+following:
+
 - `daisyui.min.css`
 - `tailwind.min.js`
 - `htmx.min.js`
 - a folder named `htmx-ext` that contains `ws.js`
 
+You will need a Valkey database.
+
+brew install valkey
+
+brew services start valkey
+
+brew services info valkey
+
+brew services stop valkey
+
+SERVICE_URI='127.0.0.1:6379' in .env
+
 ## Development
 
-Please run in a linux environment (WSL works), as there are known [issues on Windows](https://github.com/MystPi/glen/issues/5)
+Please run in a linux environment (WSL works), as there are known
+[issues on Windows](https://github.com/MystPi/glen/issues/5)
 
 ```sh
 # Run the project

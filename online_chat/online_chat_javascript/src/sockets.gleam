@@ -57,6 +57,11 @@ fn event_socket(
       state
     }
 
+    ws.Text("UPDATE") -> {
+      io.debug("The server should now get from the db and display messages")
+      state
+    }
+
     ws.Text(text_message) -> {
       case
         get_json_value(get_json_value(text_message, "HEADERS"), "HX-Trigger")
@@ -70,7 +75,7 @@ fn event_socket(
         }
 
         "test" -> {
-          valkey_publish(int.to_string(state.chat_code), "Testing Pub /Sub")
+          valkey_publish(int.to_string(state.chat_code), "Testing Pub / Sub")
           state
         }
 
