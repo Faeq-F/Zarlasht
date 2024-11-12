@@ -5,6 +5,7 @@ import gleam/io
 import gleam/javascript/promise.{type Promise}
 import glen.{type Request, type Response}
 import glen/ws
+import lib/chat.{publish_message}
 import lib/create_chat.{on_create_chat}
 import lib/join_chat.{on_to_join_chat}
 import socket_state.{type Event, type State, State}
@@ -57,11 +58,6 @@ fn event_socket(
       state
     }
 
-    ws.Text("UPDATE") -> {
-      io.debug("The server should now get from the db and display messages")
-      state
-    }
-
     ws.Text(text_message) -> {
       case
         get_json_value(get_json_value(text_message, "HEADERS"), "HX-Trigger")
@@ -74,8 +70,8 @@ fn event_socket(
           on_to_join_chat()
         }
 
-        "test" -> {
-          valkey_publish(int.to_string(state.chat_code), "Testing Pub / Sub")
+        "send_message_form" -> {
+          publish_message(conn, state, get_json_value(text_message, "message"))
           state
         }
 
