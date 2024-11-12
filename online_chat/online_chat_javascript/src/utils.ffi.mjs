@@ -16,12 +16,13 @@ const valkeyPub = new Valkey(Deno.env.get("SERVICE_URI")); // connection for pub
 valkey.flushdb(); // wipe the db on server start - ensures server state is same as db state
 
 valkeySub.on("message", (channel, message) => {
-  console.log(`Received \"${message}\" from \"${channel}\"`);
+  console.log(`A message was sent to chat \"${channel}\"`);
   const chat_sockets = sockets.get(channel);
   if (chat_sockets != undefined) {
-    // relay to update clients' chat
     chat_sockets.forEach((conn) => {
-      //conn.socket.send("UPDATE"); sends to client - need local to be aware
+      if (conn.state.username != ffi_get_json_value(message, "username")) {
+        conn.socket.send(ffi_get_json_value(message, "html"));
+      }
     });
   }
 });
