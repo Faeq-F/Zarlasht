@@ -24,12 +24,29 @@ pub fn chat_page(chat_code: String) -> String {
         ],
       ),
       send_message_form(),
+      html.script(
+        [],
+        "
+        document.getElementById(\"message_textarea\")
+        .addEventListener(\"keydown\", (evt) => {
+          if (evt.keyCode == 13 && !evt.shiftKey){
+            evt.preventDefault();
+            document.getElementById(\"send_message\").click();
+        }});
+        ",
+      ),
     ]),
   ])
   |> element.to_string
 }
 
-pub fn message(message: String, me: Bool) -> String {
+pub fn message(
+  message: String,
+  username: String,
+  date: String,
+  time: String,
+  me: Bool,
+) -> String {
   html.div(
     [
       attribute.class(
@@ -42,6 +59,12 @@ pub fn message(message: String, me: Bool) -> String {
       case me {
         True -> {
           html.div([attribute.class("chat chat-end")], [
+            html.div([attribute.class("chat-header")], [
+              html.time([attribute.class("text-2xs opacity-50 mx-2")], [
+                html.text(time),
+              ]),
+              html.text(username),
+            ]),
             html.div(
               [
                 attribute.class(
@@ -50,10 +73,19 @@ pub fn message(message: String, me: Bool) -> String {
               ],
               [text(message)],
             ),
+            html.div([attribute.class("chat-footer opacity-50 text-xs")], [
+              html.text(date),
+            ]),
           ])
         }
         _ -> {
           html.div([attribute.class("chat chat-start")], [
+            html.div([attribute.class("chat-header")], [
+              html.text(username),
+              html.time([attribute.class("text-2xs opacity-50 mx-2")], [
+                html.text(time),
+              ]),
+            ]),
             html.div(
               [
                 attribute.class(
@@ -62,6 +94,9 @@ pub fn message(message: String, me: Bool) -> String {
               ],
               [text(message)],
             ),
+            html.div([attribute.class("chat-footer opacity-50 text-xs")], [
+              html.text(date),
+            ]),
           ])
         }
       },
@@ -81,6 +116,7 @@ pub fn send_message_form() -> Element(form) {
       html.div([attribute.class("join w-full border-gray-200 border-2 ")], [
         html.textarea(
           [
+            attribute.id("message_textarea"),
             attribute.name("message"),
             attribute.placeholder("Send a message"),
             attribute("style", "height: 17px;"),
