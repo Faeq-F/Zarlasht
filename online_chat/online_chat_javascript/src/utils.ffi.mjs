@@ -16,14 +16,16 @@ const valkeyPub = new Valkey(Deno.env.get("SERVICE_URI")); // connection for pub
 valkey.flushdb(); // wipe the db on server start - ensures server state is same as db state
 
 valkeySub.on("message", (channel, message) => {
-  console.log(`A message was sent to chat \"${channel}\"`);
+  console.log(`Message ${message} was sent to chat \"${channel}\"`);
   const chat_sockets = sockets.get(channel);
   if (chat_sockets != undefined) {
-    chat_sockets.forEach((conn) => {
-      if (conn.state.username != ffi_get_json_value(message, "username")) {
+    chat_sockets
+      .filter((conn) =>
+        conn.state.username != ffi_get_json_value(message, "username")
+      )
+      .forEach((conn) => {
         conn.socket.send(ffi_get_json_value(message, "html"));
-      }
-    });
+      });
   }
 });
 
@@ -66,7 +68,7 @@ async function ffi_valkey_subscribe(channel, socket) {
 }
 
 function ffi_chat_exists(chat_code) {
-  return sockets.has(chat_code);
+  return sockets.has(chat_code + "");
 }
 
 // Other Utils ═════════════════════════════════════════════════════════════════
