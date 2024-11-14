@@ -1,15 +1,15 @@
 //// Handling WebSocket events
 
-import gleam/int
 import gleam/io
 import gleam/javascript/promise.{type Promise}
 import glen.{type Request, type Response}
 import glen/ws
 import lib/chat.{publish_message}
 import lib/create_chat.{on_create_chat}
-import lib/join_chat.{on_to_join_chat}
+import lib/join_chat.{on_join_chat, on_to_join_chat}
+import lib/set_name.{on_set_name}
 import socket_state.{type Event, type State, State}
-import utils.{get_json_value, valkey_publish}
+import utils.{get_json_value}
 
 /// Establishes a WebSocket connection for the client on the `/init_socket` endpoint
 ///
@@ -67,7 +67,15 @@ fn event_socket(
         }
 
         "join" -> {
-          on_to_join_chat()
+          on_to_join_chat(conn)
+        }
+
+        "join-chat-form" -> {
+          on_join_chat(text_message, conn)
+        }
+
+        "set-name-form" -> {
+          on_set_name(text_message, conn, state)
         }
 
         "send_message_form" -> {

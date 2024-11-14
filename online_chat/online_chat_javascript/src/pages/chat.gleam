@@ -2,7 +2,7 @@ import lustre/attribute.{attribute}
 import lustre/element.{type Element, text}
 import lustre/element/html
 
-pub fn chat_page() -> String {
+pub fn chat_page(chat_code: String) -> String {
   html.div([attribute.class("bg-base-100 min-h-screen"), attribute.id("page")], [
     html.h1(
       [attribute.class("text-5xl font-bold text-center absolute mt-4 w-screen")],
@@ -19,7 +19,7 @@ pub fn chat_page() -> String {
         ],
         [
           html.h1([attribute.class("text-2xl font-bold mt-4")], [
-            element.text("Chat started"),
+            element.text("Chat " <> chat_code <> " started"),
           ]),
         ],
       ),
