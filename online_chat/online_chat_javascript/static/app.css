@@ -35,3 +35,8 @@
   font-weight: 400;
   font-style: normal;
 }
+
+.text-2xs {
+  font-size: 0.55rem;
+  line-height: 1rem;
+}
