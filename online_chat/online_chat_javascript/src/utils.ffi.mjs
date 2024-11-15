@@ -32,11 +32,16 @@ valkeySub.on("message", (channel, message) => {
 // Utils ═══════════════════════════════════════════════════════════════════════
 
 async function ffi_db_set(key, value) {
-  valkey.set(key, value);
+  valkey.rpush(key, value);
 }
 
-async function ffi_db_get(key) {
-  return await valkey.get(key);
+async function ffi_send_old_messages(key, conn) {
+  key = key + "";
+  valkey.lrange(key, 0, await valkey.llen(key)).then((messages) => {
+    messages.forEach((message) => {
+      conn.socket.send(message);
+    });
+  });
 }
 
 async function ffi_valkey_publish(channel, message) {
@@ -86,9 +91,9 @@ function ffi_get_json_value(json_string, key) {
 
 export {
   ffi_chat_exists,
-  ffi_db_get,
   ffi_db_set,
   ffi_get_json_value,
+  ffi_send_old_messages,
   ffi_valkey_publish,
   ffi_valkey_subscribe,
 };

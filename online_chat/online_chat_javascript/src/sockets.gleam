@@ -79,7 +79,12 @@ fn event_socket(
         }
 
         "send_message_form" -> {
-          publish_message(conn, state, get_json_value(text_message, "message"))
+          let _ =
+            publish_message(
+              conn,
+              state,
+              get_json_value(text_message, "message"),
+            )
           state
         }
 
