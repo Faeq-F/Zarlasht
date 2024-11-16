@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="emerald">
+
+<head>
+  <title>ZARLASHT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="./static/favicon.png" type="image/x-icon" rel="icon">
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap">
+  <link rel="stylesheet" href="./static/app.css">
+  <script src="./static/libraries/tailwind.min.js"></script>
+  <link rel="stylesheet" href="./static/libraries/daisyui.min.css">
+  <style type="text/tailwindcss">
+    .btn {
+            @apply rounded-full;
+          }
+  </style>
+  <script>
+    tailwind.config = {
+      darkMode: 'selector',
+      daisyui: {
+        darkTheme: 'forest',
+      }
+    }
+    window.onload = () => {
+      const body = document.getElementsByTagName("body")[0];
+      const themeController = document.getElementsByClassName("theme-controller")[0];
+      themeController.addEventListener("click", () => {
+        if (body.classList.contains("dark")) {
+          body.classList.remove("dark")
+        } else {
+          body.classList.add("dark")
+        }
+      })
+    }
+  </script>
+</head>
+
+<body>
+  <!--layout-->
+  <div id="bg"></div>
+  <label class="swap swap-rotate right-0 fixed m-4 z-10">
+    <input value="forest" class="theme-controller hidden" type="checkbox">
+    <svg class="swap-off h-10 w-10 fill-current" viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z">
+      </path>
+    </svg>
+    <svg class="swap-on h-10 w-10 fill-current" viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z">
+      </path>
+    </svg>
+  </label>
+  <label class="left-0 m-4 fixed z-10">
+    <a href="https://github.com/faeq-f/zarlasht" rel="noopener noreferrer"
+      target="_blank">
+      <svg class="fill-current" viewBox="0 0 24 24" height="24" width="24"
+        xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z">
+        </path>
+      </svg>
+    </a>
+  </label>
+  <label class="left-0 bottom-0 fixed m-4 z-10">
+    <button onclick="SiteInfo.showModal()"
+      class="btn bg-transparent hover:bg-transparent border-0 text-3xl font-header">i</button>
+    <dialog id="SiteInfo" class="modal">
+      <div class="modal-box">
+        <h3 class="text-4xl font-bold font-header">Acknowledgments</h3>
+        <div class="text-2xl py-4">
+          <p class="">
+            Game created by <a
+              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+              href="https://faeq-f.github.io/" rel="noopener noreferrer"
+              target="_blank">Faeq</a>
+          </p>
+          <ul class="tree ml-[-5rem]">
+            <li>
+              <details open>
+                <summary>
+                  <p></p>
+                </summary>
+                <ul>
+                  <li>
+                    <details open>
+                      <summary>Images</summary>
+                      <ul>
+                        <li>
+                          <p>
+                            <a class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              rel="noopener noreferrer" target="_blank"
+                              href="https://unsplash.com/photos/a-black-and-white-photo-of-a-mountain-0QzFognB6bY">Background
+                              image</a> by <a rel="noopener noreferrer"
+                              target="_blank"
+                              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              href="https://unsplash.com/@cameron_visuals">Cameron
+                              Mourot</a>
+                          </p>
+                        </li>
+                      </ul>
+                    </details>
+                  </li>
+                  <li>
+                    <details open>
+                      <summary>Fonts</summary>
+                      <ul>
+                        <li>
+                          <p>
+                            <a class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              rel="noopener noreferrer" target="_blank"
+                              href="https://www.1001fonts.com/requiem-font.html">Headers
+                              font</a> by <a rel="noopener noreferrer"
+                              target="_blank"
+                              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              href="https://www.1001fonts.com/users/chrisx/">Chris
+                              Hansen</a>
+                          </p>
+                        </li>
+                        <li>
+                          <p>
+                            <a class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              rel="noopener noreferrer" target="_blank"
+                              href="https://www.1001fonts.com/chancery-cursive-font.html">Text
+                              font</a> by <a rel="noopener noreferrer"
+                              target="_blank"
+                              class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                              href="https://www.1001fonts.com/users/digitalgraphiclabs/">Digital
+                              Graphic
+                              Labs</a>
+                          </p>
+                        </li>
+                      </ul>
+                    </details>
+                  </li>
+                  <li>
+                    <p>
+                      Icons by <a href="https://fontawesome.com/"
+                        class="pl-0.5 hover:text-secondary duration-700 text-neutral font-bold text-[1.6rem] dark:text-slate-400 "
+                        rel="noopener noreferrer" target="_blank">Font
+                        Awesome</a>
+                    </p>
+                  </li>
+                </ul>
+              </details>
+            </li>
+          </ul>
+        </div>
+        <div class="modal-action">
+          <form method="dialog">
+            <button
+              class="text-2xl dark:hover:text-shadow  dark:text-slate-400 text-zinc-700 hover:text-secondary py-2 px-6 duration-700 font-bold  border-t border-b border-gray-600 rounded-lg bg-transparent">Close</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+  </label>
+  <!-- end layout-->
+  <div id="app">
+    <div id="page" class="hero bg-transparent min-h-full">
+      <h1 class="text-5xl mt-4 font-header">ZARLASHT</h1>
+      <div class="hero-content text-center absolute top-1/2 -translate-y-1/2 ">
+        <div
+          class="isolate p-12 rounded-xl dark:bg-black/40 bg-white/40 shadow-lg ring-1 ring-black/5">
+          <div class="container">
+            <div class="Name text-3xl font-header">Allies</div>
+            <div class="Chat-Button"><button
+                class="w-full  text-shadow drop-shadow-xl text-accent hover:text-secondary hover:fill-[oklch(var(--s))] fill-[oklch(var(--a))] border-t border-b border-gray-600 rounded-lg duration-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class="size-6  h-12 w-full mt-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                </svg>
+                <br>
+                <p class="text-2xl">Chat</p>
+              </button>
+            </div>
+            <div class="Me pt-4"><button
+                class=" text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current border-t border-b border-gray-600 rounded-lg w-full ">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class="size-6 h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+                <br>
+                <p class="text-2xl">Me</p>
+              </button></div>
+            <div class="Close pt-4"><button
+                class=" text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-error hover:fill-[oklch(var(--er))] border-t border-b border-gray-600 rounded-lg w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class=" h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6 18 18 6M6 6l12 12" />
+                </svg>
+                <br>
+                <p class="text-2xl">Close</p>
+              </button></div>
+            <div class="Map pt-4"><button
+                class=" text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current border-t border-b border-gray-600 rounded-lg w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class="size-6 h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
+                </svg>
+                <br>
+                <p class="text-2xl">Map</p>
+              </button></div>
+            <div class="Roll-die pt-4"><button
+                class=" text-shadow  text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current border-t border-b border-gray-600 rounded-lg w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class="size-6 h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672Zm-7.518-.267A8.25 8.25 0 1 1 20.25 10.5M8.288 14.212A5.25 5.25 0 1 1 17.25 10.5" />
+                </svg>
+                <br>
+                <p class="text-2xl">Roll die</p>
+              </button>
+            </div>
+            <div class="Chat overflowy-scroll">
+              <div
+                class="mx-12 px-2 overflow-y-scroll max-h-full h-full mt-10 border rounded-box border-gray-600">
+                <!--Messages start here-->
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--p));">
+                  <div
+                    class="chat-header  text-primary text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-primary bg-base-100 text-base-content text-lg">
+                    What kind
+                    of nonsense is this
+                  </div>
+                </div>
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--s));">
+                  <div
+                    class="chat-header  text-secondary text-shadow font-header">
+                    Picard
+                  </div>
+                  <div
+                    class="chat-bubble border border-secondary bg-base-100 text-base-content text-lg">
+                    Put me on the Council and not make me a Master!??
+                  </div>
+                </div>
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--a));">
+                  <div class="chat-header  text-accent text-shadow font-header">
+                    Catherine Halsey
+                  </div>
+                  <div
+                    class="chat-bubble border border-accent bg-base-100 text-base-content text-lg">
+                    That's never been done in the history of the Jedi. It's
+                    insulting!
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--in));">
+                  <div class="chat-header  text-info text-shadow font-header">
+                    Someone's name
+                  </div>
+                  <div
+                    class="chat-bubble border border-info bg-base-100 text-base-content text-lg">
+                    Calm down,
+                    Anakin.
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--su));">
+                  <div
+                    class="chat-header  text-success text-shadow font-header">
+                    John Doe
+                  </div>
+                  <div
+                    class="chat-bubble border border-success bg-base-100 text-base-content text-lg">
+                    You have
+                    been given a great honor.</div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--wa));">
+                  <div
+                    class="chat-header  text-warning text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-warning bg-base-100 text-base-content text-lg">
+                    To be on
+                    the Council at your age.
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--er));">
+                  <div class="chat-header text-error text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-error bg-base-100 text-base-content text-lg">
+                    It's never
+                    happened before.</div>
+                </div>
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--p));">
+                  <div
+                    class="chat-header  text-primary text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-primary bg-base-100 text-base-content text-lg">
+                    What kind
+                    of nonsense is this
+                  </div>
+                </div>
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--s));">
+                  <div
+                    class="chat-header  text-secondary text-shadow font-header">
+                    Picard
+                  </div>
+                  <div
+                    class="chat-bubble border border-secondary bg-base-100 text-base-content text-lg">
+                    Put me on the Council and not make me a Master!??
+                  </div>
+                </div>
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--a));">
+                  <div class="chat-header  text-accent text-shadow font-header">
+                    Catherine Halsey
+                  </div>
+                  <div
+                    class="chat-bubble border border-accent bg-base-100 text-base-content text-lg">
+                    That's never been done in the history of the Jedi. It's
+                    insulting!
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--in));">
+                  <div class="chat-header  text-info text-shadow font-header">
+                    Someone's name
+                  </div>
+                  <div
+                    class="chat-bubble border border-info bg-base-100 text-base-content text-lg">
+                    Calm down,
+                    Anakin.
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--su));">
+                  <div
+                    class="chat-header  text-success text-shadow font-header">
+                    John Doe
+                  </div>
+                  <div
+                    class="chat-bubble border border-success bg-base-100 text-base-content text-lg">
+                    You have
+                    been given a great honor.</div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--wa));">
+                  <div
+                    class="chat-header  text-warning text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-warning bg-base-100 text-base-content text-lg">
+                    To be on
+                    the Council at your age.
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--er));">
+                  <div class="chat-header text-error text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-error bg-base-100 text-base-content text-lg">
+                    It's never
+                    happened before.</div>
+                </div>
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--p));">
+                  <div
+                    class="chat-header  text-primary text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-primary bg-base-100 text-base-content text-lg">
+                    What kind
+                    of nonsense is this
+                  </div>
+                </div>
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--s));">
+                  <div
+                    class="chat-header  text-secondary text-shadow font-header">
+                    Picard
+                  </div>
+                  <div
+                    class="chat-bubble border border-secondary bg-base-100 text-base-content text-lg">
+                    Put me on the Council and not make me a Master!??
+                  </div>
+                </div>
+                <div class="chat chat-start"
+                  style="--chat-border-color: oklch(var(--a));">
+                  <div class="chat-header  text-accent text-shadow font-header">
+                    Catherine Halsey
+                  </div>
+                  <div
+                    class="chat-bubble border border-accent bg-base-100 text-base-content text-lg">
+                    That's never been done in the history of the Jedi. It's
+                    insulting!
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--in));">
+                  <div class="chat-header  text-info text-shadow font-header">
+                    Someone's name
+                  </div>
+                  <div
+                    class="chat-bubble border border-info bg-base-100 text-base-content text-lg">
+                    Calm down,
+                    Anakin.
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--su));">
+                  <div
+                    class="chat-header  text-success text-shadow font-header">
+                    John Doe
+                  </div>
+                  <div
+                    class="chat-bubble border border-success bg-base-100 text-base-content text-lg">
+                    You have
+                    been given a great honor.</div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--wa));">
+                  <div
+                    class="chat-header  text-warning text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-warning bg-base-100 text-base-content text-lg">
+                    To be on
+                    the Council at your age.
+                  </div>
+                </div>
+                <div class="chat chat-end"
+                  style="--chat-border-color: oklch(var(--er));">
+                  <div class="chat-header text-error text-shadow font-header">
+                    Obi-Wan Kenobi
+                  </div>
+                  <div
+                    class="chat-bubble border border-error bg-base-100 text-base-content text-lg">
+                    It's never
+                    happened before.</div>
+                </div>
+                <!--Messages end here-->
+              </div>
+            </div>
+            <div class="message join mt-12 mx-12 ">
+              <textarea
+                class="textarea join-item textarea-bordered w-full h-full text-lg bg-transparent border-gray-600 rounded-xl"
+                placeholder="Your message..."></textarea>
+              <button
+                class="btn join-item bg-transparent h-full !rounded-tr-xl !rounded-br-xl hover:bg-transparent text-shadow text-success hover:text-accent"><span
+                  class=" font-header text-4xl sendIcon  ">L</span></button>
+            </div>
+            <div class="Allies"><button
+                class=" text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary hover:fill-[oklch(var(--s))] fill-current border-t border-b border-gray-600 rounded-lg w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class=" h-12 w-full mt-6 drop-shadow-xl-green hover:drop-shadow-xl size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                </svg>
+                <br><br>
+                <p class="text-2xl">Allies</p>
+              </button>
+            </div>
+            <div class="people">
+              <details class="dropdown">
+                <summary
+                  class="mt-4 px-6 border-0 !border-l !border-r border-gray-600 rounded-lg w-full btn mb-1 bg-transparent hover:bg-transparent text-secondary-content hover:text-shadow text-shadow-green hover:text-secondary  w-full text-2xl">
+                  Direct
+                  Message
+                </summary>
+                <ul id="people-popup"
+                  class="bg-transparent rounded-box z-[1] p-2 border border-black max-w-full overflow-y-scroll max-h-96 rounded-tr-none rounded-tl-none">
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                  <li class="w-full">
+                    <button
+                      class="btn join-item bg-transparent hover:bg-transparent hover:text-secondary hover:text-shadow rounded-r-full h-full border-none text-lg">
+                      <span>Person 1</span>
+                    </button>
+                  </li>
+                </ul>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <style>
+    .container {
+      display: grid;
+      grid-template-columns: 0.4fr 2.2fr 0.4fr;
+      grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+      gap: 0px 0px;
+      grid-auto-flow: row;
+      width: 98vw;
+      height: 80vh;
+    }
+
+    .Name {
+      grid-area: 1 / 2 / 2 / 3;
+    }
+
+    .Chat-Button {
+      grid-area: 1 / 3 / 2 / 4;
+    }
+
+    .Me {
+      grid-area: 2 / 3 / 3 / 4;
+    }
+
+    .Close {
+      grid-area: 3 / 3 / 4 / 4;
+    }
+
+    .Map {
+      grid-area: 5 / 3 / 6 / 4;
+    }
+
+    .Roll-die {
+      grid-area: 4 / 3 / 5 / 4;
+    }
+
+    .Chat {
+      grid-area: 1 / 2 / 5 / 3;
+    }
+
+    .message {
+      grid-area: 5 / 2 / 6 / 3;
+    }
+
+    .Allies {
+      grid-area: 1 / 1 / 2 / 2;
+    }
+
+    .people {
+      grid-area: 2 / 1 / 6 / 2;
+    }
+
+    .close-red {
+      fill: oklch(from var(--er) l c h / calc(alpha - 0.1))
+    }
+
+    .sendIcon {
+      -webkit-transform: rotate(210deg)
+    }
+
+    .dropdown[open] summary {
+      color: oklch(var(--a));
+      text-shadow: 1px 1px 1px black;
+      border-radius: 30px 30px 0 0;
+    }
+  </style>
+</body>
+
+</html>
