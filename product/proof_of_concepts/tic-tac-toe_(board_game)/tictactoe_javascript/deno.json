@@ -1,0 +1,14 @@
+{
+  "project": "tictactoe_javascript",
+  "tasks": {
+    "start": "deno run -A src/app.ts"
+  },
+  "deploy": {
+    "project": "a33f268a-d8cb-4b62-b899-6e54b0281b2c",
+    "exclude": [
+      "**/node_modules"
+    ],
+    "include": [],
+    "entrypoint": "src/app.ts"
+  }
+}
