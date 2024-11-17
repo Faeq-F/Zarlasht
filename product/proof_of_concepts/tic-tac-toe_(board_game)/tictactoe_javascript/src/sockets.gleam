@@ -3,7 +3,8 @@ import gleam/javascript/promise.{type Promise}
 import glen.{type Request, type Response}
 import glen/ws
 import lib/create_game.{on_create_game}
-import lib/join_game.{on_to_join_game}
+import lib/join_game.{on_join_game, on_to_join_game}
+import lib/set_name.{on_set_name}
 import lustre/attribute
 import lustre/element
 import lustre/element/html
@@ -79,6 +80,14 @@ fn event_socket(
 
         "join" -> {
           on_to_join_game(conn)
+        }
+
+        "join-game-form" -> {
+          on_join_game(text_message, conn)
+        }
+
+        "set-name-form" -> {
+          on_set_name(text_message, conn, state)
         }
 
         _ -> {

@@ -91,3 +91,95 @@ pub fn tick(classes: String) -> Element(svg) {
     ],
   )
 }
+
+pub fn replay(classes: String) -> Element(svg) {
+  svg.svg(
+    [
+      attribute("viewBox", "0 0 32 32"),
+      attribute("height", "100"),
+      attribute("width", "100"),
+      attribute("y", "0px"),
+      attribute("x", "0px"),
+      attribute("xmlns", "http://www.w3.org/2000/svg"),
+      attribute.class(classes),
+    ],
+    [
+      svg.path([
+        attribute(
+          "d",
+          "M 16 4 L 16 6 C 21.535156 6 26 10.464844 26 16 C 26 21.535156 21.535156 26 16 26 C 10.464844 26 6 21.535156 6 16 C 6 12.734375 7.585938 9.851563 10 8.03125 L 10 13 L 12 13 L 12 5 L 4 5 L 4 7 L 8.09375 7 C 5.59375 9.199219 4 12.417969 4 16 C 4 22.617188 9.382813 28 16 28 C 22.617188 28 28 22.617188 28 16 C 28 9.382813 22.617188 4 16 4 Z",
+        ),
+      ]),
+    ],
+  )
+}
+
+pub fn nought(classes: String) -> Element(svg) {
+  svg.svg(
+    [
+      attribute("preserveAspectRatio", "xMidYMid meet"),
+      attribute("viewBox", "0 0 100.000000 100.000000"),
+      attribute("height", "100.000000pt"),
+      attribute("width", "100.000000pt"),
+      attribute("version", "1.0"),
+      attribute("xmlns", "http://www.w3.org/2000/svg"),
+      attribute.class(classes),
+    ],
+    [
+      svg.g(
+        [
+          attribute("stroke", "none"),
+          attribute(
+            "transform",
+            "translate(0.000000,100.000000) scale(0.100000,-0.100000)",
+          ),
+        ],
+        [
+          svg.path([
+            attribute(
+              "d",
+              "M400 949 c-115 -23 -239 -125 -279 -233 -49 -131 -52 -288 -7 -412 44 -119 112 -192 224 -235 46 -18 78 -22 162 -23 120 0 185 19 262 78 187 143 211 521 45 712 -85 97 -251 144 -407 113z m173 -160 c53 -14 110 -69 138 -132 20 -44 23 -68 23 -157 0 -89 -3 -113 -23 -157 -85 -192 -337 -192 -422 0 -20 44 -23 68 -23 157 0 126 22 190 88 246 60 52 135 67 219 43z",
+            ),
+          ]),
+        ],
+      ),
+    ],
+  )
+}
+
+pub fn cross(classes: String) -> Element(svg) {
+  svg.svg(
+    [
+      attribute("viewBox", "0 0 72 72"),
+      attribute("height", "100"),
+      attribute("width", "100"),
+      attribute("y", "0px"),
+      attribute("x", "0px"),
+      attribute("xmlns", "http://www.w3.org/2000/svg"),
+      attribute.class(classes),
+    ],
+    [
+      svg.path([
+        attribute(
+          "d",
+          "M 19 15 C 17.977 15 16.951875 15.390875 16.171875 16.171875 C 14.609875 17.733875 14.609875 20.266125 16.171875 21.828125 L 30.34375 36 L 16.171875 50.171875 C 14.609875 51.733875 14.609875 54.266125 16.171875 55.828125 C 16.951875 56.608125 17.977 57 19 57 C 20.023 57 21.048125 56.609125 21.828125 55.828125 L 36 41.65625 L 50.171875 55.828125 C 51.731875 57.390125 54.267125 57.390125 55.828125 55.828125 C 57.391125 54.265125 57.391125 51.734875 55.828125 50.171875 L 41.65625 36 L 55.828125 21.828125 C 57.390125 20.266125 57.390125 17.733875 55.828125 16.171875 C 54.268125 14.610875 51.731875 14.609875 50.171875 16.171875 L 36 30.34375 L 21.828125 16.171875 C 21.048125 15.391875 20.023 15 19 15 z",
+        ),
+      ]),
+    ],
+  )
+}
+
+pub fn empty(classes: String) -> Element(svg) {
+  svg.svg(
+    [
+      attribute.class(classes),
+      attribute("x", "0px"),
+      attribute("y", "0px"),
+      attribute("width", "100"),
+      attribute("height", "100"),
+      attribute("viewBox", "0 0 72 72"),
+      attribute("xmlns", "http://www.w3.org/2000/svg"),
+    ],
+    [],
+  )
+}

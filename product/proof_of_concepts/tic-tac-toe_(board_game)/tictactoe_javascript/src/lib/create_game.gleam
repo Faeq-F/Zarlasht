@@ -1,10 +1,12 @@
 import gleam/int
 import glen/ws
+import pages/created_game.{created_game_page}
 import socket_state.{type Event, type State, State}
 import state.{add_game}
 
 pub fn on_create_game(conn: ws.WebsocketConn(Event)) -> State {
   let game_code = generate_game_code(conn)
+  let _ = ws.send_text(conn, created_game_page(game_code))
   State(game_code, "X")
 }
 
