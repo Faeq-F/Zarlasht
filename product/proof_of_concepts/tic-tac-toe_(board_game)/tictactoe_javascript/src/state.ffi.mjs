@@ -23,6 +23,28 @@ function ffi_add_game(game_code, socket) {
   });
 }
 
+function ffi_add_socket(socket, game_code) {
+  return try_run(function () {
+    if (games.has(game_code)) {
+      const game_sockets = games.get(game_code).sockets;
+      if (game_sockets.length < 2) {
+        games.set(
+          game_code,
+          new GameState([
+            ...game_sockets,
+            new PlayerSocket(socket, Player.Player2),
+          ]),
+        );
+        return 0;
+      } else {
+        throw new Error("(STATE) Error: Game already has 2 players!");
+      }
+    } else {
+      throw new Error("(STATE) Error: Game does not exist!");
+    }
+  });
+}
+
 function ffi_remove_socket(game_code, player) {
   return try_run(function () {
     if (games.has(game_code)) {
@@ -151,6 +173,60 @@ function ffi_for_all_sockets(game_code, action) {
   });
 }
 
+function ffi_set_player_name(game_code, socket, name) {
+  let names_set = 0;
+  for (const playerSocket of games.get(game_code).sockets) {
+    if (playerSocket.socket == socket) {
+      playerSocket.name = name;
+    }
+    if (playerSocket.name != undefined) {
+      names_set++;
+    }
+  }
+  if (names_set === 2) {
+    return 0;
+  } else {
+    return -1;
+  }
+}
+
+function ffi_get_turn(game_code) {
+  return games.get(game_code).turn;
+}
+
+function ffi_get_player_from_game_state(game_code, index) {
+  return games.get(game_code).state[index];
+}
+
+function ffi_get_winning_player(game_code) {
+  const boxes = games.get(game_code).state;
+  //possible combinations of boxes marked to be a winner
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  //for each combination
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i]; // 3 boxes required to be marked
+    const player = boxes[a]; // if the same player is in all boxes
+    if (player == Player.Player1 || player == Player.Player2) {
+      if (player === boxes[b] && player === boxes[c]) {
+        console.log(player + " has won game " + game_code);
+        return player; // they won
+      }
+    }
+  }
+  for (const box of boxes) if (box == Player.Neither) return Player.Neither;
+  console.log("game " + game_code + " is a draw");
+  return "Draw";
+}
+
 //---------------------------------------------------------------------------------------
 // State helper functions
 
@@ -179,7 +255,12 @@ function ffi_get_json_value(json_string, key) {
 
 export {
   ffi_add_game,
+  ffi_add_socket,
   ffi_for_all_sockets,
   ffi_get_json_value,
+  ffi_get_player_from_game_state,
+  ffi_get_turn,
+  ffi_get_winning_player,
   ffi_remove_socket,
+  ffi_set_player_name,
 };
