@@ -1,8 +1,10 @@
+import gleam/int
 import gleam/io
 import gleam/javascript/promise.{type Promise}
 import glen.{type Request, type Response}
 import glen/ws
 import lib/create_game.{on_create_game}
+import lib/game.{on_box_click, on_send_message}
 import lib/join_game.{on_join_game, on_to_join_game}
 import lib/set_name.{on_set_name}
 import lustre/attribute
@@ -90,9 +92,28 @@ fn event_socket(
           on_set_name(text_message, conn, state)
         }
 
-        _ -> {
-          io.debug("Unknown Trigger")
-          state
+        "send_message_form" -> {
+          on_send_message(text_message, conn, state)
+        }
+
+        text -> {
+          case int.parse(text) {
+            Ok(number) -> {
+              case number >= 0 && number <= 8 {
+                True -> {
+                  on_box_click(number, state)
+                }
+                _ -> {
+                  io.debug("Unknown Number as Trigger")
+                  state
+                }
+              }
+            }
+            _ -> {
+              io.debug("Unknown Trigger")
+              state
+            }
+          }
         }
       }
     }

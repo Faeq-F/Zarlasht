@@ -163,6 +163,16 @@ class GameState {
   }
 }
 
+function ffi_update_state(game_code, index) {
+  return try_run(function () {
+    games.get(game_code).state[index] = games.get(game_code).turn;
+    games.get(game_code).turn = games.get(game_code).turn == Player.Player1
+      ? Player.Player2
+      : Player.Player1;
+    return 0;
+  });
+}
+
 //action takes arguments that represents the PlayerSocket
 function ffi_for_all_sockets(game_code, action) {
   return try_run(function () {
@@ -263,4 +273,5 @@ export {
   ffi_get_winning_player,
   ffi_remove_socket,
   ffi_set_player_name,
+  ffi_update_state,
 };

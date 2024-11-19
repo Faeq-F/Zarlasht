@@ -61,23 +61,41 @@ pub fn game_page() -> String {
                   [],
                 ),
               ]),
-              html.div([attribute.class("card text-center h-full")], [
-                html.div(
-                  [
-                    attribute.class(
-                      "w-4/6 max-h-[85vh] h-full overflow-y-scroll border-gray-200 border-2 mx-auto my-0 rounded-3xl p-4",
-                    ),
-                    attribute.id("chat"),
-                    attribute("hx-swap-oob", "beforeend"),
-                  ],
-                  [
-                    html.h1([attribute.class("text-2xl font-bold mt-4")], [
-                      element.text("Chat"),
-                    ]),
-                  ],
-                ),
-                send_message_form(),
-              ]),
+              html.div(
+                [
+                  attribute.class(
+                    "card text-center h-screen lg:h-full mt-32 lg:mt-0",
+                  ),
+                ],
+                [
+                  html.div(
+                    [
+                      attribute.class(
+                        "w-4/6 max-h-[85vh] h-screen overflow-y-scroll border-gray-200 border-2 mx-auto my-0 rounded-3xl p-4",
+                      ),
+                      attribute.id("chat"),
+                      attribute("hx-swap-oob", "beforeend"),
+                    ],
+                    [
+                      html.h1([attribute.class("text-2xl font-bold mt-4")], [
+                        element.text("Chat"),
+                      ]),
+                    ],
+                  ),
+                  send_message_form(),
+                  html.script(
+                    [],
+                    "
+                  document.getElementById(\"message_textarea\")
+                  .addEventListener(\"keydown\", (evt) => {
+                    if (evt.keyCode == 13 && !evt.shiftKey){
+                      evt.preventDefault();
+                      document.getElementById(\"send_message\").click();
+                  }});
+                  ",
+                  ),
+                ],
+              ),
             ],
           ),
         ],
@@ -96,7 +114,7 @@ pub fn update_status(
   html.div(
     [
       attribute.id("status"),
-      attribute.class("max-w-md text-center absolute bottom-0 mb-36"),
+      attribute.class("max-w-md text-center absolute bottom-0 lg:mb-36 mb-16"),
     ],
     case player_won {
       "Neither" -> {
@@ -327,6 +345,7 @@ pub fn send_message_form() -> Element(form) {
       html.div([attribute.class("join w-full border-gray-200 border-2 ")], [
         html.textarea(
           [
+            attribute.id("message_textarea"),
             attribute.name("message"),
             attribute.placeholder("Send a message"),
             attribute("style", "height: 17px;"),
