@@ -35,3 +35,6 @@ pub fn set_player_name(
   socket: ws.WebsocketConn(Event),
   name: String,
 ) -> Int
+
+@external(javascript, "./state.ffi.mjs", "ffi_update_state")
+pub fn update_state(game_code: Int, index: Int) -> Int
