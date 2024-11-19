@@ -4,7 +4,7 @@ import gleam/javascript/promise.{type Promise}
 import glen.{type Request, type Response}
 import glen/ws
 import lib/create_game.{on_create_game}
-import lib/game.{on_box_click, on_send_message}
+import lib/game.{on_box_click, on_replay_game, on_send_message}
 import lib/join_game.{on_join_game, on_to_join_game}
 import lib/set_name.{on_set_name}
 import lustre/attribute
@@ -94,6 +94,10 @@ fn event_socket(
 
         "send_message_form" -> {
           on_send_message(text_message, conn, state)
+        }
+
+        "replay_button" -> {
+          on_replay_game(state)
         }
 
         text -> {
