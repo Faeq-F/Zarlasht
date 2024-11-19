@@ -237,6 +237,21 @@ function ffi_get_winning_player(game_code) {
   return "Draw";
 }
 
+function ffi_reset_game(game_code) {
+  console.log("resetting game " + game_code);
+  games.get(game_code).state = [
+    Player.Neither,
+    Player.Neither,
+    Player.Neither,
+    Player.Neither,
+    Player.Neither,
+    Player.Neither,
+    Player.Neither,
+    Player.Neither,
+    Player.Neither,
+  ];
+}
+
 //---------------------------------------------------------------------------------------
 // State helper functions
 
@@ -272,6 +287,7 @@ export {
   ffi_get_turn,
   ffi_get_winning_player,
   ffi_remove_socket,
+  ffi_reset_game,
   ffi_set_player_name,
   ffi_update_state,
 };

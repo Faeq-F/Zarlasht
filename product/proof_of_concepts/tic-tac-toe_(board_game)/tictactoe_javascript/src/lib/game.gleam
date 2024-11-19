@@ -3,7 +3,7 @@ import lustre/element.{to_string}
 import pages/game.{message, send_message_form, update_status}
 import socket_state.{type Event, type State, State}
 import state.{
-  for_all_sockets, get_json_value, get_turn, get_winning_player,
+  for_all_sockets, get_json_value, get_turn, get_winning_player, reset_game,
   update_state,
 }
 
@@ -59,4 +59,32 @@ pub fn on_send_message(
       state
     }
   }
+}
+
+pub fn on_replay_game(state: State) -> State {
+  reset_game(state.game_code)
+  for_all_sockets(state.game_code, fn(socket, player_viewed, _name) {
+    //update game grid
+    let _ =
+      ws.send_text(
+        socket,
+        game.game_grid(
+          state.game_code,
+          player_viewed,
+          get_turn(state.game_code) == player_viewed,
+        ),
+      )
+    //update status
+    let _ =
+      ws.send_text(
+        socket,
+        update_status(
+          get_turn(state.game_code) == player_viewed,
+          player_viewed,
+          get_winning_player(state.game_code),
+        ),
+      )
+    Nil
+  })
+  state
 }

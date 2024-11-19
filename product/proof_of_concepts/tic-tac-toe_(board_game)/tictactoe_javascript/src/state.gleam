@@ -11,6 +11,9 @@ pub fn add_socket(socket: ws.WebsocketConn(Event), game_code: Int) -> Int
 @external(javascript, "./state.ffi.mjs", "ffi_remove_socket")
 pub fn remove_socket(game_code: Int, player: String) -> Int
 
+@external(javascript, "./state.ffi.mjs", "ffi_reset_game")
+pub fn reset_game(game_code: Int) -> Nil
+
 @external(javascript, "./state.ffi.mjs", "ffi_for_all_sockets")
 pub fn for_all_sockets(
   game_code: Int,
