@@ -2,6 +2,16 @@
 
 <details><summary>Term 1</summary>
 
+<details><summary>Week 9</summary>
+
+### 17/11/2024 - 19/11/2024
+
+Completed the tic-tac-toe PoC targeting javascript - aiming to translate
+javascript PoCs into erlang while developing the pong PoC to help with
+understanding key differences between the targets.
+
+</details>
+
 <details><summary>Week 8</summary>
 
 ### 14/11/2024 - 16/11/2024
