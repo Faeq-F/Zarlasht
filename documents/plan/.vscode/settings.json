@@ -23,9 +23,14 @@
   "emeraldwalk.runonsave": {
     "commands": [
       {
-        "match": "FYP_Plan.tex",
+        "match": "fyp_plan.tex",
         "isAsync": true,
-        "cmd": "texcount -sum -1 FYP_Plan.tex > wordcount.txt"
+        "cmd": "texcount -sum -1 fyp_plan.tex > wordcount.txt"
+      },
+      {
+        "match": "fyp_interim_report.tex",
+        "isAsync": true,
+        "cmd": "texcount -sum -1 fyp_interim_report.tex > wordcount.txt"
       }
     ]
   }

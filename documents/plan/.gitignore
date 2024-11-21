@@ -1,11 +1,15 @@
-*.log
-*.dvi
-*.aux
-*.bbl
-*.blg
-*.brf
-*.out
-*.gz
-fyp_plan.pdf
-faeq_faisal_signature.png
-wordcount.txt
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!fyp_interim_report.tex
+!fyp_plan.tex
+!interim_refs.bib
+!plan_refs.bib
+!project_interim.cls
+!project_plan.cls
+!rhul_logo.pdf
+# etc...
+
+# '!*/' for subdirectories (we want subdirectories)
