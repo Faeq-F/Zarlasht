@@ -1,26 +1,30 @@
 import app/router
+import app/web.{Context}
 import gleam/erlang/process
+import gleam/result.{try}
+import glenvy/dotenv
+import glenvy/env
+import logging
 import mist
 import wisp
 import wisp/wisp_mist
 
 pub fn main() {
-  // This sets the logger to print INFO level logs, and other sensible defaults
-  // for a web application.
-  wisp.configure_logger()
-
-  // Here we generate a secret key, but in a real application you would want to
-  // load this from somewhere so that it is not regenerated on every restart.
-  let secret_key_base = wisp.random_string(64)
-
-  // Start the Mist web server.
+  logging.configure()
+  let ctx = Context(static_directory())
   let assert Ok(_) =
-    wisp_mist.handler(router.handle_request, secret_key_base)
+    router.handle_request(_, ctx)
     |> mist.new
     |> mist.port(8000)
-    |> mist.start_http
+    // could randomize for recovery scenarios (in case new app takes over)
+    |> mist.start_https("pong.crt", "pong.key")
 
-  // The web server runs in new Erlang process, so put this one to sleep while
-  // it works concurrently.
-  process.sleep_forever()
+  // The web server runs in new Erlang process
+  // so put this one to sleep while it works concurrently
+  Ok(process.sleep_forever())
+}
+
+fn static_directory() {
+  let assert Ok(priv_directory) = wisp.priv_directory("pong_erlang")
+  priv_directory <> "/static"
 }

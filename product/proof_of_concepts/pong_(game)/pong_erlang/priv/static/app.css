@@ -1,0 +1,42 @@
+[data-theme=emerald] [data-theme=forest],
+[data-theme=emerald] {
+  color-scheme: light;
+  --b2: 17.522% 0.007709 17.911578;
+  --b3: 16.2032% 0.007129 17.911578;
+  --in: 72.06% 0.191 231.6;
+  --su: 64.8% 0.150 160;
+  --wa: 84.71% 0.199 83.87;
+  --er: 71.76% 0.221 22.18;
+  --sc: 13.9553% 0.027077 168.327128;
+  --ac: 14.1257% 0.02389 185.713193;
+  --nc: 86.1397% 0.007806 171.364646;
+  --inc: 0% 0 0;
+  --suc: 0% 0 0;
+  --wac: 0% 0 0;
+  --erc: 0% 0 0;
+  --rounded-box: 1rem;
+  --rounded-badge: 1.9rem;
+  --animation-btn: 0.25s;
+  --animation-input: .2s;
+  --btn-focus-scale: 0.95;
+  --border-btn: 1px;
+  --tab-border: 1px;
+  --tab-radius: 0.5rem;
+  --p: 68.6283% 0.185567 148.958922;
+  --pc: 0% 0 0;
+  --s: 69.7764% 0.135385 168.327128;
+  --a: 70.6285% 0.119451 185.713193;
+  --n: 30.6985% 0.039032 171.364646;
+  --rounded-btn: 1.9rem;
+}
+
+* {
+  font-family: "Varela Round", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.text-2xs {
+  font-size: 0.55rem;
+  line-height: 1rem;
+}
