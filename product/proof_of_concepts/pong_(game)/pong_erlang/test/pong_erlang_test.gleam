@@ -1,4 +1,5 @@
 import app/router
+import app/web.{Context}
 import glacier
 import glacier/should
 import wisp/testing
@@ -8,7 +9,8 @@ pub fn main() {
 }
 
 pub fn hello_world_test() {
-  let response = router.handle_request(testing.get("/", []))
+  let ctx = Context("priv/static/")
+  let response = router.handle_request(testing.get("/", []), ctx)
 
   response.status
   |> should.equal(200)
