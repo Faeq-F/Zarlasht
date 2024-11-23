@@ -1,14 +1,22 @@
 import gleam/bytes_tree
+import gleam/erlang/process.{type Subject}
 import gleam/http
 import gleam/http/request.{type Request}
 import gleam/http/response.{type Response}
 import gleam/int
+import gleam/io
 import gleam/string
 import logging.{Info}
 import mist.{type Connection, type ResponseData, Bytes}
+import radish.{type Message}
 
+/// Contains the Subjects that publish and susbscribe to channels on Valkey
+///
+/// Since the subscriber is limited to certain commands after subscribing to a
+/// channel, the publisher can be used for anything else that is required
+///
 pub type Context {
-  Context(static_directory: String)
+  Context(publisher: Subject(Message), subscriber: Subject(Message))
 }
 
 /// The middleware stack that the request handler uses.

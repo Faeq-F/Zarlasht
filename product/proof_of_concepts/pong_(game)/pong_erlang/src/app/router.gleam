@@ -108,3 +108,27 @@ fn get_content_type(file_path: String) {
     _ -> "application/octet-stream"
   }
 }
+// process.start(
+//     fn() {
+//       radish.subscribe(
+//         ctx.subscriber,
+//         ["hi"],
+//         on_subscribe,
+//         on_radish_message,
+//         128,
+//       )
+//     },
+//     True,
+//   )
+//
+// fn on_subscribe(a: String, b: Int) {
+//   io.debug(a <> "||||")
+//   io.debug(b)
+//   Nil
+// }
+//
+// fn on_radish_message(a: String, b: String) {
+//   io.debug(a <> "||||" <> b)
+//   radish.Continue
+// }
+//io.debug(radish.publish(ctx.publisher, "hi", "Hello Everyone!", 128))

@@ -1,17 +1,16 @@
 import app/router
 import app/web.{Context}
 import gleam/erlang/process
-import gleam/result.{try}
 import glenvy/dotenv
 import glenvy/env
 import logging
 import mist
-import wisp
-import wisp/wisp_mist
+import radish
 
 pub fn main() {
+  let _ = dotenv.load()
   logging.configure()
-  let ctx = Context(static_directory())
+  let ctx = Context(valkey_client(), valkey_client())
   let assert Ok(_) =
     router.handle_request(_, ctx)
     |> mist.new
@@ -24,7 +23,10 @@ pub fn main() {
   Ok(process.sleep_forever())
 }
 
-fn static_directory() {
-  let assert Ok(priv_directory) = wisp.priv_directory("pong_erlang")
-  priv_directory <> "/static"
+fn valkey_client() {
+  let assert Ok(valkey_uri) = env.get_string("SERVICE_URI")
+  let assert Ok(valkey_port) = env.get_int("SERVICE_PORT")
+  let assert Ok(client) =
+    radish.start(valkey_uri, valkey_port, [radish.Timeout(128)])
+  client
 }
