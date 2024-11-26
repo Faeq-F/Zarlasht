@@ -9,7 +9,7 @@ import logging.{Info}
 import mist.{type Connection, type ResponseData, Bytes}
 import radish.{type Message}
 
-/// Contains the Subjects that publish and susbscribe to channels on Valkey
+/// Contains the Subjects that publish and susbscribe to channels on Valkey, and a dictionary for all websockets in a game
 ///
 /// Since the subscriber is limited to certain commands after subscribing to a
 /// channel, the publisher can be used for anything else that is required
@@ -29,6 +29,7 @@ pub fn middleware(
   _ctx: Context,
   handle_request: fn(Request(Connection)) -> Response(ResponseData),
 ) -> Response(ResponseData) {
+  // add server rescue
   use <- log_request(req)
   use <- default_responses
   handle_request(req)
