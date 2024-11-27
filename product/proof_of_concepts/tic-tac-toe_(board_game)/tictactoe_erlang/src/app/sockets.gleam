@@ -2,16 +2,15 @@
 
 import app/lib/create_game.{on_create_game}
 import app/socket_types.{
-  type ActorState, type HEADERS, ActorState, Broadcast, HEADERS, MessageHTMX,
-  Neither, PlayerSocket,
+  type ActorState, ActorState, Broadcast, Neither, PlayerSocket,
 }
-import gleam/dynamic.{field}
+import gleam/dict
 import gleam/erlang/process
 import gleam/http/request.{type Request, Request}
 import gleam/io
-import gleam/json
 import gleam/option.{Some}
 import gleam/otp/actor
+import juno
 import logging.{Alert, Info}
 import mist.{type Connection}
 
@@ -28,8 +27,6 @@ pub fn new_socket_process(req: Request(Connection)) {
   )
 }
 
-// actor state tuple of player & name
-
 // player markings in boxes - left to right, top to bottom
 // to_string(object([
 //  #("state", [string("Neither"), string("Neither"), string("Neither"), string("Neither"), string("Neither"), string("Neither"), string("Neither"), string("Neither"), string("Neither")]),
@@ -45,13 +42,20 @@ fn handle_ws_message(state, conn, message) {
       actor.continue(state)
     }
     mist.Text(message) -> {
-      case headers_from_htmx_message(message).hx_trigger {
-        "create" -> {
-          on_create_game(PlayerSocket(conn, state))
+      let assert Ok(juno.Object(message_dict)) = juno.decode(message, [])
+      let assert Ok(juno.Object(headers_dict)) =
+        message_dict |> dict.get("HEADERS")
+      let assert Ok(juno.String(trigger)) =
+        headers_dict |> dict.get("HX-Trigger")
+
+      case trigger {
+        "create" -> on_create_game(PlayerSocket(conn, state)) |> actor.continue
+
+        _ -> {
+          logging.log(Alert, "Unknown Trigger")
+          actor.continue(state)
         }
-        _ -> logging.log(Alert, "Unknown Trigger")
       }
-      actor.continue(state)
     }
 
     mist.Binary(_) -> {
@@ -65,11 +69,6 @@ fn handle_ws_message(state, conn, message) {
     mist.Closed | mist.Shutdown -> actor.Stop(process.Normal)
   }
 }
-
-// "create" -> {
-//           on_create_game(conn)
-//         }
-
 // valkeySub.on("message", (channel, message) => {
 //   console.log(`Message ${message} was sent to chat \"${channel}\"`);
 //   const chat_sockets = sockets.get(channel);
@@ -109,22 +108,3 @@ fn handle_ws_message(state, conn, message) {
 //logging.log(Info, int.to_string(subscribers)<>" subscribers listened.")
 
 // can pub a message on game creation so all servers are aware of the game (also applys for actions in it)
-
-fn headers_from_htmx_message(message_json: String) -> HEADERS {
-  let message_decoder =
-    dynamic.decode1(MessageHTMX, field("HEADERS", of: dynamic.string))
-  let assert Ok(headers_string) =
-    json.decode(from: message_json, using: message_decoder)
-  let headers_decoder =
-    dynamic.decode5(
-      HEADERS,
-      field("HX-Request", of: dynamic.bool),
-      field("HX-Trigger", of: dynamic.string),
-      field("HX-Trigger-Name", of: dynamic.optional(dynamic.string)),
-      field("HX-Target", of: dynamic.string),
-      field("HX-Current-URL", of: dynamic.string),
-    )
-  let assert Ok(headers) =
-    json.decode(from: headers_string.headers, using: headers_decoder)
-  headers
-}
