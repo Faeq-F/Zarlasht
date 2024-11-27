@@ -1,6 +1,7 @@
 //// All Websocket related functions for the app
 
 import app/lib/create_game.{on_create_game}
+import app/lib/join_game.{on_join_game, on_to_join_game}
 import app/socket_types.{
   type ActorState, ActorState, Broadcast, Neither, PlayerSocket,
 }
@@ -50,6 +51,9 @@ fn handle_ws_message(state, conn, message) {
 
       case trigger {
         "create" -> on_create_game(PlayerSocket(conn, state)) |> actor.continue
+        "join" -> on_to_join_game(PlayerSocket(conn, state)) |> actor.continue
+        "join-game-form" ->
+          on_join_game(message, PlayerSocket(conn, state)) |> actor.continue
 
         _ -> {
           logging.log(Alert, "Unknown Trigger")
