@@ -1,6 +1,10 @@
 import app/router
+import app/socket_types
 import app/web.{Context}
+import carpenter/table
+import gleam/dict
 import gleam/erlang/process
+import gleam/io
 import gleam/result
 import glemo
 import glenvy/dotenv
@@ -9,14 +13,27 @@ import logging
 import mist
 import radish
 import radish/error
+
 import radish/resp
 import radish/utils.{execute, prepare}
 
 // Need to check the entire program for load balancing dependencies
 
+// Need to delete game when socket disconnects
+
 pub fn main() {
-  glemo.init(["cache"])
+  // Set up and configure an ETS table for holding websockets
+  let _ =
+    table.build("game_sockets")
+    |> table.privacy(table.Public)
+    |> table.write_concurrency(table.AutoWriteConcurrency)
+    |> table.read_concurrency(True)
+    |> table.decentralized_counters(True)
+    |> table.compression(False)
+    |> table.set
+  //load .env vars
   let _ = dotenv.load()
+  // configure server
   logging.configure()
   let ctx = Context(valkey_client(), valkey_client())
   let assert Ok(_) = radish_flush_db(ctx.publisher, 128)

@@ -18,8 +18,8 @@ packages = [
   { name = "gleam_json", version = "1.0.1", build_tools = ["gleam"], requirements = ["gleam_stdlib", "thoas"], otp_app = "gleam_json", source = "hex", outer_checksum = "9063D14D25406326C0255BDA0021541E797D8A7A12573D849462CAFED459F6EB" },
   { name = "gleam_otp", version = "0.14.1", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_stdlib"], otp_app = "gleam_otp", source = "hex", outer_checksum = "5A8CE8DBD01C29403390A7BD5C0A63D26F865C83173CF9708E6E827E53159C65" },
   { name = "gleam_stdlib", version = "0.43.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "69EF22E78FDCA9097CBE7DF91C05B2A8B5436826D9F66680D879182C0860A747" },
+  { name = "gleam_yielder", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_yielder", source = "hex", outer_checksum = "44C8DE196A10634667F5F7B93128A997B35DFD37E26F775D749BC6A239B499A8" },
   { name = "gleamyshell", version = "2.0.2", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleamyshell", source = "hex", outer_checksum = "9FCDB2E7C2C64CF8973049323586AEE164B72D06EBCE1AFBEA88D7B5E6B88AAE" },
-  { name = "glemo", version = "1.0.1", build_tools = ["gleam"], requirements = ["carpenter", "gleam_stdlib"], otp_app = "glemo", source = "hex", outer_checksum = "F66AF7DF6D011AC0097E12FDE82BCC9AE74CBBAC0A71F35CBBFF3070F6E99D81" },
   { name = "glenvy", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_stdlib", "nibble", "simplifile"], otp_app = "glenvy", source = "hex", outer_checksum = "BFAB5AEF5A5A662C85D6AC5C496383C279360C382F4F87AACA0F1054D692239E" },
   { name = "glisten", version = "6.0.0", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_otp", "gleam_stdlib", "logging", "telemetry"], otp_app = "glisten", source = "hex", outer_checksum = "912132751031473CB38F454120124FFC96AF6B0EA33D92C9C90DB16327A2A972" },
   { name = "globlin", version = "2.0.2", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "globlin", source = "hex", outer_checksum = "393E3421E4DA269B0E6025D69DA0F2D3DDD8517500F6BA2AE3C4024FA5F0B498" },
@@ -44,13 +44,14 @@ packages = [
 ]
 
 [requirements]
+carpenter = { version = ">= 0.3.1 and < 1.0.0" }
 glacier = { version = ">= 1.1.0 and < 2.0.0" }
 gleam_erlang = { version = ">= 0.30.0 and < 1.0.0" }
 gleam_http = { version = ">= 3.7.1 and < 4.0.0" }
 gleam_json = { version = ">= 1.0.1 and < 2.0.0" }
 gleam_otp = { version = ">= 0.14.1 and < 1.0.0" }
 gleam_stdlib = { version = ">= 0.34.0 and < 2.0.0" }
-glemo = { version = ">= 1.0.1 and < 2.0.0" }
+gleam_yielder = { version = ">= 1.0.0 and < 2.0.0" }
 glenvy = { version = ">= 1.1.0 and < 2.0.0" }
 juno = { version = ">= 1.3.0 and < 2.0.0" }
 logging = { version = ">= 1.3.0 and < 2.0.0" }
