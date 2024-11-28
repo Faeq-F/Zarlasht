@@ -1,3 +1,4 @@
+import gleam/erlang/process.{type Subject}
 import mist
 
 pub type CustomMessage {
@@ -5,7 +6,7 @@ pub type CustomMessage {
 }
 
 pub type ActorState {
-  ActorState(player: Player, name: String)
+  ActorState(player: Player, name: String, subject: Subject(String))
 }
 
 pub type Player {

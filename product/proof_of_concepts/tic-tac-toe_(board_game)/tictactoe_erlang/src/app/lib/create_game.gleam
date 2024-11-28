@@ -9,7 +9,7 @@ pub fn on_create_game(player: PlayerSocket) -> ActorState {
   let game_code = generate_game_code(player)
   let assert Ok(_) =
     mist.send_text_frame(player.socket, created_game_page(game_code))
-  ActorState(X, "")
+  ActorState(X, "", player.state.subject)
 }
 
 fn generate_game_code(player: PlayerSocket) -> Int {
