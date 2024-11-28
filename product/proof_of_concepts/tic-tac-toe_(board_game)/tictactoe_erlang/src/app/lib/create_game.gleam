@@ -2,6 +2,7 @@ import app/pages/created_game.{created_game_page}
 import app/socket_types.{type ActorState, type PlayerSocket, ActorState, X}
 import carpenter/table
 import gleam/int
+import logging.{Info}
 import mist
 
 pub fn on_create_game(player: PlayerSocket) -> ActorState {
@@ -18,6 +19,7 @@ fn generate_game_code(player: PlayerSocket) -> Int {
     [] -> {
       game_sockets
       |> table.insert([#(game_code, [player])])
+      logging.log(Info, "New game created; " <> int.to_string(game_code))
       game_code
     }
     _ -> generate_game_code(player)
