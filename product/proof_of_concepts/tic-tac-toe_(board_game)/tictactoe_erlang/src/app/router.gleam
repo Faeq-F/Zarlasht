@@ -34,7 +34,7 @@ pub fn handle_request(
     }
 
     // Websockets
-    ["init_socket"] -> new_socket_process(req)
+    ["init_socket"] -> new_socket_process(req, ctx)
 
     // Static files
     ["static", ..rest] -> serve_static(req, rest)
