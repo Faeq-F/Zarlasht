@@ -6,9 +6,6 @@ import app/socket_types.{
 import carpenter/table
 import gleam/dict
 import gleam/int
-import gleam/io
-import gleam/list
-import gleam/result
 import gleam/yielder.{each, from_list}
 import juno
 import mist
@@ -35,19 +32,19 @@ pub fn on_join_game(message: String, player: PlayerSocket) -> ActorState {
           let assert Ok(_) = mist.send_text_frame(player.socket, wrong_code())
           ActorState(Neither, "")
         }
-        _ -> {
-          let new_sockets_list = [
-            player,
-            ..{ list.first(game_sockets |> table.lookup(code)) }
-          ]
-          game_sockets
-          |> dict.insert(code, new_sockets_list)
-          |> glemo.memo("cache", fn(dict) { dict })
-          //send everyone to the set_name page
+        val -> {
+          let assert [#(code, current_sockets)] = val
+          let new_sockets_list = [player, ..current_sockets]
+          game_sockets |> table.insert([#(code, new_sockets_list)])
+          //send current user to the set_name page
+          let assert Ok(_) =
+            mist.send_text_frame(player.socket, set_name_page())
+          //send everyone else to the set_name page
           from_list(new_sockets_list)
-          |> each(fn(player: PlayerSocket) {
+          |> each(fn(other_player: PlayerSocket) {
+            //if other_player.state.player != player.state.player
             let assert Ok(_) =
-              mist.send_text_frame(player.socket, set_name_page())
+              mist.send_text_frame(other_player.socket, set_name_page())
           })
           ActorState(O, "")
         }

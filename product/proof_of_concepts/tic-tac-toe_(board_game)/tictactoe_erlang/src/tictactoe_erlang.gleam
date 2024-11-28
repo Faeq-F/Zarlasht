@@ -1,12 +1,8 @@
 import app/router
-import app/socket_types
 import app/web.{Context}
 import carpenter/table
-import gleam/dict
 import gleam/erlang/process
-import gleam/io
 import gleam/result
-import glemo
 import glenvy/dotenv
 import glenvy/env
 import logging
