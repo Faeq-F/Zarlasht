@@ -3,19 +3,23 @@
 import app/lib/create_game.{on_create_game}
 import app/lib/join_game.{on_join_game, on_to_join_game}
 import app/socket_types.{
-  type ActorState, ActorState, Broadcast, Neither, PlayerSocket,
+  type ActorState, type CustomMessage, type PlayerSocket, ActorMessage,
+  ActorState, Broadcast, Neither, PlayerSocket,
 }
 import app/web.{type Context}
 import carpenter/table
 import gleam/dict
 import gleam/dynamic
-import gleam/erlang/process.{new_subject, select_forever, selecting_anything}
+import gleam/erlang/process.{
+  type Selector, new_subject, select_forever, selecting_anything,
+}
 import gleam/function.{identity}
 import gleam/http/request.{type Request, Request}
 import gleam/int
 import gleam/io
 import gleam/option.{None, Some}
 import gleam/otp/actor
+import gleam/yielder.{each, from_list}
 import juno
 import logging.{Alert, Info}
 import mist.{type Connection, Custom}
@@ -28,23 +32,24 @@ pub fn new_socket_process(req: Request(Connection), ctx: Context) {
     request: req,
     on_init: fn(_conn) {
       let sockets_subject = new_subject()
+      // Create a new subject for the current websocket process that other actors will be able to send messages to
+      let ws_subject = process.new_subject()
+      // let new_selector =
+      //   process.new_selector()
+      //   |> process.selecting(ws_subject, function.identity)
+
+      // Register it to the CustomWebsocketMessage selector
+      let new_selector =
+        process.new_selector()
+        |> process.selecting(ws_subject, function.identity)
       // let sockets_selector =
       //   process.new_selector()
       //   |> selecting_anything(handle_message_from_subject)
       //handler(sockets_selector)
-      process.start(
-        fn() {
-          radish.subscribe(
-            ctx.subscriber,
-            ["all"],
-            on_subscribe,
-            on_radish_message,
-            128,
-          )
-        },
-        True,
-      )
-      #(ActorState(Neither, "", sockets_subject), None)
+
+      //pub fn subject_owner(subject: Subject(a)) -> Pid
+
+      #(ActorState(Neither, "", sockets_subject), Some(new_selector))
     },
     on_close: fn(_state) { io.println("A Websocket Disconnected") },
     handler: handle_ws_message,
@@ -84,6 +89,11 @@ fn handle_ws_message(state, conn, message) {
           actor.continue(state)
         }
       }
+    }
+
+    mist.Custom(ActorMessage(text)) -> {
+      let assert Ok(_) = mist.send_text_frame(conn, text)
+      actor.continue(state)
     }
 
     mist.Binary(_) -> {
@@ -143,21 +153,26 @@ fn on_subscribe(channel: String, subscribers: Int) {
 }
 
 //
-fn on_radish_message(channel: String, message: String) {
-  io.debug(
-    "The channel '" <> channel <> "' recieved the message '" <> message <> "'",
-  )
-  let assert Ok(game_sockets) = table.ref("game_sockets")
-  let val = game_sockets |> table.lookup(code)
-  let assert [#(code, current_sockets)] = val
-  from_list(current_sockets)
-  |> each(fn(other_player: PlayerSocket) {
-    other_player.state.subject
-    conn
-    message
-  })
-  radish.Continue
-}
+// fn on_radish_message(channel: String, message: String) {
+//   io.debug(
+//     "The channel '" <> channel <> "' recieved the message '" <> message <> "'",
+//   )
+
+//   radish.Continue
+// }
+
+// process.start(
+//         fn() {
+//           radish.subscribe(
+//             ctx.subscriber,
+//             ["channel"],
+//             on_subscribe,
+//             on_radish_message,
+//             128,
+//           )
+//         },
+//         True,
+//       )
 
 //let assert Ok(subscribers) = radish.publish(ctx.publisher, "channel", "message", 128)
 //logging.log(Info, int.to_string(subscribers)<>" subscribers listened.")
