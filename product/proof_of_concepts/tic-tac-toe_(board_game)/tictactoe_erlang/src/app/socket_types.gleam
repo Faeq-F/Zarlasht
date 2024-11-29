@@ -3,10 +3,11 @@ import mist
 
 pub type CustomMessage {
   Broadcast(String)
+  ActorMessage(String)
 }
 
 pub type ActorState {
-  ActorState(player: Player, name: String, subject: Subject(String))
+  ActorState(player: Player, name: String, subject: Subject(CustomMessage))
 }
 
 pub type Player {

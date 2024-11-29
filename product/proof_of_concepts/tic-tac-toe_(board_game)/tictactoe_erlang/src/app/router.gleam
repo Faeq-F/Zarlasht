@@ -1,8 +1,10 @@
 import app/pages
 import app/pages/layout.{layout}
+import app/socket_types.{type CustomMessage}
 import app/sockets.{new_socket_process}
 import app/web.{type Context}
 import gleam/bytes_tree
+import gleam/erlang/process.{type Selector}
 import gleam/http/request.{type Request, Request}
 import gleam/http/response.{type Response, Response}
 import gleam/list
@@ -17,6 +19,7 @@ import mist.{type Connection, type ResponseData, Bytes}
 pub fn handle_request(
   req: Request(Connection),
   ctx: Context,
+
 ) -> Response(ResponseData) {
   // Apply the middleware stack for this request/response.
   use _req <- web.middleware(req, ctx)
