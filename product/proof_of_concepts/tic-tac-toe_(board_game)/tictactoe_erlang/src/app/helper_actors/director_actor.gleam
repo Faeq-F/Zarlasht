@@ -1,52 +1,49 @@
 import app/actor_types.{
-  type CustomWebsocketMessage, type DirectorActorMessage, DequeueParticipant,
+  type CustomWebsocketMessage, type DirectorActorMessage,
+  type DirectorActorState, DequeueParticipant, DirectorActorState,
   EnqueueParticipant,
 }
 import app/helper_actors/game_actor
+import gleam/dict.{drop, get, insert}
 import gleam/erlang/process.{type Subject}
 import gleam/io
 import gleam/list
 import gleam/otp/actor.{type Next}
 
-pub opaque type QueueActorState {
-  QueueActorState(queue: List(#(String, Subject(CustomWebsocketMessage))))
-}
-
 pub fn start() -> Subject(DirectorActorMessage) {
-  let assert Ok(actor) = actor.start(QueueActorState([]), handle_message)
+  let assert Ok(actor) =
+    actor.start(DirectorActorState(dict.new()), handle_message)
   actor
 }
 
 fn handle_message(
   message: DirectorActorMessage,
-  state: QueueActorState,
-) -> Next(DirectorActorMessage, QueueActorState) {
+  state: DirectorActorState,
+) -> Next(DirectorActorMessage, DirectorActorState) {
   case message {
-    EnqueueParticipant(name, user_subject) -> {
-      io.println("Enqueued a user")
-
-      let participant = #(name, user_subject)
-      let new_queue = case state.queue {
-        [] -> [participant]
-        [first] -> {
-          io.debug("room actor started in queue actor")
-          game_actor.start([first, participant])
-          []
+    EnqueueParticipant(game_code, player, participant_subject) -> {
+      let participant = #(player, participant_subject)
+      let new_queue = case state.games_waiting |> get(game_code) {
+        Ok(first_participant) -> {
+          //They are joining a Game
+          game_actor.start([participant, ..first_participant])
+          state.games_waiting |> drop([game_code])
         }
-        [first, second, ..rest] -> {
-          game_actor.start([first, second])
-          list.append(rest, [participant])
+        _ -> {
+          //They created the game
+          state.games_waiting |> insert(game_code, [participant])
         }
       }
-      let new_state = QueueActorState(queue: new_queue)
+      let new_state = DirectorActorState(games_waiting: new_queue)
 
       new_state |> actor.continue
     }
-    DequeueParticipant(user_subject) -> {
-      let new_queue = list.filter(state.queue, fn(p) { p.1 != user_subject })
-      let new_state = QueueActorState(queue: new_queue)
-
-      new_state |> actor.continue
+    DequeueParticipant(participant_subject) -> {
+      // let new_queue = list.filter(state.queue, fn(p) { p.1 != user_subject })
+      // let new_state = QueueActorState(queue: new_queue)
+      //reload other persons page by sending a message to the room actor
+      // new_state |> actor.continue
+      state |> actor.continue
     }
   }
 }
