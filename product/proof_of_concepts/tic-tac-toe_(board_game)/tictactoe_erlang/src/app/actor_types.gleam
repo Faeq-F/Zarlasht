@@ -40,6 +40,7 @@ pub type GeneralMessage {
 }
 
 pub type DirectorActorMessage {
+
   EnqueueParticipant(
     game_code: Int,
     player: Player,

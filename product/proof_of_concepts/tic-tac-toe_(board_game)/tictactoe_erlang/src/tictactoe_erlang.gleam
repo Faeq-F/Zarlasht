@@ -15,9 +15,10 @@ import valkey.{radish_flush_db, valkey_client}
 
 pub fn main() {
   let director = director_actor.start()
-  // Set up and configure an ETS table for holding websockets - may no longer need
+  // Set up and configure a helper ETS table
+  // for holding games that have been created but need a second player
   let _ =
-    table.build("game_sockets")
+    table.build("waiting_games")
     |> table.privacy(table.Public)
     |> table.write_concurrency(table.AutoWriteConcurrency)
     |> table.read_concurrency(True)
