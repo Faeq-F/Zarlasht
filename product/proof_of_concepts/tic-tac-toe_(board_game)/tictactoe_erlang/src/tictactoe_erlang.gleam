@@ -1,3 +1,4 @@
+import app/helper_actors/director_actor
 import app/router
 import app/web.{Context}
 import carpenter/table
@@ -17,6 +18,7 @@ import utils.{radish_flush_db, valkey_client}
 // Need to delete game when socket disconnects
 
 pub fn main() {
+  let director = director_actor.start()
   // Set up and configure an ETS table for holding websockets
   let _ =
     table.build("game_sockets")
@@ -33,7 +35,7 @@ pub fn main() {
   let ctx = Context(valkey_client(), valkey_client())
   let assert Ok(_) = radish_flush_db(ctx.publisher, 128)
   let assert Ok(_) =
-    router.handle_request(_, ctx)
+    router.handle_request(_, ctx, director)
     |> mist.new
     |> mist.port(8000)
     // could randomize for recovery scenarios (in case new app takes over)

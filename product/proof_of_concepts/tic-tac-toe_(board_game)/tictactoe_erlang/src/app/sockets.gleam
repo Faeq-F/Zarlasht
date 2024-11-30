@@ -1,17 +1,18 @@
 //// All Websocket related functions for the app
 
+import app/actor_types.{
+  type CustomWebsocketMessage, type DirectorActorMessage, type PlayerSocket,
+  type WebsocketActorState, Disconnect, EnqueueParticipant, JoinGame, Neither,
+  PlayerSocket, SendToAll, SendToClient, WebsocketActorState,
+}
 import app/lib/create_game.{on_create_game}
 import app/lib/join_game.{on_join_game, on_to_join_game}
-import app/socket_types.{
-  type ActorState, type CustomMessage, type PlayerSocket, ActorMessage,
-  ActorState, Broadcast, Neither, PlayerSocket,
-}
 import app/web.{type Context}
 import carpenter/table
 import gleam/dict
 import gleam/dynamic
 import gleam/erlang/process.{
-  type Selector, new_subject, select_forever, selecting_anything,
+  type Selector, type Subject, new_subject, select_forever, selecting_anything,
 }
 import gleam/function.{identity}
 import gleam/http/request.{type Request, Request}
@@ -27,29 +28,31 @@ import radish
 
 ///See [here](https://hexdocs.pm/mist/mist.html#websocket)
 ///
-pub fn new_socket_process(req: Request(Connection), ctx: Context) {
+pub fn new_socket_process(
+  req: Request(Connection),
+  ctx: Context,
+  director: Subject(DirectorActorMessage),
+) {
   mist.websocket(
     request: req,
     on_init: fn(_conn) {
       let sockets_subject = new_subject()
       // Create a new subject for the current websocket process that other actors will be able to send messages to
       let ws_subject = process.new_subject()
-      // let new_selector =
-      //   process.new_selector()
-      //   |> process.selecting(ws_subject, function.identity)
-
-      // Register it to the CustomWebsocketMessage selector
       let new_selector =
         process.new_selector()
         |> process.selecting(ws_subject, function.identity)
-      // let sockets_selector =
-      //   process.new_selector()
-      //   |> selecting_anything(handle_message_from_subject)
-      //handler(sockets_selector)
-
-      //pub fn subject_owner(subject: Subject(a)) -> Pid
-
-      #(ActorState(Neither, "", sockets_subject), Some(new_selector))
+      // Set state for the connection with empty defaults
+      #(
+        WebsocketActorState(
+          name: "",
+          player: Neither,
+          ws_subject: ws_subject,
+          game_subject: None,
+          director_subject: director,
+        ),
+        Some(new_selector),
+      )
     },
     on_close: fn(_state) { io.println("A Websocket Disconnected") },
     handler: handle_ws_message,
@@ -70,6 +73,7 @@ fn handle_ws_message(state, conn, message) {
       let assert Ok(_) = mist.send_text_frame(conn, "pong")
       actor.continue(state)
     }
+
     mist.Text(message) -> {
       let assert Ok(juno.Object(message_dict)) = juno.decode(message, [])
       let assert Ok(juno.Object(headers_dict)) =
@@ -91,7 +95,39 @@ fn handle_ws_message(state, conn, message) {
       }
     }
 
-    mist.Custom(ActorMessage(text)) -> {
+    mist.Custom(JoinGame(game_subject, participants)) -> {
+      let new_state =
+        WebsocketActorState(..state, game_subject: Some(game_subject))
+
+      //stringifies message and send as text
+      // send_client_json(
+      //   connection,
+      //   socket_message.custom_body_to_json(
+      //     "joined",
+      //     json.array(participants, of: json.string),
+      // ),
+      // )
+
+      new_state |> actor.continue
+    }
+
+    mist.Custom(Disconnect) -> {
+      // ask queue actor for a match
+      // use name <- option.then(state.name)
+
+      // process.send(
+      //   state.queue_subject,
+      //   EnqueueParticipant(name, state.ws_subject),
+      // )
+      // Some(send_client_json(
+      //   connection,
+      //   socket_message.new("enqueued", "User successfully enqueued")
+      //     |> socket_message.to_json,
+      // ))
+      state |> actor.continue
+    }
+
+    mist.Custom(SendToClient(text)) -> {
       let assert Ok(_) = mist.send_text_frame(conn, text)
       actor.continue(state)
     }
@@ -100,10 +136,10 @@ fn handle_ws_message(state, conn, message) {
       actor.continue(state)
     }
 
-    mist.Custom(Broadcast(text)) -> {
-      let assert Ok(_) = mist.send_text_frame(conn, text)
-      actor.continue(state)
-    }
+    // mist.Custom(Broadcast(text)) -> {
+    //   let assert Ok(_) = mist.send_text_frame(conn, text)
+    //   actor.continue(state)
+    // }
     mist.Closed | mist.Shutdown -> actor.Stop(process.Normal)
   }
 }
