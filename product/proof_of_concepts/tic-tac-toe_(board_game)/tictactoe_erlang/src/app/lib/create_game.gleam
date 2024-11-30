@@ -21,18 +21,17 @@ pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
 }
 
 fn generate_game_code(player: PlayerSocket) -> Int {
-  // let assert Ok(game_sockets) = table.ref("game_sockets")
+  let assert Ok(waiting_games) = table.ref("waiting_games")
   let game_code = int.random(9999)
-  // Games with the same codes can exist - just cannot be waiting for a joining player at the same time
-  //check directors state for key (game_code) existing - maybe try call
-
-  // case game_sockets |> table.lookup(game_code) {
-  //   [] -> {
-  //     game_sockets
-  //     |> table.insert([#(game_code, [player])])
-  //     logging.log(Info, "New game created; " <> int.to_string(game_code))
-  //     game_code
-  //   }
-  //   _ -> generate_game_code(player)
-  // }
+  // Games with the same codes can exist;
+  // They just cannot be waiting for a joining player at the same time
+  case waiting_games |> table.lookup(game_code) {
+    [] -> {
+      waiting_games
+      |> table.insert([#(game_code, "Waiting for a player to join")])
+      logging.log(Info, "New game created; " <> int.to_string(game_code))
+      game_code
+    }
+    _ -> generate_game_code(player)
+  }
 }
