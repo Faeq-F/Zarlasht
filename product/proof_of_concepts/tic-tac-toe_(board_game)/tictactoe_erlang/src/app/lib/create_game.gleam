@@ -1,15 +1,17 @@
+import app/actor_types.{
+  type PlayerSocket, type WebsocketActorState, WebsocketActorState, X,
+}
 import app/pages/created_game.{created_game_page}
-import app/socket_types.{type ActorState, type PlayerSocket, ActorState, X}
 import carpenter/table
 import gleam/int
 import logging.{Info}
 import mist
 
-pub fn on_create_game(player: PlayerSocket) -> ActorState {
+pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
   let game_code = generate_game_code(player)
   let assert Ok(_) =
     mist.send_text_frame(player.socket, created_game_page(game_code))
-  ActorState(X, "", player.state.subject)
+  WebsocketActorState(..player.state, player: X)
 }
 
 fn generate_game_code(player: PlayerSocket) -> Int {
