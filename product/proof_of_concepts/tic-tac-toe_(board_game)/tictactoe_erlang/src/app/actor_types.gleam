@@ -1,9 +1,10 @@
+import gleam/dict.{type Dict}
 import gleam/erlang/process.{type Subject}
 import gleam/option.{type Option}
 import mist
 
 pub type CustomWebsocketMessage {
-  JoinGame(game_subject: Subject(GameActorMessage), participants: List(String))
+  JoinGame(game_subject: Subject(GameActorMessage))
   SendToClient(message: String)
   Disconnect
 }
@@ -40,9 +41,20 @@ pub type GeneralMessage {
 
 pub type DirectorActorMessage {
   EnqueueParticipant(
-    name: String,
+    game_code: Int,
+    player: Player,
     participant_subject: Subject(CustomWebsocketMessage),
   )
-  // maybe add player, etc.
+
   DequeueParticipant(participant_subject: Subject(CustomWebsocketMessage))
+}
+
+pub type DirectorActorState {
+  DirectorActorState(
+    games_waiting: Dict(Int, List(#(Player, Subject(CustomWebsocketMessage)))),
+  )
+}
+
+pub type GameActorState {
+  GameActorState(participants: List(#(Player, Subject(CustomWebsocketMessage))))
 }

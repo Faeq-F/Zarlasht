@@ -7,6 +7,7 @@ import app/actor_types.{
 }
 import app/lib/create_game.{on_create_game}
 import app/lib/join_game.{on_join_game, on_to_join_game}
+import app/pages/set_name.{set_name_page}
 import app/web.{type Context}
 import carpenter/table
 import gleam/dict
@@ -95,9 +96,10 @@ fn handle_ws_message(state, conn, message) {
       }
     }
 
-    mist.Custom(JoinGame(game_subject, participants)) -> {
+    mist.Custom(JoinGame(game_subject)) -> {
       let new_state =
         WebsocketActorState(..state, game_subject: Some(game_subject))
+      let assert Ok(_) = mist.send_text_frame(conn, set_name_page())
 
       //stringifies message and send as text
       // send_client_json(

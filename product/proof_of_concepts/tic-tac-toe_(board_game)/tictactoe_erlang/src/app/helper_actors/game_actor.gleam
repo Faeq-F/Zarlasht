@@ -1,45 +1,23 @@
 import app/actor_types.{
-  type CustomWebsocketMessage, type GameActorMessage, Disconnect,
-  DisconnectParticipant, JoinGame, SendToAll, SendToClient,
+  type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
+  type Player, Disconnect, DisconnectParticipant, GameActorState, JoinGame,
+  SendToAll, SendToClient,
 }
 import gleam/erlang/process.{type Subject, Normal}
 import gleam/io
 import gleam/list
 import gleam/otp/actor.{type Next, Stop}
 
-pub opaque type RoomActorState {
-  RoomActorState(participants: List(#(String, Subject(CustomWebsocketMessage))))
-}
-
-//name, subject
 pub fn start(
-  participants: List(#(String, Subject(CustomWebsocketMessage))),
+  participants: List(#(Player, Subject(CustomWebsocketMessage))),
 ) -> Subject(GameActorMessage) {
-  io.println("Started new room actor")
-
-  let state = RoomActorState(participants: participants)
-  io.debug("started another actor from room_actor")
+  let state = GameActorState(participants: participants)
   let assert Ok(actor) = actor.start(state, handle_message)
 
-  // Tell participants they have been put into a room
-  io.debug(
-    "sent a participant (after checking for the right one) joint_room using the new actor as a subject",
-  )
+  //send everyone to the set_name page
+  //(by sending a message that holds the game_actor)
   list.each(participants, fn(participant) {
-    process.send(
-      participant.1,
-      //the second item (index)
-      JoinGame(
-        game_subject: actor,
-        participants: participants
-          |> list.filter_map(fn(p) {
-            case p.1 != participant.1 {
-              True -> Ok(p.0)
-              False -> Error(Nil)
-            }
-          }),
-      ),
-    )
+    process.send(participant.1, JoinGame(game_subject: actor))
   })
 
   actor
@@ -47,8 +25,8 @@ pub fn start(
 
 fn handle_message(
   message: GameActorMessage,
-  state: RoomActorState,
-) -> Next(GameActorMessage, RoomActorState) {
+  state: GameActorState,
+) -> Next(GameActorMessage, GameActorState) {
   io.debug("room actor got message")
   io.debug(message)
   case message {
@@ -65,7 +43,7 @@ fn handle_message(
     }
     DisconnectParticipant(participant_subject) -> {
       let new_state =
-        RoomActorState(
+        GameActorState(
           participants: list.filter(state.participants, fn(p) {
             case p.1 != participant_subject {
               True -> True
