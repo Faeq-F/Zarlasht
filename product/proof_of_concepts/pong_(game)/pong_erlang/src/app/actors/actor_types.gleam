@@ -17,6 +17,7 @@ pub type WebsocketActorState {
 pub type CustomWebsocketMessage {
   JoinGame(game_subject: Subject(GameActorMessage))
   SendToClient(message: String)
+  Wait
   Disconnect
 }
 
@@ -50,11 +51,17 @@ pub type DirectorActorMessage {
 //----------------------------------------------------------------------
 
 pub type GameActorState {
-  GameActorState(participants: List(#(Player, Subject(CustomWebsocketMessage))))
+  GameActorState(
+    participants: List(#(Player, Subject(CustomWebsocketMessage))),
+    names_set: Int,
+    player_one_name: String,
+    player_two_name: String,
+  )
 }
 
 pub type GameActorMessage {
   UserDisconnected(player: Player)
+  AddedName(player: Player, ws: Subject(CustomWebsocketMessage), name: String)
   SendToAll(general_message: GeneralMessage)
 }
 

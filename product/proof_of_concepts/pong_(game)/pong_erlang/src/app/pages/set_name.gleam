@@ -63,3 +63,12 @@ pub fn waiting() -> String {
   ])
   |> element.to_string
 }
+
+pub fn empty_name() -> String {
+  html.div([attribute.id("waiting")], [
+    html.p([attribute.class("text-sm mt-1 text-error")], [
+      html.text("You cannot have an empty name!"),
+    ]),
+  ])
+  |> element.to_string
+}

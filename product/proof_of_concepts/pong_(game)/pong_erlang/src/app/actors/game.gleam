@@ -1,8 +1,9 @@
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, Disconnect, GameActorState, JoinGame, SendToAll, SendToClient,
-  UserDisconnected,
+  type Player, AddedName, Disconnect, GameActorState, JoinGame, One, SendToAll,
+  SendToClient, Two, UserDisconnected, Wait,
 }
+import app/pages/game.{game_page}
 import gleam/erlang/process.{type Subject}
 import gleam/io
 import gleam/list
@@ -12,7 +13,13 @@ import logging.{Info}
 pub fn start(
   participants: List(#(Player, Subject(CustomWebsocketMessage))),
 ) -> Subject(GameActorMessage) {
-  let state = GameActorState(participants: participants)
+  let state =
+    GameActorState(
+      participants: participants,
+      names_set: 0,
+      player_one_name: "",
+      player_two_name: "",
+    )
   let assert Ok(actor) = actor.start(state, handle_message)
 
   //send everyone to the set_name page
@@ -31,6 +38,43 @@ fn handle_message(
   logging.log(Info, "A Game Actor got the message")
   io.debug(message)
   case message {
+    AddedName(player, ws_subject, name) -> {
+      let assert Ok(first_person) = list.first(state.participants)
+      let new_state = case player {
+        first if first == first_person.0 ->
+          GameActorState(
+            ..state,
+            names_set: state.names_set + 1,
+            player_two_name: name,
+          )
+        _ ->
+          GameActorState(
+            ..state,
+            names_set: state.names_set + 1,
+            player_one_name: name,
+          )
+      }
+      case new_state.names_set {
+        1 -> process.send(ws_subject, Wait)
+        _ -> {
+          list.each(state.participants, fn(p) {
+            // send each participantto the game page
+            process.send(p.1, SendToClient(game_page()))
+            //update player names
+            process.send(
+              p.1,
+              SendToClient(game.player(One, new_state.player_one_name)),
+            )
+            process.send(
+              p.1,
+              SendToClient(game.player(Two, new_state.player_two_name)),
+            )
+          })
+        }
+      }
+      new_state |> actor.continue
+    }
+
     SendToAll(general_message) -> {
       let message = general_message.content
       list.each(state.participants, fn(p) {

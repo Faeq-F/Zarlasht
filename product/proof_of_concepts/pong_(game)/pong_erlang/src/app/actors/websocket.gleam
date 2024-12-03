@@ -3,10 +3,11 @@
 import app/actors/actor_types.{
   type DirectorActorMessage, type PlayerSocket, type WebsocketActorState,
   DequeueParticipant, Disconnect, JoinGame, Neither, PlayerSocket, SendToClient,
-  UserDisconnected, WebsocketActorState,
+  UserDisconnected, Wait, WebsocketActorState,
 }
 import app/lib/create_game.{on_create_game}
 import app/lib/join_game.{on_join_game, on_to_join_game}
+import app/lib/name_set.{set_name}
 import app/pages/set_name.{set_name_page}
 import gleam/dict
 import gleam/erlang/process.{type Subject}
@@ -97,6 +98,8 @@ fn handle_ws_message(state, conn, message) {
         "join-game-form" ->
           on_join_game(message, PlayerSocket(conn, state))
           |> actor.continue
+        "set-name-form" ->
+          set_name(message, PlayerSocket(conn, state)) |> actor.continue
 
         _ -> {
           logging.log(Alert, "Unknown Trigger")
@@ -110,6 +113,11 @@ fn handle_ws_message(state, conn, message) {
         WebsocketActorState(..state, game_subject: Some(game_subject))
       let assert Ok(_) = mist.send_text_frame(conn, set_name_page())
       new_state |> actor.continue
+    }
+
+    mist.Custom(Wait) -> {
+      let assert Ok(_) = mist.send_text_frame(conn, set_name.waiting())
+      actor.continue(state)
     }
 
     mist.Custom(SendToClient(text)) -> {
