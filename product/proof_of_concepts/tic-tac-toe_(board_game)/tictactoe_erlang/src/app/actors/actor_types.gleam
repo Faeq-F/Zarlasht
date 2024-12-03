@@ -56,6 +56,7 @@ pub type GameActorState {
     names_set: Int,
     player_one_name: String,
     player_two_name: String,
+    game_state: GameState,
   )
 }
 
@@ -67,4 +68,8 @@ pub type GameActorMessage {
 
 pub type GeneralMessage {
   GeneralMessage(source: String, content: String)
+}
+
+pub type GameState {
+  GameState(turn: Player, state: List(Player))
 }

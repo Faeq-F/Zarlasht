@@ -109,7 +109,7 @@ pub fn game_page() -> String {
 
 pub fn update_status(
   turn: Bool,
-  player_viewed: String,
+  player_viewed: actor_types.Player,
   player_won: String,
 ) -> String {
   html.div(
@@ -151,7 +151,15 @@ pub fn update_status(
             ),
           ]
           _ -> {
-            case player_won == player_viewed {
+            case
+              {
+                case player_won {
+                  "X" -> actor_types.X
+                  _ -> actor_types.O
+                }
+              }
+              == player_viewed
+            {
               True -> [
                 html.p([attribute.class("text-xl text-secondary")], [
                   html.text("You Won!"),
@@ -194,7 +202,11 @@ pub fn update_status(
   |> element.to_string
 }
 
-pub fn game_grid(game_code: Int, player_viewed: String, turn: Bool) -> String {
+pub fn game_grid(
+  game_state: actor_types.GameState,
+  player_viewed: actor_types.Player,
+  turn: Bool,
+) -> String {
   html.div(
     [
       attribute.class(
@@ -202,7 +214,7 @@ pub fn game_grid(game_code: Int, player_viewed: String, turn: Bool) -> String {
       ),
       attribute.id("game"),
     ],
-    generate_boxes([], 0, game_code, player_viewed, turn),
+    generate_boxes([], 0, game_state, player_viewed, turn),
   )
   |> element.to_string
 }
@@ -210,8 +222,8 @@ pub fn game_grid(game_code: Int, player_viewed: String, turn: Bool) -> String {
 fn generate_boxes(
   boxes: List(Element(button)),
   current_index: Int,
-  game_code: Int,
-  player_viewed: String,
+  game_state: actor_types.GameState,
+  player_viewed: actor_types.Player,
   turn: Bool,
 ) -> List(Element(button)) {
   case current_index == 9 {
@@ -221,14 +233,13 @@ fn generate_boxes(
         list.append(boxes, [
           game_box(
             current_index |> int.to_string,
-            "",
-            //get_player_from_game_state(game_code, current_index),
+            get_player_from_game_state(game_state, current_index),
             player_viewed,
             turn,
           ),
         ]),
         current_index + 1,
-        game_code,
+        game_state,
         player_viewed,
         turn,
       )
@@ -236,10 +247,19 @@ fn generate_boxes(
   }
 }
 
+fn get_player_from_game_state(
+  game_state: actor_types.GameState,
+  current_index: Int,
+) -> actor_types.Player {
+  let assert Ok(occupier) =
+    list.first(list.split(game_state.state, current_index).1)
+  occupier
+}
+
 fn game_box(
   id: String,
-  player_filled: String,
-  player_viewed: String,
+  player_filled: actor_types.Player,
+  player_viewed: actor_types.Player,
   turn: Bool,
 ) -> Element(button) {
   let border_style =
@@ -248,7 +268,7 @@ fn game_box(
       case player_viewed == player_filled {
         True -> "border-primary"
         _ -> {
-          case player_filled == "Neither" {
+          case player_filled == actor_types.Neither {
             True -> "border-gray-200"
             _ -> "border-accent"
           }
@@ -256,7 +276,7 @@ fn game_box(
       },
     ])
   case player_filled {
-    "X" -> {
+    actor_types.X -> {
       html.button(
         [
           attribute.id(id),
@@ -268,7 +288,7 @@ fn game_box(
         [x([class("w-36 h-36 inline")])],
       )
     }
-    "O" -> {
+    actor_types.O -> {
       html.button(
         [
           attribute.id(id),
@@ -378,7 +398,7 @@ pub fn player(player: actor_types.Player, name: String) -> String {
           attribute.id("player1"),
         ],
         [
-          x([class("w-10 h-10 inline fill-current")]),
+          x([class("w-10 h-10 inline ")]),
           html.p([attribute.class("inline text-lg")], [text(name)]),
         ],
       )
@@ -394,7 +414,7 @@ pub fn player(player: actor_types.Player, name: String) -> String {
         ],
         [
           html.p([attribute.class("inline text-lg")], [text(name)]),
-          circle([class("inline w-8 h-8 fill-current ml-1")]),
+          circle([class("inline w-8 h-8  ml-1")]),
         ],
       )
       |> element.to_string

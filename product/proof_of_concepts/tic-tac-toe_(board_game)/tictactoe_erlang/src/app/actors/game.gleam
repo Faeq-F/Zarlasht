@@ -1,7 +1,7 @@
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddedName, Disconnect, GameActorState, JoinGame, O, SendToAll,
-  SendToClient, UserDisconnected, Wait, X,
+  type GameState, type Player, AddedName, Disconnect, GameActorState, GameState,
+  JoinGame, Neither, O, SendToAll, SendToClient, UserDisconnected, Wait, X,
 }
 import app/pages/game.{game_page}
 import gleam/erlang/process.{type Subject}
@@ -19,6 +19,18 @@ pub fn start(
       names_set: 0,
       player_one_name: "",
       player_two_name: "",
+      game_state: GameState(turn: X, state: [
+        // player markings in boxes - left to right, top to bottom
+        Neither,
+        Neither,
+        Neither,
+        Neither,
+        Neither,
+        Neither,
+        Neither,
+        Neither,
+        Neither,
+      ]),
     )
   let assert Ok(actor) = actor.start(state, handle_message)
 
@@ -60,6 +72,15 @@ fn handle_message(
           list.each(state.participants, fn(p) {
             // send each participantto the game page
             process.send(p.1, SendToClient(game_page()))
+            //update game grid
+            process.send(
+              p.1,
+              SendToClient(game.game_grid(
+                state.game_state,
+                p.0,
+                state.game_state.turn == p.0,
+              )),
+            )
             //update player names
             process.send(
               p.1,
@@ -68,6 +89,15 @@ fn handle_message(
             process.send(
               p.1,
               SendToClient(game.player(O, new_state.player_two_name)),
+            )
+            //update status
+            process.send(
+              p.1,
+              SendToClient(game.update_status(
+                state.game_state.turn == p.0,
+                p.0,
+                get_winning_player(state.game_state),
+              )),
             )
           })
         }
@@ -101,4 +131,65 @@ fn handle_message(
       actor.Stop(process.Abnormal("A player disconnected from the game"))
     }
   }
+}
+
+fn get_winning_player(state: GameState) {
+  //possible combinations of boxes marked to be a winner
+  let lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ]
+  case check_lines(lines, state) {
+    Neither -> {
+      case list.contains(state.state, Neither) {
+        True -> "Neither"
+        _ -> "Draw"
+      }
+    }
+    player -> {
+      case player {
+        X -> "X"
+        _ -> "O"
+      }
+    }
+  }
+}
+
+fn check_lines(lines: List(List(Int)), state: GameState) {
+  case lines {
+    [first, ..rest] -> {
+      let assert [a, b, c] = first
+      let player = get_from_index(state.state, a)
+      case player {
+        X | O -> {
+          case
+            player == get_from_index(state.state, b)
+            && player == get_from_index(state.state, c)
+          {
+            True -> {
+              player
+            }
+            _ -> {
+              Neither
+            }
+          }
+        }
+        _ -> Neither
+      }
+
+      check_lines(rest, state)
+    }
+    [] -> Neither
+  }
+}
+
+fn get_from_index(list: List(a), index: Int) -> a {
+  let assert Ok(last) = list.first(list.split(list, index).1)
+  last
 }
