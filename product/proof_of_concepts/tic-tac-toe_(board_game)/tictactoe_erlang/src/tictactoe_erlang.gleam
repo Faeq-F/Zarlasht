@@ -12,6 +12,8 @@ import valkey.{radish_flush_db, valkey_client}
 // Need to check the entire program for load balancing dependencies - e.g., ETS data sharing
 
 pub fn main() {
+  logging.configure()
+  logging.log(logging.Debug, "Some logs may be ASCII encoded")
   let director = director.start()
   // Set up and configure a helper ETS table
   // for holding games that have been created but need a second player
@@ -26,7 +28,6 @@ pub fn main() {
   //load .env vars
   let _ = dotenv.load()
   // configure server
-  logging.configure()
   let ctx = Context(valkey_client(), valkey_client())
   let assert Ok(_) = radish_flush_db(ctx.publisher, 128)
   let assert Ok(_) =
