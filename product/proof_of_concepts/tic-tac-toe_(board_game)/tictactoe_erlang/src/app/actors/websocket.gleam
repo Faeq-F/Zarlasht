@@ -70,12 +70,6 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
   )
 }
 
-// player markings in boxes - left to right, top to bottom
-// to_string(object([
-//  #("state", [string("Neither"), string("Neither"), string("Neither"), string("Neither"), string("Neither"), string("Neither"), string("Neither"), string("Neither"), string("Neither")]),
-//  #("turn", string("X")),
-//]))
-
 fn handle_ws_message(state, conn, message) {
   logging.log(Info, "Websocket message recieved ~")
   io.debug(message)
