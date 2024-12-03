@@ -1,4 +1,4 @@
-import app/actor_types.{
+import app/actors/actor_types.{
   type PlayerSocket, type WebsocketActorState, EnqueueParticipant,
   WebsocketActorState, X,
 }

@@ -1,4 +1,4 @@
-import app/helper_actors/director_actor
+import app/actors/director
 import app/router
 import app/web.{Context}
 import carpenter/table
@@ -10,11 +10,9 @@ import valkey.{radish_flush_db, valkey_client}
 
 // TODO
 // Need to check the entire program for load balancing dependencies - e.g., ETS data sharing
-// Need to delete game when socket disconnects
-// Make sure everything is logged properly (and try to remove ASCII messages for readable ones)
 
 pub fn main() {
-  let director = director_actor.start()
+  let director = director.start()
   // Set up and configure a helper ETS table
   // for holding games that have been created but need a second player
   let _ =

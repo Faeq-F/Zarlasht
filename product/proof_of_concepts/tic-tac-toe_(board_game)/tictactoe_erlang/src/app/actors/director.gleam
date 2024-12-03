@@ -1,8 +1,8 @@
-import app/actor_types.{
+import app/actors/actor_types.{
   type DirectorActorMessage, type DirectorActorState, DequeueParticipant,
   DirectorActorState, EnqueueParticipant,
 }
-import app/helper_actors/game_actor
+import app/actors/game
 import carpenter/table
 import gleam/dict.{drop, get, insert}
 import gleam/erlang/process.{type Subject}
@@ -24,7 +24,7 @@ fn handle_message(
       let new_queue = case state.games_waiting |> get(game_code) {
         Ok(first_participant) -> {
           //They are joining a Game
-          game_actor.start([participant, ..first_participant])
+          game.start([participant, ..first_participant])
           state.games_waiting |> drop([game_code])
         }
         _ -> {

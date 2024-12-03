@@ -84,7 +84,6 @@ fn log_request(
       req.path,
     ]
     |> string.concat
-
-  logging.log(Info, message)
+  logging.log(Info, string.inspect(message))
   response
 }

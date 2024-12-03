@@ -1,7 +1,7 @@
-import app/actor_types.{type DirectorActorMessage}
+import app/actors/actor_types.{type DirectorActorMessage}
+import app/actors/websocket
 import app/pages/home
 import app/pages/layout.{layout}
-import app/sockets.{new_socket_process}
 import app/web.{type Context}
 import gleam/bytes_tree
 import gleam/erlang/process.{type Subject}
@@ -27,7 +27,7 @@ pub fn handle_request(
     [] -> serve_home_page()
 
     // Websockets
-    ["init_socket"] -> new_socket_process(req, director)
+    ["init_socket"] -> websocket.new(req, director)
 
     // Static files
     ["static", ..rest] -> serve_static(req, rest)
