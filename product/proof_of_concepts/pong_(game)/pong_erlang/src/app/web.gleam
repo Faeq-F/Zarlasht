@@ -4,7 +4,6 @@ import gleam/http
 import gleam/http/request.{type Request}
 import gleam/http/response.{type Response}
 import gleam/int
-import gleam/io
 import gleam/string
 import logging.{Info}
 import mist.{type Connection, type ResponseData, Bytes}
@@ -30,6 +29,7 @@ pub fn middleware(
   _ctx: Context,
   handle_request: fn(Request(Connection)) -> Response(ResponseData),
 ) -> Response(ResponseData) {
+  // add server rescue
   use <- log_request(req)
   use <- default_responses
   handle_request(req)
@@ -84,7 +84,6 @@ fn log_request(
       req.path,
     ]
     |> string.concat
-
-  logging.log(Info, message)
+  logging.log(Info, string.inspect(message))
   response
 }
