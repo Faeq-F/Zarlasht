@@ -12,6 +12,7 @@ pub type CustomWebsocketMessage {
 pub type WebsocketActorState {
   WebsocketActorState(
     name: String,
+    game_code: Int,
     player: Player,
     ws_subject: Subject(CustomWebsocketMessage),
     game_subject: Option(Subject(GameActorMessage)),
@@ -30,11 +31,10 @@ pub type PlayerSocket {
 }
 
 pub type GameActorMessage {
-  DisconnectParticipant(participant_subject: Subject(CustomWebsocketMessage))
+  UserDisconnected(player: Player)
   SendToAll(general_message: GeneralMessage)
 }
 
-//Was Chat
 pub type GeneralMessage {
   GeneralMessage(source: String, content: String)
 }
@@ -47,7 +47,7 @@ pub type DirectorActorMessage {
     participant_subject: Subject(CustomWebsocketMessage),
   )
 
-  DequeueParticipant(participant_subject: Subject(CustomWebsocketMessage))
+  DequeueParticipant(game_code: Int)
 }
 
 pub type DirectorActorState {

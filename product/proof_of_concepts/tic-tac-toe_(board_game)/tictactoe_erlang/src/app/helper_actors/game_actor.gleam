@@ -1,12 +1,13 @@
 import app/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, Disconnect, DisconnectParticipant, GameActorState, JoinGame,
-  SendToAll, SendToClient,
+  type Player, Disconnect, GameActorState, JoinGame, SendToAll, SendToClient,
+  UserDisconnected,
 }
-import gleam/erlang/process.{type Subject, Normal}
+import gleam/erlang/process.{type Subject}
 import gleam/io
 import gleam/list
-import gleam/otp/actor.{type Next, Stop}
+import gleam/otp/actor.{type Next}
+import logging.{Info}
 
 pub fn start(
   participants: List(#(Player, Subject(CustomWebsocketMessage))),
@@ -27,12 +28,10 @@ fn handle_message(
   message: GameActorMessage,
   state: GameActorState,
 ) -> Next(GameActorMessage, GameActorState) {
-  io.debug("room actor got message")
+  logging.log(Info, "A Game Actor got the message")
   io.debug(message)
   case message {
     SendToAll(general_message) -> {
-      // let body_json = chat |> chat.to_json
-      // let message_json = socket_message.custom_body_to_json("chat", body_json)
       let message = general_message.content
       list.each(state.participants, fn(p) {
         // send each participant's subject the message
@@ -41,34 +40,21 @@ fn handle_message(
 
       state |> actor.continue
     }
-    DisconnectParticipant(participant_subject) -> {
-      let new_state =
-        GameActorState(
-          participants: list.filter(state.participants, fn(p) {
-            case p.1 != participant_subject {
-              True -> True
-              False -> {
-                io.println("Disconnected a user from a room")
-                False
-              }
-            }
-          }),
-        )
-
-      // Close the room if one or no participants left
-      case new_state.participants {
-        [] -> {
-          io.println("No participants left. Closed a room actor")
-          Stop(Normal)
+    UserDisconnected(player) -> {
+      //make other player disconnect
+      list.each(state.participants, fn(participant) {
+        case participant.0 == player {
+          True -> {
+            // they have already disconnected so can't send them a message
+            Nil
+          }
+          _ -> {
+            process.send(participant.1, Disconnect)
+            Nil
+          }
         }
-        [participant] -> {
-          io.println("Only one participant left. Closed a room actor")
-
-          process.send(participant.1, Disconnect)
-          Stop(Normal)
-        }
-        _ -> new_state |> actor.continue
-      }
+      })
+      actor.Stop(process.Abnormal("A player disconnected from the game"))
     }
   }
 }

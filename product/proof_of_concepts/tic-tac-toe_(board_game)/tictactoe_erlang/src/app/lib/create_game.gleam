@@ -22,7 +22,10 @@ pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
 
 fn generate_game_code(player: PlayerSocket) -> Int {
   let assert Ok(waiting_games) = table.ref("waiting_games")
-  let game_code = int.random(9999)
+  let game_code = case int.random(9999) {
+    0 -> 1
+    code -> code
+  }
   // Games with the same codes can exist;
   // They just cannot be waiting for a joining player at the same time
   case waiting_games |> table.lookup(game_code) {

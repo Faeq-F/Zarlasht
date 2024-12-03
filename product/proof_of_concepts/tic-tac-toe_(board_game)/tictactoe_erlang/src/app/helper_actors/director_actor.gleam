@@ -1,13 +1,11 @@
 import app/actor_types.{
-  type CustomWebsocketMessage, type DirectorActorMessage,
-  type DirectorActorState, DequeueParticipant, DirectorActorState,
-  EnqueueParticipant,
+  type DirectorActorMessage, type DirectorActorState, DequeueParticipant,
+  DirectorActorState, EnqueueParticipant,
 }
 import app/helper_actors/game_actor
+import carpenter/table
 import gleam/dict.{drop, get, insert}
 import gleam/erlang/process.{type Subject}
-import gleam/io
-import gleam/list
 import gleam/otp/actor.{type Next}
 
 pub fn start() -> Subject(DirectorActorMessage) {
@@ -38,11 +36,10 @@ fn handle_message(
 
       new_state |> actor.continue
     }
-    DequeueParticipant(participant_subject) -> {
-      // let new_queue = list.filter(state.queue, fn(p) { p.1 != user_subject })
-      // let new_state = QueueActorState(queue: new_queue)
-      //reload other persons page by sending a message to the room actor
-      // new_state |> actor.continue
+    DequeueParticipant(game_code) -> {
+      state.games_waiting |> drop([game_code])
+      let assert Ok(waiting_games) = table.ref("waiting_games")
+      waiting_games |> table.delete(game_code)
       state |> actor.continue
     }
   }

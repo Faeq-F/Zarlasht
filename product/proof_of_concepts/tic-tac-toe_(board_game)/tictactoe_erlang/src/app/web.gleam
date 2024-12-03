@@ -9,7 +9,7 @@ import logging.{Info}
 import mist.{type Connection, type ResponseData, Bytes}
 import radish.{type Message}
 
-/// Contains the Subjects that publish and susbscribe to channels on Valkey, and a dictionary for all websockets in a game
+/// Contains the Subjects that publish and susbscribe to channels on Valkey
 ///
 /// Since the subscriber is limited to certain commands after subscribing to a
 /// channel, the publisher can be used for anything else that is required
