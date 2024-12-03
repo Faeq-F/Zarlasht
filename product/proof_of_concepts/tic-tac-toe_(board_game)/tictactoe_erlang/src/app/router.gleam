@@ -1,5 +1,5 @@
 import app/actor_types.{type DirectorActorMessage}
-import app/pages
+import app/pages/home
 import app/pages/layout.{layout}
 import app/sockets.{new_socket_process}
 import app/web.{type Context}
@@ -27,7 +27,7 @@ pub fn handle_request(
     [] -> serve_home_page()
 
     // Websockets
-    ["init_socket"] -> new_socket_process(req, ctx, director)
+    ["init_socket"] -> new_socket_process(req, director)
 
     // Static files
     ["static", ..rest] -> serve_static(req, rest)
@@ -50,7 +50,7 @@ pub fn handle_request(
 
 pub fn serve_home_page() {
   let doc_string =
-    [pages.home()]
+    [home.root()]
     |> layout
     |> element.to_document_string
   response.new(200)
