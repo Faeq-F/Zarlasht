@@ -1,6 +1,6 @@
 //// All Websocket related functions for the app
 
-import app/actor_types.{
+import app/actors/actor_types.{
   type DirectorActorMessage, type PlayerSocket, type WebsocketActorState,
   DequeueParticipant, Disconnect, JoinGame, Neither, PlayerSocket, SendToClient,
   UserDisconnected, WebsocketActorState,
@@ -24,10 +24,7 @@ import mist.{type Connection, Custom}
 
 ///See [here](https://hexdocs.pm/mist/mist.html#websocket)
 ///
-pub fn new_socket_process(
-  req: Request(Connection),
-  director: Subject(DirectorActorMessage),
-) {
+pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
   mist.websocket(
     request: req,
     on_init: fn(_conn) {

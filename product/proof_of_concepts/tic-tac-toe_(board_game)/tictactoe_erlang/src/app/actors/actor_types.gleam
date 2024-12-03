@@ -3,12 +3,6 @@ import gleam/erlang/process.{type Subject}
 import gleam/option.{type Option}
 import mist
 
-pub type CustomWebsocketMessage {
-  JoinGame(game_subject: Subject(GameActorMessage))
-  SendToClient(message: String)
-  Disconnect
-}
-
 pub type WebsocketActorState {
   WebsocketActorState(
     name: String,
@@ -20,14 +14,43 @@ pub type WebsocketActorState {
   )
 }
 
+pub type CustomWebsocketMessage {
+  JoinGame(game_subject: Subject(GameActorMessage))
+  SendToClient(message: String)
+  Disconnect
+}
+
+pub type PlayerSocket {
+  PlayerSocket(socket: mist.WebsocketConnection, state: WebsocketActorState)
+}
+
 pub type Player {
   X
   O
   Neither
 }
 
-pub type PlayerSocket {
-  PlayerSocket(socket: mist.WebsocketConnection, state: WebsocketActorState)
+//----------------------------------------------------------------------
+
+pub type DirectorActorState {
+  DirectorActorState(
+    games_waiting: Dict(Int, List(#(Player, Subject(CustomWebsocketMessage)))),
+  )
+}
+
+pub type DirectorActorMessage {
+  EnqueueParticipant(
+    game_code: Int,
+    player: Player,
+    participant_subject: Subject(CustomWebsocketMessage),
+  )
+  DequeueParticipant(game_code: Int)
+}
+
+//----------------------------------------------------------------------
+
+pub type GameActorState {
+  GameActorState(participants: List(#(Player, Subject(CustomWebsocketMessage))))
 }
 
 pub type GameActorMessage {
@@ -37,25 +60,4 @@ pub type GameActorMessage {
 
 pub type GeneralMessage {
   GeneralMessage(source: String, content: String)
-}
-
-pub type DirectorActorMessage {
-
-  EnqueueParticipant(
-    game_code: Int,
-    player: Player,
-    participant_subject: Subject(CustomWebsocketMessage),
-  )
-
-  DequeueParticipant(game_code: Int)
-}
-
-pub type DirectorActorState {
-  DirectorActorState(
-    games_waiting: Dict(Int, List(#(Player, Subject(CustomWebsocketMessage)))),
-  )
-}
-
-pub type GameActorState {
-  GameActorState(participants: List(#(Player, Subject(CustomWebsocketMessage))))
 }

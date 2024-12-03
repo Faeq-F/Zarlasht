@@ -1,4 +1,4 @@
-import app/actor_types.{
+import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
   type Player, Disconnect, GameActorState, JoinGame, SendToAll, SendToClient,
   UserDisconnected,
