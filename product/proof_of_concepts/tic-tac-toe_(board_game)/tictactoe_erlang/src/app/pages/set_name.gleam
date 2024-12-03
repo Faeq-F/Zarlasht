@@ -39,7 +39,7 @@ pub fn set_name_page() -> String {
                             "btn join-item bg-secondary text-secondary-content hover:bg-accent",
                           ),
                         ],
-                        [check([class("w-5 h-5 fill-current")])],
+                        [check([class("w-5 h-5")])],
                       ),
                     ]),
                   ],
@@ -59,6 +59,15 @@ pub fn waiting() -> String {
   html.div([attribute.id("waiting")], [
     html.p([attribute.class("text-sm mt-1 text-info")], [
       html.text("Waiting for the other player..."),
+    ]),
+  ])
+  |> element.to_string
+}
+
+pub fn empty_name() -> String {
+  html.div([attribute.id("waiting")], [
+    html.p([attribute.class("text-sm mt-1 text-error")], [
+      html.text("You cannot have an empty name!"),
     ]),
   ])
   |> element.to_string
