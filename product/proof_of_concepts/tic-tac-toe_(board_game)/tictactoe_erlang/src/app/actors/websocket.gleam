@@ -6,6 +6,7 @@ import app/actors/actor_types.{
   UserDisconnected, Wait, WebsocketActorState,
 }
 import app/lib/create_game.{on_create_game}
+import app/lib/game_action.{on_box_click, on_send_message}
 import app/lib/join_game.{on_join_game, on_to_join_game}
 import app/lib/name_set.{set_name}
 import app/pages/set_name.{set_name_page}
@@ -13,6 +14,7 @@ import gleam/dict
 import gleam/erlang/process.{type Subject}
 import gleam/function
 import gleam/http/request.{type Request, Request}
+import gleam/int
 import gleam/io
 import gleam/option.{None, Some}
 import gleam/otp/actor
@@ -94,10 +96,27 @@ fn handle_ws_message(state, conn, message) {
           |> actor.continue
         "set-name-form" ->
           set_name(message, PlayerSocket(conn, state)) |> actor.continue
+        "send_message_form" ->
+          on_send_message(message, PlayerSocket(conn, state)) |> actor.continue
 
-        _ -> {
-          logging.log(Alert, "Unknown Trigger")
-          actor.continue(state)
+        text -> {
+          case int.parse(text) {
+            Ok(number) -> {
+              case number >= 0 && number <= 8 {
+                True -> {
+                  on_box_click(number, state) |> actor.continue
+                }
+                _ -> {
+                  io.debug("Unknown Number as Trigger")
+                  actor.continue(state)
+                }
+              }
+            }
+            _ -> {
+              logging.log(Alert, "Unknown Trigger")
+              actor.continue(state)
+            }
+          }
         }
       }
     }
