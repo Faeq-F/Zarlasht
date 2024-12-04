@@ -1,9 +1,11 @@
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type GameState, type Player, AddedName, Disconnect, GameActorState, GameState,
-  JoinGame, Neither, O, SendToAll, SendToClient, UserDisconnected, Wait, X,
+  type GameState, type Player, AddedName, BoxClick, Disconnect, GameActorState,
+  GameState, JoinGame, Message, Neither, O, SendToClient, UserDisconnected, Wait,
+  X,
 }
-import app/pages/game.{game_page}
+import app/lib/game_action.{new_game_state}
+import app/pages/game.{game_page, message}
 import gleam/erlang/process.{type Subject}
 import gleam/io
 import gleam/list
@@ -44,12 +46,68 @@ pub fn start(
 }
 
 fn handle_message(
-  message: GameActorMessage,
+  message_for_actor: GameActorMessage,
   state: GameActorState,
 ) -> Next(GameActorMessage, GameActorState) {
   logging.log(Info, "A Game Actor got the message")
-  io.debug(message)
-  case message {
+  io.debug(message_for_actor)
+  case message_for_actor {
+    BoxClick(player, box_index) -> {
+      // Update state for boxe
+      let new_state = new_game_state(state, player, box_index)
+      // Update turn
+      let current_turn = state.game_state.turn
+      let next_turn = case current_turn {
+        X -> O
+        _ -> X
+      }
+      let new_state =
+        GameActorState(
+          ..new_state,
+          game_state: GameState(..new_state.game_state, turn: next_turn),
+        )
+      // Get winner
+      let winner = get_winning_player(new_state.game_state)
+      //send everyone updates
+      list.each(state.participants, fn(p) {
+        //status text
+        process.send(
+          p.1,
+          SendToClient(game.update_status(
+            new_state.game_state.turn == p.0,
+            p.0,
+            winner,
+          )),
+        )
+        // updated grid
+        process.send(
+          p.1,
+          SendToClient(
+            game.game_grid(new_state.game_state, p.0, case winner {
+              "Neither" -> new_state.game_state.turn == p.0
+              _ -> False
+              // if someone has won, the grid should no longer have clickable boxes
+            }),
+          ),
+        )
+      })
+      new_state |> actor.continue
+    }
+
+    Message(message_text, from_player) -> {
+      list.each(state.participants, fn(p) {
+        case p.0 == from_player {
+          True -> {
+            process.send(p.1, SendToClient(message(message_text, True)))
+          }
+          _ -> {
+            process.send(p.1, SendToClient(message(message_text, False)))
+          }
+        }
+      })
+      state |> actor.continue
+    }
+
     AddedName(player, ws_subject, name) -> {
       let assert Ok(first_person) = list.first(state.participants)
       let new_state = case player {
@@ -105,15 +163,6 @@ fn handle_message(
       new_state |> actor.continue
     }
 
-    SendToAll(general_message) -> {
-      let message = general_message.content
-      list.each(state.participants, fn(p) {
-        // send each participant's subject the message
-        process.send(p.1, SendToClient(message))
-      })
-
-      state |> actor.continue
-    }
     UserDisconnected(player) -> {
       //make other player disconnect
       list.each(state.participants, fn(participant) {
@@ -133,7 +182,7 @@ fn handle_message(
   }
 }
 
-fn get_winning_player(state: GameState) {
+fn get_winning_player(state: GameState) -> String {
   //possible combinations of boxes marked to be a winner
   let lines = [
     [0, 1, 2],
