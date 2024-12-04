@@ -253,12 +253,12 @@ fn get_winning_player(state: GameState) -> String {
   }
 }
 
-fn check_lines(lines: List(List(Int)), state: GameState) {
+fn check_lines(lines: List(List(Int)), state: GameState) -> Player {
   case lines {
     [first, ..rest] -> {
       let assert [a, b, c] = first
       let player = get_from_index(state.state, a)
-      case player {
+      let res = case player {
         X | O -> {
           case
             player == get_from_index(state.state, b)
@@ -274,8 +274,10 @@ fn check_lines(lines: List(List(Int)), state: GameState) {
         }
         _ -> Neither
       }
-
-      check_lines(rest, state)
+      case res {
+        Neither -> check_lines(rest, state)
+        _ -> res
+      }
     }
     [] -> Neither
   }
