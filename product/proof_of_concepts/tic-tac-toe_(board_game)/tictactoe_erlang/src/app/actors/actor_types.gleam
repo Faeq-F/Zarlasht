@@ -65,6 +65,7 @@ pub type GameActorMessage {
   AddedName(player: Player, ws: Subject(CustomWebsocketMessage), name: String)
   BoxClick(player: Player, box: Int)
   Message(message: String, from_player: Player)
+  ResetGame
 }
 
 pub type GeneralMessage {

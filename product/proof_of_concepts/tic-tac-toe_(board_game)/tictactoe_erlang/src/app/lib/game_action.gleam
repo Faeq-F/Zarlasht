@@ -1,6 +1,6 @@
 import app/actors/actor_types.{
   type GameActorState, type Player, type PlayerSocket, type WebsocketActorState,
-  BoxClick, GameActorState, GameState, Message,
+  BoxClick, GameActorState, GameState, Message, ResetGame,
 }
 import app/pages/game.{send_message_form}
 import gleam/dict
@@ -53,4 +53,10 @@ pub fn on_send_message(
       player.state
     }
   }
+}
+
+pub fn on_replay_game(player: PlayerSocket) -> WebsocketActorState {
+  let assert Some(game_subject) = player.state.game_subject
+  process.send(game_subject, ResetGame)
+  player.state
 }
