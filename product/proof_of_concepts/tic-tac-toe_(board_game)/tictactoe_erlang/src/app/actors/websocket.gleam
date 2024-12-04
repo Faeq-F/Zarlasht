@@ -6,7 +6,7 @@ import app/actors/actor_types.{
   UserDisconnected, Wait, WebsocketActorState,
 }
 import app/lib/create_game.{on_create_game}
-import app/lib/game_action.{on_box_click, on_send_message}
+import app/lib/game_action.{on_box_click, on_replay_game, on_send_message}
 import app/lib/join_game.{on_join_game, on_to_join_game}
 import app/lib/name_set.{set_name}
 import app/pages/set_name.{set_name_page}
@@ -98,6 +98,8 @@ fn handle_ws_message(state, conn, message) {
           set_name(message, PlayerSocket(conn, state)) |> actor.continue
         "send_message_form" ->
           on_send_message(message, PlayerSocket(conn, state)) |> actor.continue
+        "replay_button" ->
+          on_replay_game(PlayerSocket(conn, state)) |> actor.continue
 
         text -> {
           case int.parse(text) {

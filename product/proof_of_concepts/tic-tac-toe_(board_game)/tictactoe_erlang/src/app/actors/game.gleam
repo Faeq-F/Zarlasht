@@ -1,8 +1,8 @@
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
   type GameState, type Player, AddedName, BoxClick, Disconnect, GameActorState,
-  GameState, JoinGame, Message, Neither, O, SendToClient, UserDisconnected, Wait,
-  X,
+  GameState, JoinGame, Message, Neither, O, ResetGame, SendToClient,
+  UserDisconnected, Wait, X,
 }
 import app/lib/game_action.{new_game_state}
 import app/pages/game.{game_page, message}
@@ -160,6 +160,49 @@ fn handle_message(
           })
         }
       }
+      new_state |> actor.continue
+    }
+
+    ResetGame -> {
+      let new_state =
+        GameActorState(
+          ..state,
+          game_state: GameState(
+            ..state.game_state,
+            state: [
+              Neither,
+              Neither,
+              Neither,
+              Neither,
+              Neither,
+              Neither,
+              Neither,
+              Neither,
+              Neither,
+            ],
+          ),
+        )
+      list.each(state.participants, fn(p) {
+        //update game grid
+        process.send(
+          p.1,
+          SendToClient(game.game_grid(
+            new_state.game_state,
+            p.0,
+            new_state.game_state.turn == p.0,
+          )),
+        )
+        //update status
+        process.send(
+          p.1,
+          SendToClient(game.update_status(
+            new_state.game_state.turn == p.0,
+            p.0,
+            get_winning_player(new_state.game_state),
+          )),
+        )
+      })
+
       new_state |> actor.continue
     }
 
