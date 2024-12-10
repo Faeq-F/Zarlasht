@@ -24,4 +24,5 @@ faeq_faisal_signature.png
 !sequence_playing.pdf
 !use_case.pdf
 
-# '!*/' for subdirectories (we want subdirectories)
+# subdirs
+!.vscode/
