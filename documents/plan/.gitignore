@@ -10,6 +10,18 @@
 !project_interim.cls
 !project_plan.cls
 !rhul_logo.pdf
-# etc...
+!wordcounts.sh
+!fyp.drawio
+!FYP.pptx
+
+!*.png
+faeq_faisal_signature.png
+!architecture.pdf
+!sequence_connecting.pdf
+!sequence_creating.pdf
+!sequence_disconnecting.pdf
+!sequence_messaging.pdf
+!sequence_playing.pdf
+!use_case.pdf
 
 # '!*/' for subdirectories (we want subdirectories)

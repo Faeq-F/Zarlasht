@@ -1,9 +1,9 @@
 \documentclass[]{project_interim}
 \bibliographystyle{apalike}
 \bibstyle{apalike}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{cite}
+\usepackage{graphicx, wrapfig, listings}
+\usepackage{hyperref, cite}
+%\usepackage{wordcount}
 
 \newcommand{\bulletPoint}{\hspace{-3.1pt}$\bullet$ \hspace{5pt}}
 
@@ -28,11 +28,11 @@
 This plan has been prepared on the basis of my own work. Where other published
 and unpublished source materials have been used, these have been acknowledged.
 \vskip3em
-Word Count: \input{wordcount.txt}words
+Word Count: %\wordcount words
 \vskip3em
 Student Name: \studentname
 \vskip3em
-Date of Submission: <PLACE HERE>
+Date of Submission: Friday 13th December 2024
 \vskip3em
 Signature:
 \vskip0em
@@ -43,47 +43,1032 @@ Signature:
 \tableofcontents\pdfbookmark[0]{Table of Contents}{toc}\newpage
 
 \begin{abstract}
-  Here\cite{armstrong_making_2003}
+  As mentioned in the project plan, playing games has become an integral part of modern society, offering a large variety of benefits, from
+  being entertainment to fostering critical thinking, social interactions, and building
+  resilience~\cite{garaigordobil_developing_2022}. The interactive nature of games, particularly those
+  that provided multiplayer experiences, enhance enjoyment for players; "fun experienced when interacting
+  with others is more positive than solitary fun"~\cite{reis_fun_2017}.
+
+  There is a critical need for leveraging concurrency mechanisms, particularly within games that
+  support simultaneous play across multiple game instances. These can be provided by programming
+  languages, runtime environments or other technologies. These concurrency mechanisms can facilitate simultaneous actions in board games, provide real-time
+  error reporting, support real-time chat systems that run alongside gameplay, and dynamic world
+  updates across multiple clients. These capabilities, among others, enhance the responsiveness and
+  interactivity of multiplayer game environments.
+
+  In the first half of this project, I explored various concurrent environment technologies
+  and architectures, ultimately selecting Gleam, targeting Erlang to run on the BEAM, for its
+  robust, highly concurrent and fault-tolerant runtime. I developed multiple proof-of-concept
+  programs, including an online chat system, Tic-Tac-Toe, and Pong, to experimentally validate
+  the modularity and integration of my chosen technologies. These prototypes demonstrated
+  the ability to support multiple simultaneous game instances, simultaneous game actions
+  and real-time communication. I have begun an investigation into innovative concurrent
+  features, for my final game, focusing on creating a flexible game environment that can
+  support non-turn-based interactions. Preliminary work has also addressed potential
+  challenges in system reliability, including initial strategies for error handling and
+  scalability.
+
+  The aim of this report is to document my process of building a game environment for
+  high-concurrency, providing a comprehensive overview of the design challenges,
+  implementation strategies, and key technical achievements.
 \end{abstract}
+
+\newpage
+
+\section{Original Project Specification}
+
+\textbf{Aims:} The aim of the project is to develop a game-playing environment
+using a programming language such as Java. Besides providing appropriate error reports,
+the system should have a nice graphical interface and provide such advanced
+features such as allowing multiple games to be played at the same time.
+
+\textbf{Background:} Game-playing environments are popular systems with a
+variety of functionalities. For example, such an environment usually allows
+multiple games to be played at the same time. This can be implemented by means
+of the concurrency mechanisms supported in a programming language: multiple games
+are implemented as different threads that share the same modules that provide
+the basic functionalities such as moves in board games and error reporting procedures.
+
+\textbf{Early Deliverables}
+\begin{enumerate}
+  \item Proof of concept program: A prototype implementation of a board game (e.g., chess).
+  \item Proof of concept program: A prototype program that exhibits the behaviour of concurrent execution.
+  \item Report: A survey report on game environments.
+  \item Report: A description of the prototype implementations.
+\end{enumerate}
+
+\textbf{Final Deliverables}
+\begin{enumerate}
+  \item The system must be implemented according to modern software engineering principles.
+  \item The environment should contain a working system, with functionalities such as error reporting.
+  \item A graphical interface should be implemented.
+  \item The environment should allow the users to play multiple games at the same time.
+  \item The report should provide an overview of game-playing environments.
+  \item The report should describe the environment including its functionalities and design.
+  \item The report should describe the implementation issues (such as the choice of data structures, numerical methods etc) necessary to apply the theory.
+  \item The report should describe the testing procedures of the environment.
+  \item The report should describe the software engineering process involved in the design and implementation.
+\end{enumerate}
+
+\textbf{Suggested Extensions}
+\begin{itemize}
+  \item Advanced GUI with other useful features such as chat room.
+  \item Advanced implementation issues such as multiple game playing based on concurrency and sharing.
+\end{itemize}
+
+\textbf{Prerequisites:} Good command of programming languages such as Java.
+
 
 \chapter{Introduction}
 \section{The Problem}
-\section{Aims and Goals of the Project}
-\section{Survey of Related Literature}
-\section{Objectives}
-\subsection{Milestones Summary}
-\section{Rationale}
+Modern environments face significant challenges, especially in maintaining
+system reliability and scalability, struggling to provide a responsive gameplay
+experience. For example, the challenge of 'flash crowds', managing sudden user influxes,
+can quickly transform a popular service into an unintentional victim of a
+DDOS attack. "Flash crowds often cause very poor performance
+at the server side and result in a significant number of un
+satisfied clients"\cite{Ari_crss_nodate}. Unexpectedly high concurrent connections can overwhelm
+system resources and cause catastrophic service failure, as was the case for
+the CodinGame platform, where heavy loads led to a memory leak on the application
+servers, and contributed towards a system crash\cite{jobert_story_2017}.
 
-\chapter{Concurrency Mechanism}
+To support simultaneous game instances and multi-player interactions,
+a robust concurrency model is essential. My approach initially involved
+transitioning from more familiar technologies like JavaScript to
+gradually understand and implement advanced concurrency concepts,
+allowing for a exploration of new models and design patterns before
+undertaking a more comprehensive architectural implementation.
+
+\section{Aims and Goals of the Project}
+The primary aim of this project is to develop a concurrent game environment that;
+\begin{itemize}
+  \item Supports multiple simultaneous game instances
+  \item Enables real-time communication and dynamic world updates
+  \item Provides a flexible, modular architecture for hosting different game types
+  \item Demonstrates innovative concurrent programming techniques
+  \item Implements robust error handling and system reliability mechanisms
+  \item Has a nice graphical interface with error reporting
+  \item Is implemented according to modern software engineering principles
+\end{itemize}
+
+\newpage
+
+The growing importance of multiplayer and interactive gaming experiences
+is the motivation for this project. As a result, after having researched limitations
+in existing game environment architectures, the potential of advanced
+concurrency models to enhance game interactivity and exploring different
+approaches to distributed system design, I have decided upon the following
+goals for this term;
+
+\begin{itemize}
+  \item Produce a survey report on game environments
+  \item Learn how WebSockets work and how to use them effectively
+  \item Learn the functional programming paradigm through the Gleam programming language
+  \item Learn how to use databases based off Redis OSS, like Valkey or DragonflyDB
+  \item Design a scalable client-server model
+  \item Implement my planned Online Chat and Tic-Tac-Toe proof of concepts in Gleam, targeting JavaScript, utilizing the above technologies
+  \item Implement my planned Online Chat and Tic-Tac-Toe and Pong proof of concepts in Gleam, targeting Erlang, to learn it's concurrency model
+  \item Ensure all code is well tested and documented for future reuse and adaptation
+  \item Implement the foundational concurrent features for the final game
+\end{itemize}
+
+In addition to designing a scalable environment,
+by exploring the Erlang ecosystem, with its actor model representing one of the
+most sophisticated approaches to concurrent programming, and
+BEAM languages, particularly Gleam, a new, modern, statically-typed language,
+this project aims to address the limitations of existing multiplayer
+game systems and create a more responsive game environment.
+
+Throughout the first term, I successfully completed all planned objectives,
+including developing proof-of-concept applications,
+establishing the core game environment architecture, and implementing initial
+concurrent features for the final game. Anticipating the project timeline,
+I proactively began next term's objectives, conducting comprehensive performance
+optimizations and initiating informal user testing and feedback integration,
+which allowed for earlier refinement of the system's design and functionality.
+
+\chapter{A Survey Report on Game Environments}
+
+Game environments have evolved significantly over the years, with various platforms
+offering unique architectures, modularity, and characteristics. This report surveys
+three major game platforms: Steam, Epic Games Store, and Xbox Live, highlighting
+their characteristics, architectures, modularity, and issues.
+
+\section{Steam}
+Steam, developed by Valve Corporation, is a digital distribution platform
+for PC games. Its concurrency architecture primarily relies on multi-threading and asynchronous
+programming models. By leveraging these techniques, the platform can efficiently manage
+multiple simultaneous connections and complex computational tasks. The implementation
+of robust multi-threaded architectures allows Steam to handle concurrent user interactions
+across chat systems, game matchmaking, and other community features. On top of this,
+Steam's modularity is strongly evident in its Steamworks API, which allows developers to
+integrate Steam's functions, including DRM, into their products.\cite{simmons_decoding_2023, noauthor_steamworks_nodate}
+This modularity enables developers to create and distribute games seamlessly on the platform.
+Steam's plans involve continuous updates and expansions to keep up with
+the evolving gaming industry.\cite{noauthor_steam_nodate1} However, issues such as DRM and the need for
+constant updates can pose challenges for developers and users\cite{noauthor_steam_nodate}.
+
+Steam uses WebSockets for real-time communications, without blocking primary execution threads.
+This technology is vital for certain features like their chat system.\cite{noauthor_isteamnetworkingsockets_nodate}
+Steam also employs a combination of SQL and NoSQL databases\cite{simmons_decoding_2023, djundik_how_2017},emphasizing availability
+and partition tolerance, to manage user data, game metadata, and transaction records, while
+the backend services are primarily written in C++ and Python.\cite{simmons_decoding_2023}  C++ provides them with low-level thread management through standard
+library implementations, while Python offers high-level abstractions like asyncio
+for asynchronous programming.
+
+\section{Epic Games Store}
+The Epic Games Store, like Steam, is a digital distribution platform for
+PC games. It focuses on providing a streamlined user experience with features
+like free game giveaways and a more generous revenue split for developers
+compared to Steam. The Epic Games Store takes a distinctive approach to concurrency by utilizing
+Go's native concurrency mechanisms, goroutines\cite{epic_games_jobs}. Goroutines offer several
+advantages here, including extremely low overhead compared to traditional OS threads
+, efficient scheduling and multiplexing of concurrent tasks and simplified
+programming through built-in communication mechanisms and easy to use syntax.
+Part of the backend services are written in C++ too\cite{epic_games_jobs}. This combination
+helps to manage high loads and ensure smooth performance.
+
+The Epic Games Store's architecture is designed to be developer-friendly, with a
+focus on ease of use and integration. It offers tools and services to help
+developers manage their games and reach a wider audience.This helps Epic Games
+Store's plans to involve aggressive marketing strategies and exclusive
+deals to attract users and developers. However, issues such as the lack of modding support and
+some community features compared to Steam can be a drawback for some users.
+\cite{epic_games_dev_update} Similar to Steam, Epic Games Store uses WebSockets for real-time interactions,
+such as notifications and social features, and utilizes both SQL and NoSQL
+databases for storing user profiles, purchase history, and game data,
+prioritizing availability and scalability.\cite{spring_epic_2016, epic_games_jobs}
+
+\section{Xbox Live}
+Xbox Live is Microsoft's online gaming service for Xbox consoles. It offers
+features like online multiplayer, digital game purchases, and media streaming.
+Xbox Live employs a traditional, multi-threading approach, complemented by modern
+asynchronous programming patterns. They utilize C++ and C\# with .NET\cite{kevinasgari_microsoft.xbox.services_nodate}, implementing
+explicit thread management and patterns for non-blocking network and database operations.
+The .NET framework provides async/await patterns, allowing developers to write
+asynchronous code that appears synchronous, simplifying complex concurrent scenarios.
+Though, advanced thread synchronization mechanisms are used to ensure data consistency.
+\cite{m-stahl_sdk_2023, woolsey_how_2024} Xbox Live's architecture is designed to support a wide range of services, including gaming,
+media streaming, and social networking, integrating with Microsoft's other services, such as Xbox Game
+Pass and Xbox Cloud Gaming, to provide a comprehensive gaming experience. Xbox Live is well known
+for its offers on cloud gaming services through Xbox Cloud Gaming.
+
+Xbox Live relies upon continuous updates to enhance user experience and
+expand service offerings. However, issues such as network outages and the need
+for a subscription for online multiplayer can be challenging for some users.
+Again, WebSockets are used in the chat systems and multiplayer gaming.
+SQL databases are used for user data and game data, prioritizing consistency,
+and ensuring operations are non-blocking.\cite{woolsey_how_2024}
+
+
+\section{Conclusion}
+
+The analysis of Steam, Epic Games Store, and Xbox Live illuminates
+critical strategies for building highly concurrent game environments. Each platform
+demonstrates a unique approach to concurrency, reflecting the fundamental challenges.
+The CAP theorem, which posits that distributed systems can
+simultaneously guarantee only two of three critical properties: Consistency,
+Availability, and Partition Tolerance, means that game platforms must
+strategically prioritize system characteristics—whether emphasizing real-time
+responsiveness, data uniformity, or network resilience.
+\cite{gilbert_perspectives_2012} While each platform balances these
+trade-offs differently, they share common technologies like WebSockets for real-time
+communication and a combination of SQL and NoSQL databases to manage complex,
+different types of data.
+
+Future research in game environment architectures should focus
+on the concurrency models specifically, such as actor-based systems and advanced coroutine
+implementations, which promise to further optimize performance, scalability,
+and the user's experience, as seen here.
+
+\chapter{Concurrency Mechanisms}
 \section{State-of-the-art Concurrency}
+
+There is a critical need for robust concurrency mechanisms that can efficiently
+manage complex, interactive game environments while ensuring scalability
+and fault tolerance. As a result, the field of concurrent programming is concerned
+with various aspects like scheduling, synchronization, and programming patterns.
+
+A system is concurrent if it consists of multiple execution flows that
+can progress simultaneously and interact with each other.
+This covers both overlapping time frames, such as those found
+in multi-core or multi-processor architectures, and non-overlapping
+time frames, like those in single-core architectures.\cite{bianchi_survey_2018}
+There are two main types of concurrent systems based on their interaction
+mechanisms; shared memory (indirect) and message-passing systems (direct).\cite{bianchi_survey_2018}
+In shared memory systems, execution flows interact through accessing
+common memory space, while in message-passing systems,
+they exchange messages, which can occur within the same physical
+node or across different nodes. "Conversely, Shared memory mechanisms
+are only possible when the execution flows are
+located on the same node (as in multi-threaded systems)."\cite{bianchi_survey_2018}
+
+If using shared memory, synchronization is important
+for ensuring mutual exclusion through mechanisms like locks.
+While temporal constraints, such as real-time requirements in embedded systems,
+aren't as critical in games, they are still relevant for an interactive
+experience. Programming patterns like async-await, reactive programming,
+actors, and process calculi, enhance reliability by ensuring fault-tolerance,
+through handling all interleavings correctly,
+and providing an easy implementation of concurrent programs. As well as this, implementation efficiency
+is paramount for performance.
+
+\subsection{Event Loops}
+Since I aim for a web interface for my games, to make
+accessibility an easier goal to achieve, I will first look at JavaScript's
+concurrency model, since it is a core technology of the Web.
+JavaScript's concurrency model is based on an event loop, which allows it to
+perform tasks asynchronously, even though it runs on a single thread.\cite{zhao_concurrency_2021}
+Concurrency is achieved through callbacks, promises, and
+async/await mechanisms. This means it can handle many tasks at the same time without waiting for one
+to finish before starting another. The event loop continuously checks the call
+stack and the callback queue, executing functions from the queue once
+the stack is clear. This model relies on non-blocking I/O operations,
+using Web APIs provided by the browser to handle tasks like network
+requests and timers. \cite{noauthor_event_2024}
+
+Promises provides an abstraction for managing asynchronous operations,
+encapsulating event callbacks within an object that executes
+immediately upon creation. \cite{zhao_concurrency_2021}
+Upon completion, a Promise either
+resolves successfully with a result or rejects with an error.
+\cite{zhao_concurrency_2021} When combined with async and await
+keywords, Promises enable
+developers to compose asynchronous operations within a
+sequential programming paradigm, creating a more linear and
+readable approach to handling concurrent tasks.
+
+While Promises simulate thread-like behavior through non-preemptive scheduling
+and offer methods like race() and all() for managing concurrent operations,
+\cite{noauthor_event_2024} they fundamentally differ from traditional thread-based
+concurrency models.
+Critically, Promises lack essential threading utilities such as synchronization
+mechanisms and task cancellation,\cite{zhao_concurrency_2021} which limits their effectiveness in
+complex concurrent scenarios requiring more granular control over execution
+and resource management.
+
+The reliance on non-blocking I/O and the fact that it runs on a single thread
+limits the model, as JavaScript applications grow in complexity. It
+is common to have numerous callbacks with complex dependencies,
+which makes it difficult to identify concurrent
+execution of tasks.
+It can can lead to complex and difficult-to-maintain code structures, often
+referred to as ”pyramid of doom” or ”callback hell” phenomenon.\cite{belson_survey_2019, noauthor_callback_nodate}
+Moreover, the single-threaded nature limits its scalability in handling
+intensive concurrent processes, making it less suitable for demanding game environments.
+In contrast, more robust concurrency models that are well-suited for
+such environments will be discussed.
+
+\subsection{Coroutines}
+
+Coroutines represent a more advanced concurrency mechanism that extends
+traditional function behavior by introducing suspend and resume operations. \cite{belson_survey_2019}
+These  constructs can be applied across multiple paradigms, including event
+handling, data-flow management, cooperative multitasking, and
+implementing async/await patterns.\cite{belson_survey_2019}
+
+During suspension, a coroutine's implementation captures and stores
+its current execution point, and often preserves the state of local variables.
+Coroutine implementations are typically categorized into two primary types:
+stackful and stackless. A stackful coroutine maintains its own independent
+stack, separate from the caller's stack, which allows for local variables
+to be stored there during suspension. In contrast, stackless coroutines
+manage state by removing their state from the stack
+during suspension, similar to a standard function return.\cite{belson_survey_2019}
+This fundamental difference means that alternative state preservation
+mechanisms are required for stackless coroutines, such as storing
+local variables in global storage or using specialized state management techniques.
+
+An important limitation of stackless coroutines is their suspension granularity;
+they can typically only be suspended from within their own execution context,
+restricting the ability to suspend from subroutines or nested function calls.
+\cite{belson_survey_2019} This constraint introduces additional complexity
+in designing flexible concurrent systems using stackless coroutine implementations.
+
+\subsection{Goroutines}
+
+An alternative is Go’s goroutines, offering a lightweight threading model,
+facilitating efficient concurrency through
+simple syntax, and enabling developers to handle thousands of concurrent tasks with
+minimal overhead. This model proves highly effective in scenarios requiring fast
+and reliable processing.
+
+As a statically typed, imperative programming language, Go distinguishes
+itself through its unique concurrency features, primarily lightweight threads
+(goroutines) and communication channels.
+The language's synchronization approach
+is deeply rooted in theoretical concurrency models,
+drawing inspiration from models such as Hoare's communicating sequential
+processes (CSP).\cite{lange_empirical_2019}
+"Go is renowned for its good support for system programming
+and its channel based concurrency mechanism. It is advertised
+as “an open source programming
+language that makes it easy to build simple, reliable, and
+efficient software”".\cite{lange_empirical_2019}
+
+Go challenges traditional inter-thread synchronization
+paradigms by inverting the conventional shared memory model. Instead
+of communication through shared memory, Go promotes a philosophy of
+"don't communicate by sharing memory, share memory by communicating."
+This channel-based communication approach aims to create concurrent programs
+that are conceptually more straightforward and inherently more amenable
+to automatic verification to guarantee
+the absence of communication errors such as deadlock and
+thread starvation.\cite{lange_empirical_2019}
+
+Despite its innovative communication model, Go's tooling provides only basic
+concurrency error detection, primarily relying on a runtime global deadlock
+detector and a type system. Communication channels
+in Go are synchronous by default, meaning send and receive operations are
+blocking, with the option to create bounded asynchronous channels, whose
+send operations are not blocking as long as the channel
+is not full. \cite{lange_empirical_2019} However, these channels
+introduce complexity for static verification, as channel bounds may not be
+statically determinable and the maximal capacity of
+asynchronous channels can often be reached in practice.\cite{lange_empirical_2019}
+
+\subsection{Actors}
+The actor model, implemented in languages such as Erlang and frameworks
+like Akka for Scala, encapsulates state and behavior within independent actors.
+These actors communicate solely through message passing, ensuring high fault
+tolerance and scalability. The actor model is particularly advantageous in
+distributed systems, where reliable message passing and isolated state
+management are critical.
+
+%Asynchronous JavaScript and XML
+Web Workers do provide parallel computation in JavaScript, based off AJAX and its
+introduction of asynchronous computation via HTTP requests, enabling background
+JavaScript execution without affecting page performance. Web Workers operate as
+actor-style threads, handling input and output using
+XMLHttpRequest. However, the communication costs between workers
+is high due to low bandwidth and the lack of shared memory,
+increasing overhead and communication latency.\cite{namiot_js_2015}
+
+Actor-based languages such as Erlang
+implement the communication between threads
+using messages, and ensure that messages are processed
+atomically. This guarantees freedom from race conditions
+by design.\cite{bianchi_survey_2018}
+
+The BEAM, a component of the ERTS, implements concurrency by running schedulers
+on OS threads, which pull processes from programs, making these processes execute in
+\textit{strong isolation} ~\cite{stenman_erlang_2024, armstrong_making_2003, debenedetto_elixir_2019}.
+This abstracts the feature of concurrency from languages like Erlang.
+
+Erlang is designed for building fault-tolerant, distributed, real-time
+applications. Its core innovation lies in making concurrency a fundamental
+language feature, where programs consist of numerous lightweight,
+isolated processes that can communicate via message passing.
+Unlike traditional languages, Erlang allows programmers to
+create large numbers of processes without worrying about resource limitations,
+as these processes are spread across computer cores and share no data.\cite{armstrong_erlang_2010}
+
+Since processes in Erlang are completely isolated, with no shared memory, mutexes,
+or semaphores do not exist. Instead, each process has a mailbox for receiving messages,
+and only method of process synchronization is through message passing.
+When errors occur, the recommended approach is to let failing processes
+crash while other processes detect and fix these issues. \cite{armstrong_erlang_2010}
+This is formalized
+through an internal "link" mechanism that propagates error signals between
+linked processes. Erlang includes sophisticated error handling, code-replacement
+mechanisms, and a large set of libraries.\cite{armstrong_erlang_2010}
+
+Erlang's fault-tolerance is particularly robust.
+A core argument for message passing was that shared memory was something
+preventing fault-tolerance.\cite{armstrong_erlang_2010}
+If a machine crashes, another
+machine in the network can detect the failure and take over, ensuring continuous
+application operation without user-perceivable interruption. The OTP further
+enhances this by using supervision trees that
+organize processes in a hierarchical structure, allowing higher-level processes
+to monitor and correct errors in lower-level processes. \cite{armstrong_erlang_2010}
+
+\subsection{My choice of mechanism}
+While JavaScript’s event loop model has its limitations, concurrency
+models like goroutines, coroutines, and the actor model offer superior
+alternatives for building highly concurrent and reliable game environments.
+As previously seen, coroutines still have limitations, communicating by yielding
+to each other\cite{noauthor_introconcurrency_nodate}, as do goroutines,
+eventhough they provide a robust model, they still rely on shared memory.
+An important principle to consider is Amdahl's law; "Your parallel program only goes as fast as its slowest sequential part".\cite{yang_c_nodate}
+"It indicates how much of a speedup you can expect your system to have whenever
+you add parallelism to it, and in what proportion."\cite{yang_c_nodate}
+This means that concurrent environments would greatly benefit from being able to
+not worry about resource limitations.
+\begin{figure*}[ht!]
+  \centering
+  \includegraphics[width=0.7\linewidth]{amdahl}
+  \vspace*{-0.3cm}
+  \caption{Amdahl's Law. From \cite{noauthor_hitchhikers_nodate}}
+  \label{fig: 0}
+\end{figure*}
+
+As a result, I have chosen to use actors as my agent. I have specifically
+chosen to target Erlang, since it was made for highly-concurrent, fault-tolerant
+systems. Functional programming languages do not allow mutable state and thus
+guarantee race freedom by design. \cite{bianchi_survey_2018}
+As can be seen in figure \ref{fig: 1}, Erlang's performance is up to par with the
+other languages I have explored. This will be greatly beneficial when implementing
+a pool of servers within my architecture.
+
+\begin{figure*}[ht!]
+  \centering
+  \includegraphics[width=\linewidth]{c_erlang_java_go}
+  \vspace*{-0.5cm}
+  \caption{A graph representing the test results for web server performance in several languages. From \cite{yang_c_nodate}}
+  \label{fig: 1}
+\end{figure*}
+
 \section{Architectural paradigms and design patterns}
 
+For implementing the concurrent game environments themselves, there are various architectural approaches.
+To start, there is the choice between the peer-to-peer model or client-server model.
+The peer-to-peer model eliminates the need for a central server, simplifying setup and
+reducing costs. While this model is resilient to server failures, it presents challenges
+in managing peer disconnections and potential cheating through data manipulation~\cite{franchetti_coping_2020}.
+Conversely, the client-server model allows the server to act as a neutral authority to govern the game,
+validating players' actions. The model does introduce more upfront challenges though, including cost,
+latency, and scaling. Mitigations exist, for example, using a load balancer with multiple servers,
+"so that if a server goes down, another one can take its place without causing significant
+disruption for clients", or by having auto-scaling so that servers "can spin up or down
+based on usage" \cite{pandey_peer--peer_2022}.
+
+I will opt for the client-server model, using WebSockets, along with using a OSS Redis based database,
+as this seems to be the most common approach
+across my research, mitigating all forseeable risks via the use of load balancers,
+Pub/Sub, etc..
+
 \chapter{Software Engineering}
+
 \section{Methodology}
+Employing an engineering approach is crucial in system development. I began with
+requirement analysis to capture functional needs, leading to detailed use case
+descriptions and a comprehensive use case diagram. This foundation allowed me to
+create UML sequence diagrams that map out system interactions. Throughout development,
+version control enabled me to experiment with new features or fixes without
+affecting the main codebase, while a solid test strategy identified and resolved
+defects early, ensuring the system's reliability and performance.
+
+\begin{figure*}[ht!]
+  \centering
+  \includegraphics[width=\linewidth]{use_case}
+  \vspace*{-1.5cm}
+  \caption{A use-case diagram for the Tic-Tac-Toe game}
+  \label{fig: 2}
+\end{figure*}
+
+In my project, I did not create a class diagram due to the use of the functional
+programming paradigm. Instead, I focused on use case diagrams and sequence diagrams,
+as detailed further below. In functional programming, it is more common to begin
+by writing the signatures of the top-level functions. As more detail is needed,
+signatures for helper functions are subsequently defined. \cite{Wlaschin_functional_2014}
+This was done alongside writing the types that the function signatures use. "Type design and function
+signature design are really two faces of the same coin."\cite{noauthor_chapter_2024}
+This approach is effective because functional programming lacks side effects; functions are
+specified solely in terms of their inputs and outputs. Consequently,
+type signatures serve as a powerful design tool, providing clarity and structure.
+This contrasts with imperative programming, where side effects often complicate
+the design process. Despite the compiler's ability to infer type signatures,
+they are explicitly used to enhance readability and maintainability of the code.
+
+I also tried to use design patterns, a set of software engineering
+techniques which aim to address recurring issues within development. Some of these
+issues are reducing the complexity of code, increasing the cohesiveness of code,
+and improving reusability. I particularly aimed to use functional patterns, including
+writing endomorphisms, monoids which are functions that use the same type for their
+input and output\cite{Wlaschin_functional_2014}, as well as using monadic binds
+wherever possible, to make my code linear and clear. While this is visible
+throughout the codebase, as this was my first time doing functional programming,
+I suspect there are many more design patterns and refactoring opportunities to explore
+to enhance the codebase.
+
+To ensure a robust and reliable development process, I utilized a private GitHub repository
+alongside the departmentally mandated GitLab instance. This approach not only mitigated
+the risk of data loss due to hardware failure but also leveraged the many benefits of
+version control. By consistently committing and pushing work, following a consistent
+git workflow, branching model and naming schemes, I was able to track changes
+over time, providing a detailed history of the project's evolution. This made
+it easier to identify and revert to previous versions when necessary. Version
+control also facilitated branching and merging, allowing me to experiment with
+new features or fixes without affecting the main codebase. This maintained a
+clear record of progress and decisions, invaluable for documentation and debugging.
+These capabilities ensured a more organized, efficient, and resilient development
+process, enhancing the overall quality and reliability of the project.
+
 \section{Testing}
+Testing is an essential component of software development. Tests can be used to
+help identify bugs within code early on, and can also aid in the debugging process.
+Most games don't follow TDD; in game development, play-testing is commonly favored
+over unit testing due to the need to assess visual elements like animations and
+latency in real-time.\cite{politowski_survey_2021} TDD requires developers to know
+in advance what they want to
+achieve so they can write tests before creating the functions. Game developers often don't
+have this complete knowledge initially, leading to tests that fail even when the function
+works as intended. This makes TDD challenging in game development, as developers may
+need to rewrite tests later, defeating the purpose of the technique.
+
+In my project, I only wrote unit tests for functions without server
+dependencies, relying on end-to-end testing for those requiring server interaction.
+Even though my unit tests are few in number, I have still tested all code through
+end to end testing, including browser automation tests via chrobot, a package providing
+an interface and bindings to the Chrome Devtools Protocol \cite{noauthor_chrobot_nodate},
+and informal play testing.
+
 \section{Documentation}
-I used gleams built-in thing for docs \& their command to produce the webpage
+Using Gleam's built-in tooling for writing documentation and generating web pages
+for public types and functions significantly streamlined the development process.
+I documented all modules, types, and functions, including private ones,
+in order to enhance code reuse and adaptation. This thorough approach not
+only simplifies future maintenance and optimizations but also helps facilitate a
+deeper understanding of the codebase. As I have already begun the
+optimizations for my final game, having comprehensive documentation
+ensures that any modifications or enhancements can be made efficiently,
+maintaining a high standard of code quality and usability.
+
+In solo projects, documenting code is especially beneficial, even if the advantages
+aren't immediately apparent. Since the project is developed over an extended period
+and includes many unique modules and functions, after a significant break from a
+feature, it can be challenging to recall the purpose of each module or function.
+This leads to backtracking to understand the rationale behind old code.
+Comprehensive documentation helps quick identification of why specific decisions
+were made and the intent behind certain pieces of code.
+
+\chapter{A Description of the Prototype Implementations}
+
+% After careful evaluation, the project will utilize:
+
+% Gleam Programming Language: A statically-typed functional language that compiles to Erlang
+% Erlang/BEAM: Provides a robust actor model and highly concurrent runtime environment
+% WebSockets: For real-time, bidirectional communication
+% Distributed Systems Techniques: To support multiple game instances and scalability
+
+% Gleam was chosen for its modern approach to functional programming, strong type system, and ability to compile to the Erlang ecosystem. The BEAM runtime offers exceptional concurrency capabilities, making it ideal for building responsive, fault-tolerant game environments.
+
+% This project addresses critical challenges in multiplayer game design by:
+
+% Demonstrating advanced concurrency techniques
+% Creating a flexible, scalable game environment
+% Exploring innovative approaches to real-time interactive systems
+% Providing insights into functional programming in game development
+
+% By combining cutting-edge technologies and focusing on concurrent system design, the project aims to push the boundaries of multiplayer game environment architecture.
+
+% The majority of architectures I have seen are this and this is their benefits\dots
+% client server
+
+% I had been interested in using Gleam for some time due to it's features. Particularly the fact that it is statically typed and designed for systems that can scale.
+% The homepage for the language describes why I have interest in it perfectly, it's because it has "The power of a type system, the expressiveness of functional programming, and the reliability of the highly concurrent, fault tolerant Erlang runtime, with a familiar and modern syntax."
+
+% Running on the battle-tested Erlang virtual machine that powers planet-scale systems such as WhatsApp and Ericsson, Gleam is ready for workloads of any size.
+
+% "Thanks to a multi-core actor based concurrency system that can run millions of concurrent tasks, fast immutable data structures, and a concurrent garbage collector that never stops the world, your service can scale and stay lightning fast with ease."
+
+% "Gleam comes with compiler, build tool, formatter, editor integrations, and package manager all built in"
+
+% "As part of the wider BEAM ecosystem, Gleam programs can use thousands of published packages, whether they are written in Gleam, Erlang, or Elixir."
+
+% "No null values, no exceptions, clear error messages, and a practical type system."
+
+% "Gleam can additionally compile to JavaScript," which is a familiar environment
+% and gives me more confidence in producing my prototypes as I could first learn
+% the technologies I wish to use in that environemnt, less of a learning curve,
+% and then move over to Erlang and implement it all properly there.
+% %Maybe not learning curve - check wording
+
+% ValKey is based off OSS Redis which means that it can scale horizontally.
+% This differs from other NoSQL and SQL databases where they may still have
+% fast times but cannot scale as well as a Redis cluster.
+
+% Below is a diagram of the architecture I decided upon using for my Game's environment.
+
+% Lustre was used solely as a component frameword due to it's web server model
+% not being able to handle more than one socket at an endpoint at the same time.
+
+% I had considered using wisp but it's current state, while it has matured, still
+% does not good support for websockets as it couples too tightly with mist.
+
+Developing prototypes was crucial for validating the architectural design,
+testing concurrency mechanisms, and iteratively refining the game environment's
+core technologies and interaction patterns before working on the final,
+more complex game. With the exception of JavaScript,
+all technologies in the tech stack were new to me, which led to
+significant learning and growth.
+
+This section will focus on the Tic-Tac-Toe prototype targeting Erlang,
+as the JavaScript prototypes were primarily exploratory tools for learning
+new technologies like WebSockets, Valkey, Gleam and functional programming.
+The other Erlang prototypes share a similar, modular implementation,
+optimized for the final game. The online chat's functionality is
+encapsulated within the Tic-Tac-Toe prototype, and the Pong game
+served to demonstrate the versatility of the underlying game
+environment architecture.
+
+\begin{figure*}[ht!]
+  \centering
+  \includegraphics[width=\linewidth]{architecture}
+  \vspace*{-1.5cm}
+  \caption{A diagram representing the game environment architecture I chose to use}
+  \label{fig: 2}
+\end{figure*}
+
+The client-side is managed by the htmx library, as the main focus for my project
+was on the architecture of the environement and the implementation of the game
+servers. The simplicity and power of htmx, giving me access to AJAX, CSS Transitions,
+WebSockets and Server Sent Events, directly in HTML using attributes,\cite{noauthor_htmx_nodate} allowed me to
+focus on the server, as I tried to make the client-side stateless. I mostly
+used the WebSockets extension for the library. It had many useful features;
+"if the WebSocket is closed unexpectedly, due to Abnormal Closure, Service Restart
+or Try Again Later, the extension will attempt to reconnect until the connection
+is reestablished. [...] The extension also implements a simple queuing mechanism that
+keeps messages in memory when the socket is not in OPEN state and sends
+them once the connection is restored."\cite{noauthor_htmx_ws_nodate} Other useful features include the
+use of a full-jitter exponential-backoff algorithm that chooses a randomized
+retry delay that grows exponentially over time, and the exposed
+set of events that allow you to observe and customize the extensions behavior.
+\cite{noauthor_htmx_ws_nodate}
+
+To avoid issues like the ones the CodinGame platform
+experienced, previously mentioned, I implemented one of the
+solutions to their problem, which was the use of a load balancer and a pool
+of servers\cite{jobert_story_2017}. The load balancer uses nginx, which can
+support more requests
+than the game servers that are running the Erlang code (compiled Gleam code),
+as seen in figure ~\ref{1}, allowing it to keep up with influxes of users.
+The load balancer ensures that servers do not have their buffers overfilled
+and that load is distributed evenly so that the game service can operate smoothly.
+As well as this, it allows for easier scalability, as all that needs to be managed is the
+number of servers in the pool.
+
+The Game servers themselves were written in Gleam, with the JavaScript prototypes
+using glen as their web framework, lustre for their components and HTML templates,
+and some JavaScript through a FFI, to manage local state. For the prototypes
+targeting Erlang, mist was used as the web server, due to it's mature state
+and support for websockets, and carpenter for access to ETS tables, for managing
+local state. Since Gleam compiles to Erlang, I could build a fault-tolerant
+system, due to certain notions like 'Shared Nothing' and the lack for a need
+of locks.
+
+Valkey was used as the database since it is a fork of Redis OSS.
+This means that it can scale horizontally as a Cluster, resulting in
+the ability to "automatically split the dataset among multiple nodes", and
+"continue operations when a subset of the nodes are experiencing failures
+or are unable to communicate with the rest of the cluster"\cite{noauthor_scale_nodate}.
+This ensures scalability and some tolerance towards hardware failure and data loss.
+
+I mostly used Valkey as a message broker, within the Pub/Sub model, as I
+tried to keep state on the game servers themselves, reducing the risk of data
+loss, as all servers try to maintain the same state through sending messages
+via Pub/Sub. The Pub/Sub pattern is a vital part of this architectiure as it
+allows all of the servers to update each other on actions being carried out
+in the game, allowing all of them to maintain the same state,
+instead of being inconsistent. In the Online Chat prototype,
+I did save messages in the database, so that users who joined
+a chat room later than the creator, could still see old messages, and so that all
+users could disconnect from a chat room, and join back in and still see the old
+messages.
+
+
+valkey is the fastest
+
+\newpage
+
+\begin{wrapfigure}{r}{20em}
+  \caption{A sequence diagram used for designing how the player will connect to the game}\label{wrap-fig:1}
+  \includegraphics[width=20em]{sequence_connecting}
+  \caption{The function that creates the WebSocket actor and the response containing the WebSocket for the client}\label{wrap-fig:2}
+  \vspace*{0.5cm}
+  \includegraphics[width=20em]{new_websocket_actor}
+\end{wrapfigure}
+
+To start, figure\ref{wrap-fig:1} demonstrates how the player will connect to the game.
+When the player enters the URL of the game's site in their browser, this sends a HTTP
+GET request to the game server. The server will respond with the homepage which
+includes a HTML DIV element with the ID 'app'. This element uses the htmx websockets
+extension to establish a websocket qwith the game server. This websocket will be
+used for all further interactions with the game server. Every websocket will have a
+Actor on the game server they are connected to, for handling client-side messages and
+server-side events.
+
+The code shown in figure\ref{wrap-fig:2}, defines an 'on\_init' function for the WebSocket actor. This function,
+creates a subject for the actor so that other actors can send messages to it.
+It then creates the initial state for the actor, using empty defaults where appropriate,
+as many state values will be updated over time, as the player continues towards
+joining and playing a game. Furthermore, it defines the 'on\_close' function,
+which is triggered when the WebSocket disconnects, and the actor is about to shutdown. This function carries out
+'clean-up' for the different actors' states, by first checking if the player
+connected via the closed WebSocket was in a game or not and then sending the
+appropriate messages to the other actors.
+
+If the game actor recieves a 'UserDiconnected'
+message, it will send a message to the other player's client, that will force it to disconnect
+from the game after displaying the error message "Your opponent disconnected!".
+Since the director actor is mostly used for managing players that are waiting for
+their game to be joined, when it recieves a 'DequeueParticipant' message, all it needs
+to do is update its state and notify the other game servers by publishing a message.
+
+The subsequent sequence diagrams would also include a subscriber actor
+but it is not included since it does not do much on the same server
+messages are being published from, other than disregard the message.
+Other servers would have a subscriber actor too and use it to update
+their other actors' states in accordance with what updated in the game,
+denoted by the published message.
+
+\newpage
+
+\begin{figure*}[ht!]
+  \centering
+  \caption{A sequence diagram used for designing how the player disconnections will be managed}
+  \vspace*{0.5cm}
+  \includegraphics[width=\linewidth]{sequence_disconnecting}
+  \label{fig: 3}
+  \caption{A sequence diagram used for designing how games (rooms / sessions) will be created}
+  \vspace*{0.5cm}
+  \includegraphics[width=\linewidth]{sequence_creating}
+  \label{fig: 4}
+\end{figure*}
+
+When a user wishes to create a game, a stringified JSON message is sent to the game server.
+This goes for any websocket messages to the server from the player interactions.
+The message is parsed to identify that the player wishes to create a game. As seen in the diagram,
+messages are sent to update the states of multiple actors, and the player's page is updated to tell
+them that the game has been created, and which code to use for someone else to join it.
+(The 'page' is a HTML DIV element, with the ID 'page', within the 'app' DIV, so that the WebSocket
+connection stays open). Then when a player joins the game, the director will start
+a game actor for use in any further actions in that game (room / session).
+
+\begin{wrapfigure}{r}{20em}
+  \caption{The director actor module}\label{wrap-fig:5}
+  \vspace*{0.5cm}
+  \includegraphics[width=20em]{director_actor}
+  \caption{The function that starts the game actor}\label{wrap-fig:6}
+  \vspace*{0.5cm}
+  \includegraphics[width=20em]{new_game_actor}
+\end{wrapfigure}
+
+\vspace*{2em}
+The director actor's state is a dictionary of 'waiting games',
+games with a single player. An ETS table is also used for keeping
+state of all games. When the player joins a game, it gets dropped
+from the dictionary, but not from the ETS table. Only when a player
+disconnects, does it get dropped from the ETS table.
+
+\vspace*{20em}
+
+The state of the game actor, as shown in figure \ref{wrap-fig:6}
+holds the game state, using a list for the state of the Tic-Tac-Toe boxes
+where the index of the items correspond to the boxes on the page, from
+left-to-right, top-to-bottom. The initial state holds 'Neither' in
+all spaces in the list, indicating that neither player has placed
+their mark in those boxes yet.
+
+\begin{wrapfigure}{r}{20em}
+  \caption{The }\label{wrap-fig:7}
+  \vspace*{0.5cm}
+  \includegraphics[width=20em]{generate_game_code}
+  \caption{The }\label{wrap-fig:8}
+  \vspace*{0.5cm}
+  \includegraphics[width=20em]{join_game}
+\end{wrapfigure}
+
+As seen in figure \ref{wrap-fig:7},
+
+\begin{figure*}[ht!]
+  \centering
+  \caption{teh}
+  \vspace*{0.5cm}
+  \includegraphics[width=\linewidth]{sequence_messaging}
+  \label{fig: 5}
+  \caption{teh}
+  \vspace*{0.5cm}
+  \includegraphics[width=\linewidth]{sequence_playing}
+  \label{fig: 6}
+\end{figure*}
+
+
+
+
+\begin{wrapfigure}{r}{20em}
+  \begin{lstlisting}
+
+pub fn on_box_click(box: Int, state: WebsocketActorState) -> WebsocketActorState {
+  let assert Some(game_subject) = state.game_subject
+  process.send(game_subject, BoxClick(state.player, box))
+  state
+}
+
+pub fn new_game_state(
+  state: GameActorState,
+  player: Player,
+  box_index: Int,
+) -> GameActorState {
+  let before_box = { state.game_state.state |> list.split(box_index) }.0
+  let assert Ok(after_box) =
+    list.rest({ state.game_state.state |> list.split(box_index) }.1)
+  let new_list = list.flatten([before_box, [player], after_box])
+
+  GameActorState(
+    ..state,
+    game_state: GameState(..state.game_state, state: new_list),
+  )
+}
+
+  \end{lstlisting}
+  \caption{The }\label{wrap-fig:9}
+  \includegraphics[width=20em]{box_click}
+  \caption{The }\label{wrap-fig:10}
+  \includegraphics[width=20em]{get_winning_player}
+
+
+\end{wrapfigure}
+
+
+
+
 
 \chapter{End System Development}
-\section{Proof of Concepts}
-\section{Architecture of the End System}
-\section{Features of the End System}
-\section{Running the Application}
-\section{Work Log}
-\section{Potential Future Enhancements}
 
-\chapter{Assessment}
-\section{Professional Considerations for this Project}
-\section{Self Evaluation}
+Evidence of understanding of background theory, ideally demonstrated by
+explanation of appropriate proof of concept programs.
+Clear evidence of independent thought using background theory imaginatively.
+
+After creating and implementing procedural generation, I have discovered a few issues and areas I
+have to improve upon.
+
+A good resource which helped me learn how to
+Chatter-Reborn
+
+%such as the choice of data struc- tures, numerical methods etc
+
+Mist too had an issue where it's documentation did not describe how to use multiple
+actors with websockets and be able to send messages between them. After multiple
+extensive tries at doing this, I found an issue on the frameworks Github page
+where others were trying to do the same and a user going by "Casper-..." provided
+a solution that he used for his "Chatter-Reborn" project. This was vital for my
+progress on creating the prototypes that targeted Erlang and provided inspiration
+for how I implemented the actors for my programs. Namely, using a actor for queues,
+and then passing the specific scenario, like a chat room or game, to another actor
+for the rest of the communications between users in the scenario.
+\section{Architecture}
+The architecture for the end system will follow that of the prototypes that
+targeted Erlang as I have tried and tested it and it works well with what I
+wish to accomplish for my final game.
+
+Architecture same as image above.
+\section{Features of the End System}
+
+could have this but not a priority so could come back to it
 
 \newpage
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliography{interim_refs}
 
 \chapter{Planning and Time-scale}
+During the initial weeks of beginning my project, I had outlined what I would hope to achieve at
+each week during term time. Below is the initial timeline I hoped to follow.
+
+As it is the end of term one, I now have the chance to review my progress and analyse how close I
+am to my final goal. I have successfully followed my original timeline up to ...
+
+Unfortunately,
+I had underestimated how much time it would take to carry out extensive research
+
+Along with this, I have also had
+many other commitments that I had to prioritise which effected the amount of time I had initially
+planned on allocating towards creating my games and their environments.
+
+I had also experienced hardware issues  and unexpected challenges when moving between frameworks
+
+This setback was completely
+unexpected
+
+However, during the winter break I will continue to work on my
+project which will put me back on schedule.
+
+My timeline for term two is still what I aim to follow with a few minor tweaks. During the first
+week I expect to work more on...
+
+before continuing with the goals listed on my timeline.
 
 \chapter{Appendix}
 \section{Diary}
+Diary of achievements well related to original plan.
+Reflective diary showing strong evidence of analysis of process.
+\section{Video Demo}
+
+\chapter{Acronyms \& Glossary}
+
+Threads
+
+A sequential flow of control within a process. A process can contain one or more threads.
+Threads have their own program counter and register values, but they share the memory space
+and other resources of the process
+
+%from the uni
+
+Parallelism
+
+Truly simultaneous execution or evaluation of things.
+%from the uni
+
+Concurrency
+
+The coordination and management of independent lines of execution. These executions
+can be truly parallel or simply be managed by interleaving. They can communicate
+via shared memory or message passing. (Rob Pike's definition: “the composition of
+dependently executing computations”)
+%from the uni
+
+Deadlock
+Two threads are blocked, waiting for each other to release a resource that they need. So neither can proceed.
+
+Starvation
+A thread is waiting for a resource that is always given to other threads.
+
+Livelock
+Two threads are waiting for each other to release a resource. They keep trying to resolve their impasse, but never succeed.
+
+Race Condition
+Two threads are trying to access a shared resource at the same time. The result is dependent on the order of execution.
+%from the uni
+BEAM
+
+Bogdan's Erlang Abstract Machine / Björn's Erlang Abstract Machine - a virtual machine, built into the OTP
+distribution, that executes user code in the ERTS.
+
+OTP
+
+Open Telecom Platform - a framework that provides an abstraction of common uses of / interactions with
+certain types of processes. It provides modules and behaviours that represent standard implementations of
+common practices like process supervision, message passing, spawning tasks, etc.
+
+ERTS
+
+Erlang Run Time System - the system that contains functionality necessary to run the Erlang system.
+
+OS
+
+Operating System - system software that manages computer hardware and software resources, and
+provides common services for computer programs.
+
+Websockets
+
+A computer communications protocol, providing a simultaneous two-way communication channel
+over a single TCP connection.
+
+TCP
+
+Transmission Control Protocol - one of the main protocols of the Internet protocol suite. TCP provides
+reliable, ordered, and error-checked delivery of a stream of bytes between applications over a IP network.
+
+HTTP
+
+HyperText Transfer Protocol - an application layer protocol in the Internet protocol suite.
+It is used for transferring data between clients and servers.
+
+DoS
+
+Denial of Service - An attack where the perpetrator seeks to make a machine or network resource unavailable
+to its intended users
 
 \end{document}
 \end{article}
