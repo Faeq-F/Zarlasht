@@ -37,10 +37,11 @@ fn handle_message(
       new_state |> actor.continue
     }
     DequeueParticipant(game_code) -> {
-      state.games_waiting |> drop([game_code])
+      let new_queue = state.games_waiting |> drop([game_code])
       let assert Ok(waiting_games) = table.ref("waiting_games")
       waiting_games |> table.delete(game_code)
-      state |> actor.continue
+      let new_state = DirectorActorState(games_waiting: new_queue)
+      new_state |> actor.continue
     }
   }
 }
