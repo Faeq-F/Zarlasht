@@ -7,14 +7,18 @@ import pages/to_join_chat.{join_chat_page, wrong_code}
 import socket_state.{type Event, type State, State}
 import utils.{chat_exists, get_json_value}
 
-/// Joining chat
+/// Asked to join a chat
+///
+/// Sends the user to the `join_chat_page`
 ///
 pub fn on_to_join_chat(conn: ws.WebsocketConn(Event)) -> State {
   let _ = ws.send_text(conn, join_chat_page())
   State(-1, "")
 }
 
-/// After chat code is inputted on join screen
+/// After the chat code has been inputted on the join page
+///
+/// Checks if the chat exists and sends them to the `set_name_page`
 ///
 pub fn on_join_chat(
   text_message: String,

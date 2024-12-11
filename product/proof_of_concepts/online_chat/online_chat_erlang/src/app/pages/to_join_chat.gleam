@@ -41,7 +41,7 @@ pub fn join_chat_page() -> String {
 pub fn wrong_code() -> String {
   html.div([attribute.id("errorCode")], [
     html.p([attribute.class("text-sm mt-1 text-error")], [
-      html.text("A chat does not exist for this code!"),
+      html.text("A game does not exist for this code!"),
     ]),
   ])
   |> element.to_string

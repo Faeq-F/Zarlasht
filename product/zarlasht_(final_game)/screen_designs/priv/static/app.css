@@ -1,3 +1,5 @@
+/* General */
+
 [data-theme=emerald] [data-theme=forest],
 [data-theme=emerald] {
   color-scheme: light !important;
@@ -201,4 +203,121 @@ body.dark .dark\:hover\:text-shadow:hover {
 .chat-start .chat-bubble::before {
   border-color: var(--chat-border-color);
   border-width: 5px;
+}
+
+/* Chat */
+
+.container {
+  display: grid;
+  grid-template-columns: 0.4fr 2.2fr 0.4fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  width: 98vw;
+  height: 80vh;
+}
+
+.Name {
+  grid-area: 1 / 2 / 2 / 3;
+}
+
+.Chat-Button {
+  grid-area: 1 / 3 / 2 / 4;
+}
+
+.Me {
+  grid-area: 2 / 3 / 3 / 4;
+}
+
+.Close {
+  grid-area: 3 / 3 / 4 / 4;
+}
+
+.Map {
+  grid-area: 5 / 3 / 6 / 4;
+}
+
+.Roll-die {
+  grid-area: 4 / 3 / 5 / 4;
+}
+
+.Chat {
+  grid-area: 1 / 2 / 5 / 3;
+}
+
+.message {
+  grid-area: 5 / 2 / 6 / 3;
+}
+
+.Allies {
+  grid-area: 1 / 1 / 2 / 2;
+}
+
+.people {
+  grid-area: 2 / 1 / 6 / 2;
+}
+
+.close-red {
+  fill: oklch(from var(--er) l c h / calc(alpha - 0.1))
+}
+
+.sendIcon {
+  -webkit-transform: rotate(210deg)
+}
+
+.dropdown[open] summary {
+  color: oklch(var(--a));
+  text-shadow: 1px 1px 1px black;
+  border-radius: 30px 30px 0 0;
+}
+
+
+
+
+/* created game */
+
+.game-container {
+  width: 90vw;
+  overflow-x: scroll;
+}
+
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(9999, 1fr);
+  width: 90vw;
+}
+
+.grid .row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  overflow-x: scroll;
+}
+
+#player-container {
+  margin: 0 auto;
+  width: 90vw;
+}
+
+.sortable div,
+.row .item {
+  display: inline-block;
+  width: 15em;
+  border: 1px solid gray;
+  border-radius: 15px;
+  margin: 10px;
+  height: 5em;
+}
+
+.row .item {
+  height: 30em !important;
+}
+
+.sortable {
+  display: flex;
+}
+
+.tick {
+  -webkit-transform: rotate(47deg) scale(-1, 1)
 }
