@@ -1,7 +1,15 @@
+//// The page seen when the user has entered the chat
+
 import lustre/attribute.{attribute}
 import lustre/element.{type Element, text}
 import lustre/element/html
 
+/// The chat page - where users communicate with each other
+///
+/// Composed of the `send_message_form` and a wrapper for the layout of the form
+///
+/// Returns stringified HTML to send to the websocket
+///
 pub fn chat_page(chat_code: String) -> String {
   html.div([attribute.class("bg-base-100 min-h-screen"), attribute.id("page")], [
     html.h1(
@@ -40,6 +48,10 @@ pub fn chat_page(chat_code: String) -> String {
   |> element.to_string
 }
 
+/// A message within the chat
+///
+/// Returns stringified HTML to send to the websocket
+///
 pub fn message(
   message: String,
   username: String,
@@ -105,6 +117,10 @@ pub fn message(
   |> element.to_string
 }
 
+/// The form used to send messages
+///
+/// Composed of a textarea to write the message and a button to send the message
+///
 pub fn send_message_form() -> Element(form) {
   html.form(
     [
