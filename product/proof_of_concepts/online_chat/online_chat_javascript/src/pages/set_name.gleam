@@ -1,8 +1,16 @@
+//// The page seen when trying to set your name
+
 import lustre/attribute.{attribute}
 import lustre/element
 import lustre/element/html
 import pages/svg_elements.{tick}
 
+/// The page used to set a user's name
+///
+/// Composed of a text field to enter your name and a button to submit it
+///
+/// Returns stringified HTML to send to the websocket
+///
 pub fn set_name_page() -> String {
   html.div(
     [attribute.class("hero bg-base-100 min-h-full"), attribute.id("page")],
