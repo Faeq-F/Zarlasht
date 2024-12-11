@@ -61,6 +61,8 @@ pub fn new(
   )
 }
 
+///Handle all messages from the client and from other Actors
+///
 fn handle_ws_message(state, conn, message) {
   logging.log(Info, "Websocket message recieved ~")
   io.debug(message)

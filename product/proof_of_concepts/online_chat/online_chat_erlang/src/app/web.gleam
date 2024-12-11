@@ -1,3 +1,5 @@
+//// Middleware
+
 import gleam/bytes_tree
 import gleam/erlang/process.{type Subject}
 import gleam/http
@@ -35,6 +37,8 @@ pub fn middleware(
   handle_request(req)
 }
 
+/// Parses the response status and delivers an appropriate page
+///
 pub fn default_responses(
   handle_request: fn() -> Response(ResponseData),
 ) -> Response(ResponseData) {
@@ -70,6 +74,8 @@ pub fn default_responses(
   }
 }
 
+/// Logs all requests to the server
+///
 fn log_request(
   req: Request(Connection),
   handler: fn() -> Response(ResponseData),
