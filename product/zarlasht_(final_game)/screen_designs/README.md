@@ -1,24 +1,34 @@
-# screen_designs
+## Setup
 
-[![Package Version](https://img.shields.io/hexpm/v/screen_designs)](https://hex.pm/packages/screen_designs)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/screen_designs/)
+Install [Gleam](https://gleam.run/getting-started/installing/)
 
-```sh
-gleam add screen_designs@1
-```
-```gleam
-import screen_designs
+Within the `priv/static` folder, you will need a `libraries` folder with the
+following:
 
-pub fn main() {
-  // TODO: An example of the project in use
-}
-```
-
-Further documentation can be found at <https://hexdocs.pm/screen_designs>.
+- `daisyui.min.css`
+- `tailwind.min.js`
 
 ## Development
 
 ```sh
-gleam run   # Run the project
-gleam test  # Run the tests
+# Run the project
+gleam run
 ```
+
+## Use
+
+Pages are accessible via the following `path_segments`:
+
+```gleam
+[] | ["home"] 
+["created_game"]
+["join_game"] 
+["set_name"] 
+["game"] 
+["roll_die"] 
+["chat"] 
+["player"]
+```
+
+i.e., the homepage is accessible via http://127.0.0.1:8000/ or
+http://127.0.0.1:8000/home<br> (localhost is an alias of 127.0.0.1)
