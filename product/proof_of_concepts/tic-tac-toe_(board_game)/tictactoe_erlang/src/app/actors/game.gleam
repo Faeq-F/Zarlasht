@@ -53,7 +53,7 @@ fn handle_message(
   io.debug(message_for_actor)
   case message_for_actor {
     BoxClick(player, box_index) -> {
-      // Update state for boxe
+      // Update state for boxes
       let new_state = new_game_state(state, player, box_index)
       // Update turn
       let current_turn = state.game_state.turn
@@ -86,7 +86,8 @@ fn handle_message(
             game.game_grid(new_state.game_state, p.0, case winner {
               "Neither" -> new_state.game_state.turn == p.0
               _ -> False
-              // if someone has won, the grid should no longer have clickable boxes
+              // if someone has won,
+              // the grid should no longer have clickable boxes
             }),
           ),
         )
