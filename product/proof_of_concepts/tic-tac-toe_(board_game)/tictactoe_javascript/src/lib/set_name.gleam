@@ -1,3 +1,5 @@
+//// Setting the name of a user
+
 import glen/ws
 import pages/game.{game_page, update_status}
 import pages/set_name.{waiting}
@@ -6,6 +8,10 @@ import state.{
   for_all_sockets, get_json_value, get_turn, get_winning_player, set_player_name,
 }
 
+/// Set a players's name
+///
+/// Sends the player to the game page after subscribing to the game's channel.
+///
 pub fn on_set_name(
   text_message: String,
   conn: ws.WebsocketConn(Event),
