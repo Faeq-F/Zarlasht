@@ -1,3 +1,5 @@
+//// Chat Actions
+
 import app/actors/actor_types.{
   type UserSocket, type WebsocketActorState, SentMessage,
 }
@@ -8,6 +10,8 @@ import juno
 import lustre/element.{to_string}
 import mist
 
+/// Sending a message
+///
 pub fn on_send_message(
   text_message: String,
   player: UserSocket,

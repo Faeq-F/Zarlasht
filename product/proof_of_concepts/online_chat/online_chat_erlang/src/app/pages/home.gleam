@@ -1,7 +1,13 @@
+//// The home page of the site
+
 import lustre/attribute.{attribute}
 import lustre/element.{type Element, text}
 import lustre/element/html
 
+/// The home page of the site
+///
+/// A page with two buttons; one for creating a chat and another for joining a chat
+///
 pub fn root() -> Element(t) {
   html.div([attribute.class("hero bg-base-100 min-h-full")], [
     html.div(
