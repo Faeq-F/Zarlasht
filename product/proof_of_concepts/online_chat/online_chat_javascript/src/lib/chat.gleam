@@ -1,3 +1,5 @@
+//// Chat Actions
+
 import birl.{now, to_naive_date_string, to_naive_time_string}
 import gleam/dynamic
 import gleam/int
@@ -8,6 +10,10 @@ import pages/chat.{message, send_message_form}
 import socket_state.{type Event, type State}
 import utils.{db_set, valkey_publish}
 
+/// Sending a message
+///
+/// Constructs the HTML for the message, saves it to the database, and sends it to all users in the chat (also publishing it to other servers)
+///
 pub fn publish_message(
   conn: ws.WebsocketConn(Event),
   state: State,

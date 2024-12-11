@@ -1,9 +1,9 @@
 //// The page seen when trying to set your name
 
-import lustre/attribute.{attribute}
+import lucide_lustre.{check}
+import lustre/attribute.{attribute, class}
 import lustre/element
 import lustre/element/html
-import pages/svg_elements.{tick}
 
 /// The page used to set a user's name
 ///
@@ -46,7 +46,7 @@ pub fn set_name_page() -> String {
                             "btn join-item bg-secondary text-secondary-content hover:bg-accent",
                           ),
                         ],
-                        [tick("w-5 h-5 fill-current")],
+                        [check([class("w-5 h-5")])],
                       ),
                     ]),
                   ],
@@ -58,5 +58,18 @@ pub fn set_name_page() -> String {
       ),
     ],
   )
+  |> element.to_string
+}
+
+/// The error message the user will see if they do not enter a name
+///
+/// Returns stringified HTML to send to the websocket
+///
+pub fn empty_name() -> String {
+  html.div([attribute.id("waiting")], [
+    html.p([attribute.class("text-sm mt-1 text-error")], [
+      html.text("You cannot have an empty name!"),
+    ]),
+  ])
   |> element.to_string
 }
