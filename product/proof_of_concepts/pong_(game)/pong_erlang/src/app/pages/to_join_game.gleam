@@ -1,3 +1,5 @@
+//// The page seen when trying to join a game
+
 import lustre/attribute.{attribute}
 import lustre/element
 import lustre/element/html
