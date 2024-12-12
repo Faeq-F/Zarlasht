@@ -62,7 +62,6 @@ pub type GameActorState {
 pub type GameActorMessage {
   UserDisconnected(player: Player)
   AddedName(player: Player, ws: Subject(CustomWebsocketMessage), name: String)
-  SendToAll(general_message: GeneralMessage)
 }
 
 pub type GeneralMessage {

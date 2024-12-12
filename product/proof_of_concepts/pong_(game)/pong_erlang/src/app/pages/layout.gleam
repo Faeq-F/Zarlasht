@@ -64,16 +64,19 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
       ),
     ]),
     html.body([], [
-      html.label([attribute.class("swap swap-rotate right-0 fixed m-4 z-10")], [
-        html.input([
-          attribute.value("forest"),
-          attribute.class("theme-controller hidden"),
-          attribute.type_("checkbox"),
-        ]),
-        sun([class("swap-off h-10 w-10")]),
-        moon([class("swap-on h-10 w-10")]),
-      ]),
-      html.label([attribute.class("left-0 m-4 fixed z-10")], [
+      html.label(
+        [attribute.class("swap swap-rotate right-0 fixed m-4 z-10 top-0")],
+        [
+          html.input([
+            attribute.value("forest"),
+            attribute.class("theme-controller hidden"),
+            attribute.type_("checkbox"),
+          ]),
+          sun([class("swap-off h-10 w-10")]),
+          moon([class("swap-on h-10 w-10")]),
+        ],
+      ),
+      html.label([attribute.class("left-0 m-4 fixed z-10 top-0")], [
         html.a(
           [
             attribute.href("https://github.com/faeq-f/online_chat"),

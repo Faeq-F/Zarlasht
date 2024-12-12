@@ -8,7 +8,7 @@ pub fn set_name_page() -> String {
   html.div(
     [attribute.class("hero bg-base-100 min-h-full"), attribute.id("page")],
     [
-      html.h1([attribute.class("text-5xl font-bold mt-4")], [
+      html.h1([attribute.class("text-5xl font-bold mt-4 fixed top-0")], [
         element.text("Pong"),
       ]),
       html.div(
