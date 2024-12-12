@@ -1,3 +1,5 @@
+//// All types relating to the different actors
+
 import app/web.{type Context}
 import gleam/dict.{type Dict}
 import gleam/erlang/process.{type Subject}
@@ -24,7 +26,6 @@ pub type CustomWebsocketMessage {
 }
 
 /// A wrapper for a user's WebSocket Actor state and their connection
-///
 ///
 pub type UserSocket {
   UserSocket(socket: mist.WebsocketConnection, state: WebsocketActorState)

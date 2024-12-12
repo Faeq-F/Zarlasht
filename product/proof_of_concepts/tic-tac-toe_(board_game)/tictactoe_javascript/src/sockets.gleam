@@ -1,3 +1,5 @@
+//// Handling WebSocket events
+
 import gleam/int
 import gleam/io
 import gleam/javascript/promise.{type Promise}
@@ -13,6 +15,8 @@ import lustre/element/html
 import socket_state.{type Event, type State, State}
 import state.{for_all_sockets, get_json_value, remove_socket}
 
+/// Establishes a WebSocket connection for the client on the `/init_socket` endpoint
+///
 pub fn init_socket(req: Request) -> Promise(Response) {
   use _ <- glen.websocket(
     req,
@@ -23,11 +27,19 @@ pub fn init_socket(req: Request) -> Promise(Response) {
   Nil
 }
 
+/// The function that runs when a WebSocket connects
+///
+/// Logs `"A Socket Connected"` & sets the Socket's state to `-1` for the `chat_code` and `"Neither"` for the `player`
+///
 fn open_socket(_conn: ws.WebsocketConn(Event)) -> State {
   io.debug("A Socket Connected")
   State(-1, "Neither")
 }
 
+/// The function that runs when a WebSocket disconnects
+///
+/// Logs `"A Socket Disconnected"` and forces the opponent to disconnect after an error message
+///
 fn close_socket(state: State) -> Nil {
   io.debug("A Socket Disconnected")
   case remove_socket(state.game_code, state.player) {
@@ -55,6 +67,10 @@ fn close_socket(state: State) -> Nil {
   }
 }
 
+/// The function that runs when any message is recieved from a WebSocket (including Events that were fired)
+///
+/// `"ping"`s are responded with `"pong"`s
+///
 fn event_socket(
   conn: ws.WebsocketConn(Event),
   state: State,

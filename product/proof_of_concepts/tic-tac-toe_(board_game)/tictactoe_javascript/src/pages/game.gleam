@@ -1,3 +1,5 @@
+//// The page seen when the user has entered the game
+
 import gleam/int
 import gleam/list
 import gleam/string
@@ -7,6 +9,8 @@ import lustre/element/html.{text}
 import pages/svg_elements.{cross, empty, nought, replay}
 import state.{get_player_from_game_state}
 
+/// The page itself, including the tictactoe grid, and the send-message form
+///
 pub fn game_page() -> String {
   html.div(
     [attribute.class("hero bg-base-100 min-h-full"), attribute.id("page")],
@@ -106,6 +110,8 @@ pub fn game_page() -> String {
   |> element.to_string
 }
 
+/// The status for the game
+///
 pub fn update_status(
   turn: Bool,
   player_viewed: String,
@@ -193,6 +199,8 @@ pub fn update_status(
   |> element.to_string
 }
 
+/// The game grid
+///
 pub fn game_grid(game_code: Int, player_viewed: String, turn: Bool) -> String {
   html.div(
     [
@@ -206,6 +214,8 @@ pub fn game_grid(game_code: Int, player_viewed: String, turn: Bool) -> String {
   |> element.to_string
 }
 
+/// Creates all of the boxes for the grid
+///
 fn generate_boxes(
   boxes: List(Element(button)),
   current_index: Int,
@@ -234,6 +244,8 @@ fn generate_boxes(
   }
 }
 
+/// The game section of the page
+///
 fn game_box(
   id: String,
   player_filled: String,
@@ -293,6 +305,8 @@ fn game_box(
   }
 }
 
+/// The chat section of the page
+///
 pub fn message(message: String, me: Bool) -> String {
   html.div(
     [
@@ -334,6 +348,8 @@ pub fn message(message: String, me: Bool) -> String {
   |> element.to_string
 }
 
+/// The form to send messages in the chat
+///
 pub fn send_message_form() -> Element(form) {
   html.form(
     [
@@ -367,6 +383,8 @@ pub fn send_message_form() -> Element(form) {
   )
 }
 
+/// The player indicators on the page
+///
 pub fn player(player: String, name: String) -> String {
   case player == "X" {
     True -> {

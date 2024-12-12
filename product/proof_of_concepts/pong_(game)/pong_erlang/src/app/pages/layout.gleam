@@ -1,9 +1,9 @@
 //// Layout for all pages the site renders
 
-import lustre/attribute.{attribute}
+import lucide_lustre.{github, moon, sun}
+import lustre/attribute.{attribute, class}
 import lustre/element.{type Element}
 import lustre/element/html
-import pages/svg_elements.{github, moon, sun}
 
 /// Layout for all pages the site renders
 ///
@@ -12,7 +12,7 @@ import pages/svg_elements.{github, moon, sun}
 pub fn layout(elements: List(Element(t))) -> Element(t) {
   html.html([attribute("lang", "en"), attribute("data-theme", "emerald")], [
     html.head([], [
-      html.title([], "Tic-Tac-Toe"),
+      html.title([], "Pong"),
       html.meta([
         attribute.name("viewport"),
         attribute("content", "width=device-width, initial-scale=1"),
@@ -37,10 +37,7 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
           "https://fonts.googleapis.com/css2?family=Varela+Round&display=swap",
         ),
       ]),
-      html.link([
-        attribute.rel("stylesheet"),
-        attribute.href("/static/pages/app.css"),
-      ]),
+      html.link([attribute.rel("stylesheet"), attribute.href("/static/app.css")]),
       html.script([attribute.src("/static/libraries/htmx.min.js")], ""),
       html.script([attribute.src("/static/libraries/htmx-ext/ws.js")], ""),
       html.script([attribute.src("/static/libraries/tailwind.min.js")], ""),
@@ -67,23 +64,26 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
       ),
     ]),
     html.body([], [
-      html.label([attribute.class("swap swap-rotate right-0 fixed m-4 z-10")], [
-        html.input([
-          attribute.value("forest"),
-          attribute.class("theme-controller hidden"),
-          attribute.type_("checkbox"),
-        ]),
-        sun("swap-off h-10 w-10 fill-current"),
-        moon("swap-on h-10 w-10 fill-current"),
-      ]),
-      html.label([attribute.class("left-0 m-4 fixed z-10")], [
+      html.label(
+        [attribute.class("swap swap-rotate right-0 fixed m-4 z-10 top-0")],
+        [
+          html.input([
+            attribute.value("forest"),
+            attribute.class("theme-controller hidden"),
+            attribute.type_("checkbox"),
+          ]),
+          sun([class("swap-off h-10 w-10")]),
+          moon([class("swap-on h-10 w-10")]),
+        ],
+      ),
+      html.label([attribute.class("left-0 m-4 fixed z-10 top-0")], [
         html.a(
           [
-            attribute.href("https://github.com/faeq-f/tic-tac-toe"),
+            attribute.href("https://github.com/faeq-f/online_chat"),
             attribute.rel("noopener noreferrer"),
             attribute.target("_blank"),
           ],
-          [github("fill-current")],
+          [github([])],
         ),
       ]),
       html.label([attribute.class("left-0 bottom-0 fixed m-4 z-10")], [
