@@ -1,7 +1,11 @@
+//// SVG Lustre elements for different pages
+
 import lustre/attribute.{attribute}
 import lustre/element.{type Element}
 import lustre/element/svg
 
+/// Sun icon for switching to the light theme on the site
+///
 pub fn sun(classes: String) -> Element(svg) {
   svg.svg(
     [
@@ -20,6 +24,8 @@ pub fn sun(classes: String) -> Element(svg) {
   )
 }
 
+/// Moon icon for switching to the dark theme on the site
+///
 pub fn moon(classes: String) -> Element(svg) {
   svg.svg(
     [
@@ -38,6 +44,8 @@ pub fn moon(classes: String) -> Element(svg) {
   )
 }
 
+/// GitHub icon for opening a new tab with this project's repository
+///
 pub fn github(classes: String) -> Element(svg) {
   svg.svg(
     [
@@ -58,6 +66,8 @@ pub fn github(classes: String) -> Element(svg) {
   )
 }
 
+/// A tick icon for confirmations, etc.
+///
 pub fn tick(classes: String) -> Element(svg) {
   svg.svg(
     [
@@ -92,6 +102,8 @@ pub fn tick(classes: String) -> Element(svg) {
   )
 }
 
+/// A replay icon for replaying the game
+///
 pub fn replay(classes: String) -> Element(svg) {
   svg.svg(
     [
@@ -114,6 +126,8 @@ pub fn replay(classes: String) -> Element(svg) {
   )
 }
 
+/// A nought for when the O player makes a mark
+///
 pub fn nought(classes: String) -> Element(svg) {
   svg.svg(
     [
@@ -147,6 +161,8 @@ pub fn nought(classes: String) -> Element(svg) {
   )
 }
 
+/// A cross for when the X player makes a mark
+///
 pub fn cross(classes: String) -> Element(svg) {
   svg.svg(
     [
@@ -169,6 +185,8 @@ pub fn cross(classes: String) -> Element(svg) {
   )
 }
 
+/// A filler for a box when there is no mark in it
+///
 pub fn empty(classes: String) -> Element(svg) {
   svg.svg(
     [

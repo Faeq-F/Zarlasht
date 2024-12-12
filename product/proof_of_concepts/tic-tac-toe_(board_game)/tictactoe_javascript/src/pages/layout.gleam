@@ -1,8 +1,14 @@
+//// Layout for all pages the site renders
+
 import lustre/attribute.{attribute}
 import lustre/element.{type Element}
 import lustre/element/html
 import pages/svg_elements.{github, moon, sun}
 
+/// Layout for all pages the site renders
+///
+/// The elements provided are placed in a DIV element with the ID `page`
+///
 pub fn layout(elements: List(Element(t))) -> Element(t) {
   html.html([attribute("lang", "en"), attribute("data-theme", "emerald")], [
     html.head([], [
