@@ -1,62 +1,34 @@
+//// Database related functions
+
+import gleam/erlang/process
 import gleam/result
 import glenvy/env
-import radish
+import radish.{type Next}
 import radish/error
 import radish/resp
 import radish/utils.{execute, prepare}
 
-// valkeySub.on("message", (channel, message) => {
-//   console.log(`Message ${message} was sent to chat \"${channel}\"`);
-//   const chat_sockets = sockets.get(channel);
-//   if (chat_sockets != undefined) {
-//     chat_sockets
-//       .filter((conn) =>
-//         conn.state.username != ffi_get_json_value(message, "username")
-//       )
-//       .forEach((conn) => {
-//         conn.socket.send(ffi_get_json_value(message, "html"));
-//       });
-//   }
-// });
-// process.start(
-//     fn() {
-//       radish.subscribe(
-//         ctx.subscriber,
-//         ["channel"],
-//         on_subscribe,
-//         on_radish_message,
-//         128,
-//       )
-//     },
-//     True,
-//   )
-
-//
-// fn on_subscribe(channel: String, subscribers: Int) {
-//   io.debug(
-//     "'"
-//     <> channel
-//     <> "' has been subscribed to. There are now "
-//     <> int.to_string(subscribers)
-//     <> " subscribers to this channel.",
-//   )
-//   Nil
-// }
-
-//
-// fn on_radish_message(channel: String, message: String) {
-//   io.debug(
-//     "The channel '" <> channel <> "' recieved the message '" <> message <> "'",
-//   )
-
-//   radish.Continue
-// }
-
-//let assert Ok(subscribers) = radish.publish(ctx.publisher, "channel", "message", 128)
-//logging.log(Info, int.to_string(subscribers)<>" subscribers listened.")
+/// Subscribes to channels using a new valkey client
+///
+/// Please see [this](https://hexdocs.pm/radish/radish.html#subscribe)!
+///
+pub fn valkey_subscribe(
+  channels: List(String),
+  on_subscribe: fn(String, Int) -> Nil,
+  on_message: fn(String, String) -> Next,
+) {
+  process.start(
+    fn() {
+      radish.subscribe(valkey_client(), channels, on_subscribe, on_message, 128)
+    },
+    True,
+  )
+}
 
 // can pub a message on game creation so all servers are aware of the game (also applys for actions in it)
 
+/// Creates a new client process for the database using credentials from the .env file
+///
 pub fn valkey_client() {
   let assert Ok(valkey_uri) = env.get_string("SERVICE_URI")
   let assert Ok(valkey_port) = env.get_int("SERVICE_PORT")

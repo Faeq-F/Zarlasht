@@ -1,3 +1,5 @@
+//// The middleware for the site
+
 import gleam/bytes_tree
 import gleam/erlang/process.{type Subject}
 import gleam/http

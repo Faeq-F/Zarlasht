@@ -1,3 +1,5 @@
+//// The game actor - process to manage a single game being played between two players
+
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
   type Player, AddedName, Disconnect, GameActorState, JoinGame, One,
