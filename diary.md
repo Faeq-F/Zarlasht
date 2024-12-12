@@ -2,7 +2,61 @@
 
 <details><summary>Term 1</summary>
 
+<details><summary>Week 12</summary>
+
+### 11/12/2024 - 13/12/2024
+
+Converted the screen designs for the final game into Lustre for easier
+development next term. Practicing for my presentation. Finalizing my interim
+report. Adding forgotten pieces to the repository and report.
+
+### 08/12/2024 - 10/12/2024
+
+Converted my UML diagrams to be digital and finished producing a draft for my
+interim report to get feedback from my supervisor.
+
+</details>
+
+<details><summary>Week 11</summary>
+
+### 05/12/2024 - 07/12/2024
+
+Continued with the Pong PoC - shifting focus on deployable implementation to one
+that can show that the technologies used are versatile (and not hard-coded for
+one game) (this was the original intention of having this game planned).
+Continued writing up the interim report; mostly making incoherent notes for now.
+
+### 01/12/2024 - 04/12/2024
+
+Cleaned up the fix to the error from last week and optimized it for the final
+game; made it reusable so that it can be transplanted into the Pong PoC and
+final game. Completed the tic-tac-toe PoC targeting Erlang.
+
+</details>
+
+<details><summary>Week 10</summary>
+
+### 28/11/2024 - 30/11/2024
+
+Trying to fix error relating to not using the owner process of a websocket
+connection to send messages. Taking inspiration from
+[chatter-reborn](https://github.com/connellr023/chatter-reborn) on how to use
+actors for high concurrency.
+
+### 23/11/2024 - 27/11/2024
+
+Added Valkey and WebSocket connections to the Pong game. Also added the
+`FLUSHDB` command for Valkey, and HTMX message interpretation for the
+tic-tac-toe PoC targeting Erlang.
+
+</details>
+
 <details><summary>Week 9</summary>
+
+### 20/11/2024 - 22/11/2024
+
+Started the Pong PoC. Tried using Wisp but swapped it out for Mist due to the
+state of websockets on the framework. Also started the interim report.
 
 ### 17/11/2024 - 19/11/2024
 

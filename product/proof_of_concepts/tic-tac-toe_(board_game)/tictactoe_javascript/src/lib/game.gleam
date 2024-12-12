@@ -1,3 +1,5 @@
+//// Game actions
+
 import glen/ws
 import lustre/element.{to_string}
 import pages/game.{message, send_message_form, update_status}
@@ -7,6 +9,8 @@ import state.{
   update_state,
 }
 
+/// Updates the game state when a player clicks on a box
+///
 pub fn on_box_click(box: Int, state: State) -> State {
   update_state(state.game_code, box)
   let winner = get_winning_player(state.game_code)
@@ -32,6 +36,8 @@ pub fn on_box_click(box: Int, state: State) -> State {
   state
 }
 
+/// Distributes the message to the other player
+///
 pub fn on_send_message(
   text_message: String,
   conn: ws.WebsocketConn(Event),
@@ -61,6 +67,10 @@ pub fn on_send_message(
   }
 }
 
+/// Resets the game state when a player wishes to replay
+///
+/// Lets the other player (one who didn't go first last time) take the first turn
+///
 pub fn on_replay_game(state: State) -> State {
   reset_game(state.game_code)
   for_all_sockets(state.game_code, fn(socket, player_viewed, _name) {
