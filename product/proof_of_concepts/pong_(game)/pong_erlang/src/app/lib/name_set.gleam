@@ -1,3 +1,5 @@
+//// Setting the name of a user
+
 import app/actors/actor_types.{
   type PlayerSocket, type WebsocketActorState, AddedName, WebsocketActorState,
 }
@@ -8,6 +10,10 @@ import gleam/option.{Some}
 import juno
 import mist
 
+/// Set a player's name
+///
+/// Also sends the player to the game page
+///
 pub fn set_name(message: String, player: PlayerSocket) -> WebsocketActorState {
   let assert Ok(juno.Object(message_dict)) = juno.decode(message, [])
   let assert Ok(juno.String(name)) = message_dict |> dict.get("name")
