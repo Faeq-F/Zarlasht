@@ -1,3 +1,9 @@
+# About
+
+The game itself was modified from
+[GeeksForGeeks](https://www.geeksforgeeks.org/pong-game-in-javascript/)<br>
+(This project was made to show that the code stack is versatile)
+
 ## Setup
 
 Install [Gleam](https://gleam.run/getting-started/installing/)
