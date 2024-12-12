@@ -51,7 +51,7 @@ pub type PlayerSocket {
   PlayerSocket(socket: mist.WebsocketConnection, state: WebsocketActorState)
 }
 
-/// The player a user is / marking is for
+/// The player a user is
 ///
 pub type Player {
   One

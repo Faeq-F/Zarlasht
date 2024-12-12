@@ -305,7 +305,7 @@ fn game_box(
   }
 }
 
-/// The chat section of the page
+/// A message in the chat
 ///
 pub fn message(message: String, me: Bool) -> String {
   html.div(

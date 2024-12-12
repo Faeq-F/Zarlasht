@@ -1,3 +1,5 @@
+//// The game actor - process to manage a single game being played between two players
+
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
   type GameState, type Player, AddedName, BoxClick, Disconnect, GameActorState,
@@ -12,6 +14,8 @@ import gleam/list
 import gleam/otp/actor.{type Next}
 import logging.{Info}
 
+/// Creates the actor
+///
 pub fn start(
   participants: List(#(Player, Subject(CustomWebsocketMessage))),
 ) -> Subject(GameActorMessage) {
@@ -45,6 +49,8 @@ pub fn start(
   actor
 }
 
+///Handle all messages  from other Actors
+///
 fn handle_message(
   message_for_actor: GameActorMessage,
   state: GameActorState,
@@ -226,6 +232,12 @@ fn handle_message(
   }
 }
 
+/// Gets the winning player for a game
+///
+/// Returns "X", "O", or "Draw" if a game has ended
+///
+/// Returns "Neither" if a game has not ended
+///
 fn get_winning_player(state: GameState) -> String {
   //possible combinations of boxes marked to be a winner
   let lines = [
@@ -254,6 +266,8 @@ fn get_winning_player(state: GameState) -> String {
   }
 }
 
+/// Goes through all possible combinations for getting a three in a row and checks if it exists on the current game grid
+///
 fn check_lines(lines: List(List(Int)), state: GameState) -> Player {
   case lines {
     [first, ..rest] -> {
@@ -284,6 +298,8 @@ fn check_lines(lines: List(List(Int)), state: GameState) -> Player {
   }
 }
 
+/// Helper function to get an item from a list through its index
+///
 fn get_from_index(list: List(a), index: Int) -> a {
   let assert Ok(last) = list.first(list.split(list, index).1)
   last

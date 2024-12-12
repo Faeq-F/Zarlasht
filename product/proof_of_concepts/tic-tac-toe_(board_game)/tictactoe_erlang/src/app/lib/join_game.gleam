@@ -1,3 +1,5 @@
+//// Joining a game that has already been created
+
 import app/actors/actor_types.{
   type PlayerSocket, type WebsocketActorState, EnqueueParticipant, O,
   WebsocketActorState,
@@ -11,17 +13,19 @@ import gleam/json.{int}
 import juno
 import mist
 
-//----------------------------------------------------------------
-// Before game code input
-
+/// Asked to join a game
+///
+/// Sends the player to the `join_game_page`
+///
 pub fn on_to_join_game(player: PlayerSocket) -> WebsocketActorState {
   let assert Ok(_) = mist.send_text_frame(player.socket, join_game_page())
   player.state
 }
 
-//----------------------------------------------------------------
-// After game code input
-
+/// After the game code has been inputted on the join page
+///
+/// Sends the player to the `set_name_page`
+///
 pub fn on_join_game(
   message: String,
   player: PlayerSocket,

@@ -1,3 +1,5 @@
+//// The page seen when the user has entered the game
+
 import app/actors/actor_types
 import gleam/int
 import gleam/list
@@ -8,6 +10,12 @@ import lustre/element.{type Element}
 import lustre/element/html.{text}
 import lustre/element/svg
 
+/// The game page - where users play the game
+///
+/// Includes the tictactoe grid, and the send-message form
+///
+/// Returns stringified HTML to send to the websocket
+///
 pub fn game_page() -> String {
   html.div(
     [attribute.class("hero bg-base-100 min-h-full"), attribute.id("page")],
@@ -107,6 +115,8 @@ pub fn game_page() -> String {
   |> element.to_string
 }
 
+/// The status for the game
+///
 pub fn update_status(
   turn: Bool,
   player_viewed: actor_types.Player,
@@ -202,6 +212,8 @@ pub fn update_status(
   |> element.to_string
 }
 
+/// The game grid
+///
 pub fn game_grid(
   game_state: actor_types.GameState,
   player_viewed: actor_types.Player,
@@ -219,6 +231,8 @@ pub fn game_grid(
   |> element.to_string
 }
 
+/// Creates all of the boxes for the grid
+///
 fn generate_boxes(
   boxes: List(Element(button)),
   current_index: Int,
@@ -247,6 +261,8 @@ fn generate_boxes(
   }
 }
 
+/// Gets the player marking from a game's state
+///
 fn get_player_from_game_state(
   game_state: actor_types.GameState,
   current_index: Int,
@@ -256,6 +272,8 @@ fn get_player_from_game_state(
   occupier
 }
 
+/// The game section of the page
+///
 fn game_box(
   id: String,
   player_filled: actor_types.Player,
@@ -315,6 +333,8 @@ fn game_box(
   }
 }
 
+/// A message in the chat
+///
 pub fn message(message: String, me: Bool) -> String {
   html.div(
     [
@@ -356,6 +376,8 @@ pub fn message(message: String, me: Bool) -> String {
   |> element.to_string
 }
 
+/// The form to send messages in the chat
+///
 pub fn send_message_form() -> Element(form) {
   html.form(
     [
@@ -389,6 +411,8 @@ pub fn send_message_form() -> Element(form) {
   )
 }
 
+/// The player indicators on the page
+///
 pub fn player(player: actor_types.Player, name: String) -> String {
   case player {
     actor_types.X -> {
@@ -422,6 +446,8 @@ pub fn player(player: actor_types.Player, name: String) -> String {
   }
 }
 
+/// A filler for a box when there is no mark in it
+///
 pub fn empty(classes: String) -> Element(svg) {
   svg.svg(
     [

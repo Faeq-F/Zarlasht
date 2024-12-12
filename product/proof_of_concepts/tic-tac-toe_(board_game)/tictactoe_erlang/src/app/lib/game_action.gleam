@@ -1,3 +1,5 @@
+//// Game actions
+
 import app/actors/actor_types.{
   type GameActorState, type Player, type PlayerSocket, type WebsocketActorState,
   BoxClick, GameActorState, GameState, Message, ResetGame,
@@ -11,12 +13,18 @@ import juno
 import lustre/element.{to_string}
 import mist
 
+/// Updates the game state when a player clicks on a box
+///
+/// (Just sends the game actor a message to do this)
+///
 pub fn on_box_click(box: Int, state: WebsocketActorState) -> WebsocketActorState {
   let assert Some(game_subject) = state.game_subject
   process.send(game_subject, BoxClick(state.player, box))
   state
 }
 
+/// Produces a game state with the box that was clicked, marked
+///
 pub fn new_game_state(
   state: GameActorState,
   player: Player,
@@ -33,6 +41,10 @@ pub fn new_game_state(
   )
 }
 
+/// Distributes the message to the other player
+///
+/// (Just sends the game actor a message to do this)
+///
 pub fn on_send_message(
   text_message: String,
   player: PlayerSocket,
@@ -55,6 +67,12 @@ pub fn on_send_message(
   }
 }
 
+/// Resets the game state when a player wishes to replay
+///
+/// (Just sends the game actor a message to do this)
+///
+/// Lets the other player (one who didn't go first last time) take the first turn
+///
 pub fn on_replay_game(player: PlayerSocket) -> WebsocketActorState {
   let assert Some(game_subject) = player.state.game_subject
   process.send(game_subject, ResetGame)

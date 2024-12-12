@@ -72,6 +72,8 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
   )
 }
 
+///Handle all messages from the client and from other Actors
+///
 fn handle_ws_message(state, conn, message) {
   logging.log(Info, "Websocket message recieved ~")
   io.debug(message)
@@ -156,6 +158,8 @@ fn handle_ws_message(state, conn, message) {
   }
 }
 
+///The JS script to alert the player that the opponent has disconnected, and to disconnect them
+///
 fn disconnect() {
   html.div([attribute.id("page")], [
     html.script(

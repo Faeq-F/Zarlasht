@@ -1,3 +1,5 @@
+//// Game creation
+
 import app/actors/actor_types.{
   type PlayerSocket, type WebsocketActorState, EnqueueParticipant,
   WebsocketActorState, X,
@@ -9,6 +11,8 @@ import gleam/int
 import logging.{Info}
 import mist
 
+/// Creates a new game & updates the WebSocket state
+///
 pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
   let game_code = generate_game_code(player)
   process.send(
@@ -20,6 +24,8 @@ pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
   WebsocketActorState(..player.state, player: X)
 }
 
+/// Creates a unique code for the game
+///
 fn generate_game_code(player: PlayerSocket) -> Int {
   let assert Ok(waiting_games) = table.ref("waiting_games")
   let game_code = case int.random(9999) {
