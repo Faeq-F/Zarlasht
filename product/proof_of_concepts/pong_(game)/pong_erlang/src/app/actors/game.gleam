@@ -1,6 +1,6 @@
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddedName, Disconnect, GameActorState, JoinGame, One, SendToAll,
+  type Player, AddedName, Disconnect, GameActorState, JoinGame, One,
   SendToClient, Two, UserDisconnected, Wait,
 }
 import app/pages/game.{game_page}
@@ -75,15 +75,6 @@ fn handle_message(
       new_state |> actor.continue
     }
 
-    SendToAll(general_message) -> {
-      let message = general_message.content
-      list.each(state.participants, fn(p) {
-        // send each participant's subject the message
-        process.send(p.1, SendToClient(message))
-      })
-
-      state |> actor.continue
-    }
     UserDisconnected(player) -> {
       //make other player disconnect
       list.each(state.participants, fn(participant) {
