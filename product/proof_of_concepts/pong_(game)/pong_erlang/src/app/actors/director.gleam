@@ -1,3 +1,5 @@
+//// The director actor - process to manage all tasks the server carries out
+
 import app/actors/actor_types.{
   type DirectorActorMessage, type DirectorActorState, DequeueParticipant,
   DirectorActorState, EnqueueParticipant,
@@ -8,12 +10,15 @@ import gleam/dict.{drop, get, insert}
 import gleam/erlang/process.{type Subject}
 import gleam/otp/actor.{type Next}
 
+/// Creates the Actor
 pub fn start() -> Subject(DirectorActorMessage) {
   let assert Ok(actor) =
     actor.start(DirectorActorState(dict.new()), handle_message)
   actor
 }
 
+/// Handles messages from other actors
+///
 fn handle_message(
   message: DirectorActorMessage,
   state: DirectorActorState,

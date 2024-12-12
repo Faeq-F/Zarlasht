@@ -1,3 +1,5 @@
+//// The site itself
+
 import app/actors/director
 import app/router
 import app/web.{Context}
@@ -11,6 +13,8 @@ import valkey.{radish_flush_db, valkey_client}
 // TODO
 // Need to check the entire program for load balancing dependencies - e.g., ETS data sharing
 
+/// The entry-point for the program
+///
 pub fn main() {
   let director = director.start()
   // Set up and configure a helper ETS table

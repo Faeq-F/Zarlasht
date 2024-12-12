@@ -10,6 +10,8 @@ import gleam/list
 import gleam/otp/actor.{type Next}
 import logging.{Info}
 
+/// Creates the actor
+///
 pub fn start(
   participants: List(#(Player, Subject(CustomWebsocketMessage))),
 ) -> Subject(GameActorMessage) {
@@ -31,6 +33,8 @@ pub fn start(
   actor
 }
 
+///Handle all messages  from other Actors
+///
 fn handle_message(
   message: GameActorMessage,
   state: GameActorState,

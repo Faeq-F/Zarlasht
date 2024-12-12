@@ -1,11 +1,17 @@
+//// The page seen when the user has entered the game
+
 import app/actors/actor_types
 import lustre/attribute.{attribute}
-import lustre/element.{type Element}
+import lustre/element
 import lustre/element/html.{text}
-import lustre/element/svg
 
-// Modified from https://www.geeksforgeeks.org/pong-game-in-javascript/
-// (This project was made to show that the code stack is versatile)
+/// The game page - where users play the game
+///
+/// Modified from [GeeksForGeeks](https://www.geeksforgeeks.org/pong-game-in-javascript/)<br>
+/// (This project was made to show that the code stack is versatile)
+///
+/// Returns stringified HTML to send to the websocket
+///
 pub fn game_page() -> String {
   html.div([attribute.class("bg-base-100 min-h-full"), attribute.id("page")], [
     html.div(
@@ -213,6 +219,8 @@ pub fn game_page() -> String {
   |> element.to_string
 }
 
+/// The name of a player on the game page
+///
 pub fn player(player: actor_types.Player, name: String) -> String {
   case player {
     actor_types.One -> {
@@ -238,19 +246,4 @@ pub fn player(player: actor_types.Player, name: String) -> String {
       |> element.to_string
     }
   }
-}
-
-pub fn empty(classes: String) -> Element(svg) {
-  svg.svg(
-    [
-      attribute.class(classes),
-      attribute("x", "0px"),
-      attribute("y", "0px"),
-      attribute("width", "100"),
-      attribute("height", "100"),
-      attribute("viewBox", "0 0 72 72"),
-      attribute("xmlns", "http://www.w3.org/2000/svg"),
-    ],
-    [],
-  )
 }

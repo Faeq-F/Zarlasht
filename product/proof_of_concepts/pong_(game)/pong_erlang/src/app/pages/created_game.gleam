@@ -1,8 +1,14 @@
+//// The page the user sees when they create a game
+
 import gleam/int
 import lustre/attribute.{attribute}
 import lustre/element
 import lustre/element/html
 
+/// The page the user sees when they create a game
+///
+/// Provides them with the game_code to share with others
+///
 pub fn created_game_page(game_code: Int) -> String {
   html.div(
     [attribute.class("hero bg-base-100 min-h-full"), attribute.id("page")],

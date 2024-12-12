@@ -1,3 +1,5 @@
+//// Page routing for the site
+
 import app/actors/actor_types.{type DirectorActorMessage}
 import app/actors/websocket
 import app/pages/home
@@ -48,6 +50,8 @@ pub fn handle_request(
   }
 }
 
+/// Produces a response with the home_page for the user
+///
 pub fn serve_home_page() {
   let doc_string =
     [home.root()]
@@ -58,6 +62,8 @@ pub fn serve_home_page() {
   |> response.set_header("content-type", "text/html; charset=utf-8")
 }
 
+/// Produces responses for obtaining static resources
+///
 fn serve_static(_req: Request(Connection), path: List(String)) {
   let file_path = string.join(["static", ..path], "/")
 
@@ -73,6 +79,8 @@ fn serve_static(_req: Request(Connection), path: List(String)) {
   })
 }
 
+///Get the content type of a resource
+///
 fn get_content_type(file_path: String) {
   let suffixes = string.split(file_path, ".")
   case list.last(suffixes) {
