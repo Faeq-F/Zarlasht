@@ -13,6 +13,7 @@
         "--pdf",
         "--synctex=1",
         "--clean",
+        "--tex-option=\"--shell-escape\"",
         "--tex-option=\"-interaction=nonstopmode\"",
         "--tex-option=\"-file-line-error\"",
         "%DOC_EXT%"
