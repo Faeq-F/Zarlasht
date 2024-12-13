@@ -19,12 +19,7 @@ etc.), and the file structure of the main branch;
 ```
 root
 ├── documents
-│   ├── plan
-│   │   └── ... (code)
-│   ├── interim
-│   │   └── ... (code)
-│   └── final
-│       └── ... (code)
+│   └── ... (code)
 ├── product
 │   ├── proof_of_concepts
 │   │   │

@@ -1,3 +1,5 @@
+//// Joining a game that has already been created
+
 import gleam/int
 import glen/ws
 import pages/set_name.{set_name_page}
@@ -5,17 +7,19 @@ import pages/to_join_game.{join_game_page, wrong_code}
 import socket_state.{type Event, type State, State}
 import state.{add_socket, for_all_sockets, get_json_value}
 
-//----------------------------------------------------------------
-// Before game code input
-
+/// Asked to join a game
+///
+/// Sends the user to the `join_game_page`
+///
 pub fn on_to_join_game(conn: ws.WebsocketConn(Event)) -> State {
   let _ = ws.send_text(conn, join_game_page())
   State(-1, "Neither")
 }
 
-//----------------------------------------------------------------
-// After game code input
-
+/// After the game code has been inputted on the join page
+///
+/// Checks if the game exists and sends them to the `set_name_page`
+///
 pub fn on_join_game(
   text_message: String,
   conn: ws.WebsocketConn(Event),

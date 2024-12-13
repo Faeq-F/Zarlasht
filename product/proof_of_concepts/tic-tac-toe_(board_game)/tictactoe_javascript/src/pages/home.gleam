@@ -1,3 +1,5 @@
+//// The home page of the site
+
 import gleam/http
 import gleam/javascript/promise.{type Promise}
 import glen.{type Request, type Response}
@@ -7,6 +9,14 @@ import lustre/element.{text}
 import lustre/element/html
 import pages/layout
 
+/// The home page of the site
+///
+/// A page with two buttons; one for creating a game and another for joining a game
+///
+/// The function takes in the request to the site, creates the page and wraps
+/// it in `pages/layout`, and converts it `to_document_string`. It then creates a
+/// `status.ok` response and returns a resolved promise with it
+///
 pub fn home_page(req: Request) -> Promise(Response) {
   use <- glen.require_method(req, http.Get)
   [

@@ -12,7 +12,3 @@ pub fn nested_test() {
   get_json_value(get_json_value(htmx_json, "HEADERS"), "HX-Trigger")
   |> should.equal("create")
 }
-
-pub fn pubsub_test() {
-  todo
-}
