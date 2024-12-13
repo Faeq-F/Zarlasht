@@ -1,0 +1,13 @@
+*.beam
+*.ez
+/build
+erl_crash.dump
+*Zone.Identifier
+/static/libraries
+.env
+tictactoe.crt
+tictactoe.csr
+tictactoe.ext
+tictactoe.key
+# all lucide icons in lustre, installed via 'gleam run -m lucide_lustre/add_all'
+lucide_lustre.gleam

@@ -1,0 +1,323 @@
+/* General */
+
+[data-theme=emerald] [data-theme=forest],
+[data-theme=emerald] {
+  color-scheme: light !important;
+  --b2: 17.522% 0.007709 17.911578 !important;
+  --b3: 16.2032% 0.007129 17.911578 !important;
+  --in: 72.06% 0.191 231.6 !important;
+  --su: 64.8% 0.150 160 !important;
+  --wa: 84.71% 0.199 83.87 !important;
+  --er: 71.76% 0.221 22.18 !important;
+  --sc: 13.9553% 0.027077 168.327128 !important;
+  --ac: 14.1257% 0.02389 185.713193 !important;
+  --nc: 86.1397% 0.007806 171.364646 !important;
+  --inc: 0% 0 0 !important;
+  --suc: 0% 0 0 !important;
+  --wac: 0% 0 0 !important;
+  --erc: 0% 0 0 !important;
+  --rounded-box: 1rem !important;
+  --rounded-badge: 1.9rem !important;
+  --animation-btn: 0.25s !important;
+  --animation-input: .2s !important;
+  --btn-focus-scale: 0.9 !important;
+  --border-btn: 1px !important;
+  --tab-border: 1px !important;
+  --tab-radius: 0.5rem !important;
+  --p: 68.6283% 0.185567 148.958922 !important;
+  --pc: 0% 0 0 !important;
+  --s: 69.7764% 0.135385 168.327128 !important;
+  --a: 70.6285% 0.119451 185.713193 !important;
+  --n: 30.6985% 0.039032 171.364646 !important;
+  --rounded-btn: 1.9rem !important;
+}
+
+* {
+  font-family: "Text", sans-serif;
+  font-style: normal;
+
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.font-header {
+  font-family: "Header", sans-serif;
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: 'Header';
+  src: url('Header.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Text';
+  src: url('Text.ttf') format('truetype');
+}
+
+#bg {
+  background-image: url(./bg.jpg);
+  height: 100vh;
+  width: 100vw;
+  background-size: cover;
+  z-index: 0;
+  position: absolute;
+}
+
+/* html[data-theme=forest] #bg {
+  filter: invert(100);
+} */
+
+.hover\:text-shadow:hover {
+  text-shadow: 1px 1px 1px black;
+}
+
+.hover\:text-shadow-400:hover {
+  text-shadow: 1px 1px 1px #00000066;
+}
+
+body.dark .dark\:hover\:text-shadow:hover {
+  text-shadow: 1px 1px 1px black;
+}
+
+.text-shadow {
+  text-shadow: 1px 1px 1px black;
+}
+
+.text-shadow-green {
+  text-shadow: 1px 1px 1px oklch(var(--p));
+}
+
+.nav-btn {
+  width: 95% !important;
+  height: 95% !important;
+  background: transparent !important;
+  border-radius: 15px !important;
+  font-size: 1.5rem !important;
+  line-height: 2rem !important;
+}
+
+:root:has(input.theme-controller[value=forest]:checked) #bg {
+  filter: invert(100);
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.drop-shadow-xl-green {
+
+  filter: drop-shadow(0 20px 13px oklch(from oklch(var(--p)) l c h / 20%)) drop-shadow(0 8px 5px oklch(from oklch(var(--p)) l c h / 20%));
+}
+
+.tree {
+  --spacing: 1.5rem;
+  --radius: 0px;
+}
+
+.tree li {
+  display: block;
+  position: relative;
+  margin-left: 4rem;
+  margin-top: 0.5rem;
+}
+
+.tree li p {
+  margin-left: 2rem;
+
+}
+
+.tree ul {
+  margin-left: calc(var(--radius) - var(--spacing));
+  padding-left: 0;
+}
+
+.tree ul li {
+  border-left: 2px solid #ddd;
+}
+
+.tree ul li:last-child {
+  border-color: transparent;
+}
+
+.tree ul li::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: calc(var(--spacing) / -2);
+  left: -2px;
+  width: calc(var(--spacing) + 2px);
+  height: calc(var(--spacing) + 1px);
+  border: solid #ddd;
+  border-width: 0 0 2px 2px;
+}
+
+.tree summary {
+  display: block;
+  cursor: pointer;
+  margin-left: 2rem;
+  pointer-events: none;
+}
+
+.tree summary::marker,
+.tree summary::-webkit-details-marker {
+  display: none;
+}
+
+.tree summary:focus {
+  outline: none;
+}
+
+.tree summary:focus-visible {
+  outline: 1px dotted #000;
+}
+
+.tree li::after,
+.tree summary::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: calc(var(--spacing) / 2 - var(--radius));
+  left: calc(var(--spacing) - var(--radius) - 1px);
+  width: calc(2 * var(--radius));
+  height: calc(2 * var(--radius));
+  border-radius: 50%;
+  background: transparent;
+}
+
+.tree details[open]>summary::before {
+  background-position: calc(-2 * var(--radius)) 0;
+}
+
+.chat-end .chat-bubble::before,
+.chat-start .chat-bubble::before {
+  border-color: var(--chat-border-color);
+  border-width: 5px;
+}
+
+/* Chat */
+
+.container {
+  display: grid;
+  grid-template-columns: 0.4fr 2.2fr 0.4fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  width: 98vw;
+  height: 80vh;
+}
+
+.Name {
+  grid-area: 1 / 2 / 2 / 3;
+}
+
+.Chat-Button {
+  grid-area: 1 / 3 / 2 / 4;
+}
+
+.Me {
+  grid-area: 2 / 3 / 3 / 4;
+}
+
+.Close {
+  grid-area: 3 / 3 / 4 / 4;
+}
+
+.Map {
+  grid-area: 5 / 3 / 6 / 4;
+}
+
+.Roll-die {
+  grid-area: 4 / 3 / 5 / 4;
+}
+
+.Chat {
+  grid-area: 1 / 2 / 5 / 3;
+}
+
+.message {
+  grid-area: 5 / 2 / 6 / 3;
+}
+
+.Allies {
+  grid-area: 1 / 1 / 2 / 2;
+}
+
+.people {
+  grid-area: 2 / 1 / 6 / 2;
+}
+
+.close-red {
+  fill: oklch(from var(--er) l c h / calc(alpha - 0.1))
+}
+
+.sendIcon {
+  -webkit-transform: rotate(210deg)
+}
+
+.dropdown[open] summary {
+  color: oklch(var(--a));
+  text-shadow: 1px 1px 1px black;
+  border-radius: 30px 30px 0 0;
+}
+
+
+
+
+/* created game */
+
+.game-container {
+  width: 90vw;
+  overflow-x: scroll;
+}
+
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(9999, 1fr);
+  width: 90vw;
+}
+
+.grid .row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  overflow-x: scroll;
+}
+
+#player-container {
+  margin: 0 auto;
+  width: 90vw;
+}
+
+.sortable div,
+.row .item {
+  display: inline-block;
+  width: 15em;
+  border: 1px solid gray;
+  border-radius: 15px;
+  margin: 10px;
+  height: 5em;
+}
+
+.row .item {
+  height: 30em !important;
+}
+
+.sortable {
+  display: flex;
+}
+
+.tick {
+  -webkit-transform: rotate(47deg) scale(-1, 1)
+}

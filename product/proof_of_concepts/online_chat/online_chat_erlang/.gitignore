@@ -1,0 +1,13 @@
+*.beam
+*.ez
+/build
+erl_crash.dump
+*Zone.Identifier
+/static/libraries
+.env
+chat.crt
+chat.csr
+chat.ext
+chat.key
+# all lucide icons in lustre, installed via 'gleam run -m lucide_lustre/add_all'
+lucide_lustre.gleam
