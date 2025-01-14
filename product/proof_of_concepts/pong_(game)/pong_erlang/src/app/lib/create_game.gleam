@@ -1,15 +1,13 @@
 //// Game creation
 
 import app/actors/actor_types.{
-  type PlayerSocket, type WebsocketActorState, EnqueueParticipant, One,
-  WebsocketActorState,
+  type PlayerSocket, type WebsocketActorState, EnqueueUser, WebsocketActorState,
 }
-import app/pages/created_game.{created_game_page}
+
 import carpenter/table
 import gleam/erlang/process
 import gleam/int
 import logging.{Info}
-import mist
 
 /// Creates a new game & updates the WebSocket state
 ///
@@ -17,27 +15,23 @@ pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
   let game_code = generate_game_code(player)
   process.send(
     player.state.director_subject,
-    EnqueueParticipant(game_code, One, player.state.ws_subject),
+    EnqueueUser(game_code, player.state.ws_subject),
   )
-  let assert Ok(_) =
-    mist.send_text_frame(player.socket, created_game_page(game_code))
-  WebsocketActorState(..player.state, player: One)
+  WebsocketActorState(..player.state, game_code: game_code)
 }
 
 /// Creates a unique code for the game
 ///
 fn generate_game_code(player: PlayerSocket) -> Int {
-  let assert Ok(waiting_games) = table.ref("waiting_games")
+  let assert Ok(games) = table.ref("games")
   let game_code = case int.random(9999) {
     0 -> 1
     code -> code
   }
-  // Games with the same codes can exist;
-  // They just cannot be waiting for a joining player at the same time
-  case waiting_games |> table.lookup(game_code) {
+  case games |> table.lookup(game_code) {
     [] -> {
-      waiting_games
-      |> table.insert([#(game_code, "Waiting for a player to join")])
+      games
+      |> table.insert([#(game_code, "Game created")])
       logging.log(Info, "New game created; " <> int.to_string(game_code))
       game_code
     }

@@ -20,7 +20,7 @@ pub fn main() {
   // Set up and configure a helper ETS table
   // for holding games that have been created but need a second player
   let _ =
-    table.build("waiting_games")
+    table.build("games")
     |> table.privacy(table.Public)
     |> table.write_concurrency(table.AutoWriteConcurrency)
     |> table.read_concurrency(True)

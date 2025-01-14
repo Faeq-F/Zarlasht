@@ -11,9 +11,7 @@ import mist
 ///
 pub type WebsocketActorState {
   WebsocketActorState(
-    name: String,
     game_code: Int,
-    player: Player,
     ws_subject: Subject(CustomWebsocketMessage),
     game_subject: Option(Subject(GameActorMessage)),
     director_subject: Subject(DirectorActorMessage),
@@ -23,40 +21,20 @@ pub type WebsocketActorState {
 /// Custom messages for the WebSocket actor
 ///
 pub type CustomWebsocketMessage {
-  /// 2 players have joined
-  ///
-  /// Send the player to the game page
-  ///
-  JoinGame(game_subject: Subject(GameActorMessage))
   ///Send a message to the client
   ///
   /// (usually HTML for htmx)
   ///
   SendToClient(message: String)
-  ///Waiting for the other player to enter their name
+  ///Fills the game_subject filed for the user when they are in a game
   ///
-  /// Sends the player a message to indicate this
-  ///
-  Wait
-  /// The other player has disconnected
-  ///
-  /// Send this player an alert and then disconnect them too
-  ///
-  Disconnect
+  JoinGame(game_subject: Subject(GameActorMessage))
 }
 
 /// A wrapper for a player's WebSocket Actor state and their connection
 ///
 pub type PlayerSocket {
   PlayerSocket(socket: mist.WebsocketConnection, state: WebsocketActorState)
-}
-
-/// The player a user is
-///
-pub type Player {
-  One
-  Two
-  Neither
 }
 
 //----------------------------------------------------------------------
@@ -66,24 +44,21 @@ pub type Player {
 /// Holds all games managed by this server
 ///
 pub type DirectorActorState {
-  DirectorActorState(
-    games_waiting: Dict(Int, List(#(Player, Subject(CustomWebsocketMessage)))),
-  )
+  DirectorActorState(games: Dict(Int, Subject(CustomWebsocketMessage)))
 }
 
 /// Custom message for the Director actor
 ///
 pub type DirectorActorMessage {
-  ///Adds a Player to a game
+  ///Adds a game for a user
   ///
-  EnqueueParticipant(
+  EnqueueUser(
     game_code: Int,
-    player: Player,
     participant_subject: Subject(CustomWebsocketMessage),
   )
-  ///Deletes a Player from a game
+  ///Deletes a game
   ///
-  DequeueParticipant(game_code: Int)
+  DequeueUser(game_code: Int)
 }
 
 //----------------------------------------------------------------------
@@ -94,22 +69,19 @@ pub type DirectorActorMessage {
 ///
 pub type GameActorState {
   GameActorState(
-    participants: List(#(Player, Subject(CustomWebsocketMessage))),
-    names_set: Int,
-    player_one_name: String,
-    player_two_name: String,
+    user: Subject(CustomWebsocketMessage),
+    player1name: String,
+    player2name: String,
   )
 }
 
 ///Custom message for the Game actor
 ///
 pub type GameActorMessage {
-  /// A player disconnected
+  /// The user disconnected
   ///
-  /// disconnects the other player after alerting them
+  UserDisconnected
+  /// The players have set their names
   ///
-  UserDisconnected(player: Player)
-  /// A player has set their name
-  ///
-  AddedName(player: Player, ws: Subject(CustomWebsocketMessage), name: String)
+  SetNames(player1name: String, player2name: String)
 }

@@ -1,8 +1,8 @@
 //// The director actor - process to manage all tasks the server carries out
 
 import app/actors/actor_types.{
-  type DirectorActorMessage, type DirectorActorState, DequeueParticipant,
-  DirectorActorState, EnqueueParticipant,
+  type DirectorActorMessage, type DirectorActorState, DequeueUser,
+  DirectorActorState, EnqueueUser,
 }
 import app/actors/game
 import carpenter/table
@@ -24,27 +24,16 @@ fn handle_message(
   state: DirectorActorState,
 ) -> Next(DirectorActorMessage, DirectorActorState) {
   case message {
-    EnqueueParticipant(game_code, player, participant_subject) -> {
-      let participant = #(player, participant_subject)
-      let new_queue = case state.games_waiting |> get(game_code) {
-        Ok(first_participant) -> {
-          //They are joining a Game
-          game.start([participant, ..first_participant])
-          state.games_waiting |> drop([game_code])
-        }
-        _ -> {
-          //They created the game
-          state.games_waiting |> insert(game_code, [participant])
-        }
-      }
-      let new_state = DirectorActorState(games_waiting: new_queue)
-
+    EnqueueUser(game_code, participant_subject) -> {
+      game.start(participant_subject)
+      let new_queue = state.games |> insert(game_code, participant_subject)
+      let new_state = DirectorActorState(games: new_queue)
       new_state |> actor.continue
     }
-    DequeueParticipant(game_code) -> {
-      state.games_waiting |> drop([game_code])
-      let assert Ok(waiting_games) = table.ref("waiting_games")
-      waiting_games |> table.delete(game_code)
+    DequeueUser(game_code) -> {
+      state.games |> drop([game_code])
+      let assert Ok(games) = table.ref("games")
+      games |> table.delete(game_code)
       state |> actor.continue
     }
   }

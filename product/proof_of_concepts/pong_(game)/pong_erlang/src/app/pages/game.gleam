@@ -12,7 +12,7 @@ import lustre/element/html.{text}
 ///
 /// Returns stringified HTML to send to the websocket
 ///
-pub fn game_page() -> String {
+pub fn game_page(player1name: String, player2name: String) -> String {
   html.div([attribute.class("bg-base-100 min-h-full"), attribute.id("page")], [
     html.div(
       [
@@ -32,40 +32,26 @@ pub fn game_page() -> String {
         html.div([attribute.class("grid grid-cols-2 gap-10 w-full h-full")], [
           html.div([attribute.class("card text-center h-full")], [
             html.div(
+              [attribute.class("w-4/6 h-1/7 rounded-3xl p-4 pl-36 text-left")],
               [
-                attribute.class("w-4/6 h-1/7 rounded-3xl p-4 pl-36 text-left"),
-                attribute.id("player1"),
+                html.p([attribute.id("player1")], [html.text(player1name)]),
+                html.p([], [
+                  html.kbd([attribute.class("kbd")], [html.text("W")]),
+                  html.kbd([attribute.class("kbd")], [html.text("S")]),
+                ]),
               ],
-              [],
-            ),
-            html.div(
-              [
-                attribute.class(
-                  "m-auto w-4/6 h-full mx-auto my-0 p-4 grid grid-cols-3 gap-4 h-full",
-                ),
-                attribute.id("game"),
-              ],
-              [],
             ),
           ]),
           html.div([attribute.class("card text-center h-full")], [
             html.div(
+              [attribute.class("w-4/6 h-1/7 rounded-3xl p-4 pl-36 text-left")],
               [
-                attribute.class(
-                  "m-auto w-4/6 h-full mx-auto my-0 p-4 grid grid-cols-3 gap-4 h-full",
-                ),
-                attribute.id("game"),
+                html.p([attribute.id("player2")], [html.text(player2name)]),
+                html.p([], [
+                  html.kbd([attribute.class("kbd")], [html.text("↑")]),
+                  html.kbd([attribute.class("kbd")], [html.text("↓")]),
+                ]),
               ],
-              [],
-            ),
-            html.div(
-              [
-                attribute.class(
-                  "w-4/6 h-1/7 rounded-3xl p-4 mr-0 ml-0 pr-36 text-right",
-                ),
-                attribute.id("player2"),
-              ],
-              [],
             ),
           ]),
         ]),
@@ -217,33 +203,4 @@ pub fn game_page() -> String {
     ),
   ])
   |> element.to_string
-}
-
-/// The name of a player on the game page
-///
-pub fn player(player: actor_types.Player, name: String) -> String {
-  case player {
-    actor_types.One -> {
-      html.div(
-        [
-          attribute.class("w-4/6 h-1/7 rounded-3xl p-4 pl-36 text-left"),
-          attribute.id("player1"),
-        ],
-        [html.p([attribute.class("inline text-lg")], [text(name)])],
-      )
-      |> element.to_string
-    }
-    _ -> {
-      html.div(
-        [
-          attribute.class(
-            "w-4/6 h-1/7 rounded-3xl p-4 mr-0 ml-auto pr-36 text-right",
-          ),
-          attribute.id("player2"),
-        ],
-        [html.p([attribute.class("inline text-lg")], [text(name)])],
-      )
-      |> element.to_string
-    }
-  }
 }
