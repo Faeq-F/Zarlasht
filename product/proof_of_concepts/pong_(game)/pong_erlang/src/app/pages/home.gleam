@@ -21,30 +21,17 @@ pub fn root() -> Element(t) {
           html.h1([attribute.class("text-5xl font-bold mb-3")], [
             element.text("Pong"),
           ]),
-          html.div([attribute.class("join"), attribute.id("pageInputs")], [
-            html.button(
-              [
-                attribute("ws-send", ""),
-                attribute.id("create"),
-                attribute("data-theme", "forest"),
-                attribute.class(
-                  "btn join-item bg-secondary text-secondary-content hover:bg-accent",
-                ),
-              ],
-              [text("Create a game")],
-            ),
-            html.button(
-              [
-                attribute("ws-send", ""),
-                attribute.id("join"),
-                attribute("data-theme", "forest"),
-                attribute.class(
-                  "btn join-item bg-neutral hover:bg-accent hover:text-secondary-content",
-                ),
-              ],
-              [text("Join a game")],
-            ),
-          ]),
+          html.button(
+            [
+              attribute("ws-send", ""),
+              attribute.id("create"),
+              attribute("data-theme", "forest"),
+              attribute.class(
+                "btn join-item bg-secondary text-secondary-content hover:bg-accent",
+              ),
+            ],
+            [text("Create a game")],
+          ),
         ]),
       ],
     ),

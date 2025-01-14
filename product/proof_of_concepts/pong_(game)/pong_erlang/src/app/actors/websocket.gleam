@@ -2,11 +2,10 @@
 
 import app/actors/actor_types.{
   type DirectorActorMessage, type PlayerSocket, type WebsocketActorState,
-  DequeueParticipant, Disconnect, JoinGame, Neither, PlayerSocket, SendToClient,
-  UserDisconnected, Wait, WebsocketActorState,
+  DequeueUser, JoinGame, PlayerSocket, SendToClient, UserDisconnected,
+  WebsocketActorState,
 }
 import app/lib/create_game.{on_create_game}
-import app/lib/join_game.{on_join_game, on_to_join_game}
 import app/lib/name_set.{set_name}
 import app/pages/set_name.{set_name_page}
 import gleam/dict
@@ -39,9 +38,7 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
       // Set state for the connection with empty defaults
       #(
         WebsocketActorState(
-          name: "",
           game_code: 0,
-          player: Neither,
           ws_subject: ws_subject,
           game_subject: None,
           director_subject: director,
@@ -53,14 +50,10 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
       logging.log(Info, "A Websocket Disconnected")
       case state.game_subject {
         Some(game_subject) -> {
-          process.send(game_subject, UserDisconnected(state.player))
-          io.debug("Forced other participants to disconnect")
+          process.send(game_subject, UserDisconnected)
+          io.debug("A game ended")
         }
         _ -> {
-          process.send(
-            state.director_subject,
-            DequeueParticipant(state.game_code),
-          )
           io.debug("Socket was not part of a game")
         }
       }
@@ -90,13 +83,8 @@ fn handle_ws_message(state, conn, message) {
 
       case trigger {
         "create" -> on_create_game(PlayerSocket(conn, state)) |> actor.continue
-        "join" -> on_to_join_game(PlayerSocket(conn, state)) |> actor.continue
-        "join-game-form" ->
-          on_join_game(message, PlayerSocket(conn, state))
-          |> actor.continue
         "set-name-form" ->
           set_name(message, PlayerSocket(conn, state)) |> actor.continue
-
         _ -> {
           logging.log(Alert, "Unknown Trigger")
           actor.continue(state)
@@ -105,26 +93,15 @@ fn handle_ws_message(state, conn, message) {
     }
 
     mist.Custom(JoinGame(game_subject)) -> {
-      let new_state =
-        WebsocketActorState(..state, game_subject: Some(game_subject))
       let assert Ok(_) = mist.send_text_frame(conn, set_name_page())
-      new_state |> actor.continue
-    }
-
-    mist.Custom(Wait) -> {
-      let assert Ok(_) = mist.send_text_frame(conn, set_name.waiting())
-      actor.continue(state)
+      actor.continue(
+        WebsocketActorState(..state, game_subject: Some(game_subject)),
+      )
     }
 
     mist.Custom(SendToClient(text)) -> {
       let assert Ok(_) = mist.send_text_frame(conn, text)
       actor.continue(state)
-    }
-
-    mist.Custom(Disconnect) -> {
-      // The forced reload will disconnect the socket
-      let assert Ok(_) = mist.send_text_frame(conn, disconnect())
-      state |> actor.continue
     }
 
     mist.Binary(binary) -> {
@@ -135,16 +112,4 @@ fn handle_ws_message(state, conn, message) {
 
     mist.Closed | mist.Shutdown -> actor.Stop(process.Normal)
   }
-}
-
-///The JS script to alert the player that the opponent has disconnected, and to disconnect them
-///
-fn disconnect() {
-  html.div([attribute.id("page")], [
-    html.script(
-      [],
-      "alert('Your opponent disconnected!'); window.onbeforeunload = null; location.reload();",
-    ),
-  ])
-  |> element.to_string
 }
