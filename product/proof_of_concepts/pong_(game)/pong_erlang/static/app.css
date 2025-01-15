@@ -41,7 +41,23 @@
   line-height: 1rem;
 }
 
-/* Modified from https://www.geeksforgeeks.org/pong-game-in-javascript/ */
+.kbd{
+      display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: .5rem;
+    border-width: 1px;
+    border-color: oklch(27.8078% .029596 256.847952 / .2);
+    background-color:oklch(96.1151% 0 0 / 1);
+    padding-left: .5rem;
+    padding-right: .5rem;
+    color: oklch(27.8078% .029596 256.847952 / 1);
+    border-bottom-width: 2px;
+    min-height: 2.2em;
+    min-width: 2.2em;
+}
+
+/* Adapted from https://www.geeksforgeeks.org/pong-game-in-javascript/ */
 /* (This project was made to show that the code stack is versatile) */
 
 * {
@@ -59,13 +75,13 @@ body {
   overflow: hidden;
 }
 
-.board {
+#board {
   height: 85vh;
   width: 80vw;
   border-radius: 14px;
 }
 
-.ball {
+#ball {
   height: 30px;
   width: 30px;
   border-radius: 50%;
@@ -74,82 +90,26 @@ body {
   left: calc(50% - 15px);
 }
 
-.ball_effect {
-  height: 100%;
-  width: 100%;
-  border-radius: 100px;
-  animation: spinBall 0.1s linear infinite;
-  box-shadow: inset 0 0 18px #000, inset 6px 0 18px #fff, inset -6px 0 18px #fff, inset 6px 0 30px #fff, inset -6px 0 30px #fff, 0 0 18px #fff, -4px 0 18px #fff, 4px 0 18px #fff;
-}
-
-@keyframes spinBall {
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}
-
 .paddle {
   height: 100px;
   width: 18px;
-  border-radius: 50%;
+  border-radius: 18px;
   position: fixed;
 }
 
-.paddle_1 {
+#paddle_1 {
   top: calc(7.5vh + 55px);
   left: calc(10vw + 30px);
-  box-shadow: inset 0 0 18px #000, inset -6px 0 18px #fff, inset 6px 0 18px #fff, inset -6px 0 30px #fff, inset 6px 0 30px #fff, 0 0 18px #fff, 4px 0 18px #fff, -4px 0 18px #fff;
 }
 
-.paddle_2 {
+#paddle_2 {
   top: calc(85vh + 7.5vh - 100px - 55px);
   right: calc(10vw + 30px);
-  box-shadow: inset 0 0 18px #000, inset -6px 0 18px #fff, inset 6px 0 18px #fff, inset -6px 0 30px #fff, inset 6px 0 30px #fff, 0 0 18px #fff, 4px 0 18px #fff, -4px 0 18px #fff;
 }
 
-.player_1_score {
-  height: 50px;
-  width: 50px;
-
-  position: fixed;
-  left: 30vw;
-  margin-top: 30px;
-}
-
-.player_2_score {
-  height: 50px;
-  width: 50px;
-
-  position: fixed;
-  left: 70vw;
-  margin-top: 30px;
-}
-
-.message {
+#instruction {
   position: fixed;
   height: 10vh;
   width: 30vw;
-
-  left: 38vw;
   margin: 30px auto auto auto;
-}
-
-
-
-
-.kbd{
-      display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: .5rem;
-    border-width: 1px;
-    border-color: oklch(27.8078% .029596 256.847952 / .2);
-    background-color:oklch(96.1151% 0 0 / 1);
-    padding-left: .5rem;
-    padding-right: .5rem;
-    color: oklch(27.8078% .029596 256.847952 / 1);
-    border-bottom-width: 2px;
-    min-height: 2.2em;
-    min-width: 2.2em;
 }

@@ -79,7 +79,7 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
       html.label([attribute.class("left-0 m-4 fixed z-10 top-0")], [
         html.a(
           [
-            attribute.href("https://github.com/faeq-f/online_chat"),
+            attribute.href("https://github.com/faeq-f/zarlasht"),
             attribute.rel("noopener noreferrer"),
             attribute.target("_blank"),
           ],
