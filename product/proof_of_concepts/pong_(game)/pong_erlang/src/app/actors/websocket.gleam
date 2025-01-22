@@ -6,6 +6,7 @@ import app/actors/actor_types.{
   WebsocketActorState,
 }
 import app/lib/create_game.{on_create_game}
+import app/lib/game_actions
 import app/lib/name_set.{set_name}
 import app/pages/set_name.{set_name_page}
 import gleam/dict
@@ -85,6 +86,26 @@ fn handle_ws_message(state, conn, message) {
         "create" -> on_create_game(PlayerSocket(conn, state)) |> actor.continue
         "set-name-form" ->
           set_name(message, PlayerSocket(conn, state)) |> actor.continue
+        "Enter" -> {
+          game_actions.on_enter(PlayerSocket(conn, state), message)
+          state |> actor.continue
+        }
+        "Wkey" -> {
+          game_actions.on_w(PlayerSocket(conn, state), message)
+          state |> actor.continue
+        }
+        "Skey" -> {
+          game_actions.on_s(PlayerSocket(conn, state), message)
+          state |> actor.continue
+        }
+        "UpArrowKey" -> {
+          game_actions.on_up(PlayerSocket(conn, state), message)
+          state |> actor.continue
+        }
+        "DownArrowKey" -> {
+          game_actions.on_down(PlayerSocket(conn, state), message)
+          state |> actor.continue
+        }
         _ -> {
           logging.log(Alert, "Unknown Trigger")
           actor.continue(state)

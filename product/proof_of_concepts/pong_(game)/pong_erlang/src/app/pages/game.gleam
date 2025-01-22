@@ -16,13 +16,60 @@ pub fn game_page(player1name: String, player2name: String) -> String {
   html.div([attribute.class("bg-base-100 min-h-full"), attribute.id("page")], [
     html.div(
       [
+        attribute.id("Enter"),
+        attribute("ws-send", ""),
+        attribute("hx-trigger", "pageLoaded, keyup[key=='Enter'] from:body"),
+        attribute("hx-include", "[name='extraInfo']"),
+      ],
+      [],
+    ),
+    html.div(
+      [
+        attribute.id("Wkey"),
+        attribute("ws-send", ""),
+        attribute("hx-trigger", "keyup[key=='w'] from:body"),
+        attribute("hx-include", "[name='extraInfo']"),
+      ],
+      [],
+    ),
+    html.div(
+      [
+        attribute.id("Skey"),
+        attribute("ws-send", ""),
+        attribute("hx-trigger", "keyup[key=='s'] from:body"),
+        attribute("hx-include", "[name='extraInfo']"),
+      ],
+      [],
+    ),
+    html.div(
+      [
+        attribute.id("UpArrowKey"),
+        attribute("ws-send", ""),
+        attribute("hx-trigger", "keyup[key=='ArrowUp'] from:body"),
+        attribute("hx-include", "[name='extraInfo']"),
+      ],
+      [],
+    ),
+    html.div(
+      [
+        attribute.id("DownArrowKey"),
+        attribute("ws-send", ""),
+        attribute("hx-trigger", "keyup[key=='ArrowDown'] from:body"),
+        attribute("hx-include", "[name='extraInfo']"),
+      ],
+      [],
+    ),
+    html.div([attribute.class("hidden")], [
+      html.input([attribute.type_("text"), attribute.name("extraInfo")]),
+    ]),
+    html.div(
+      [
         attribute.class(
           "divider lg:divider-horizontal absolute min-w-full left-0 top-1/2 -translate-y-1/2 h-96 m-0",
         ),
       ],
       [],
     ),
-    //hx-trigger="click, keyup[altKey&&shiftKey&&key=='D'] from:body"
     html.div(
       [attribute.class(" border border-current"), attribute.id("board")],
       [
@@ -89,27 +136,13 @@ pub fn game_page(player1name: String, player2name: String) -> String {
             ),
           ],
         ),
-        html.h1(
-          [
-            attribute.class(
-              " absolute left-0 -translate-y-1/2 min-w-full text-center top-10",
-            ),
-            attribute.id("instruction"),
-          ],
-          [html.text("Press Enter to Start")],
-        ),
+        instruction(True),
       ],
     ),
+    inject_js(""),
     html.script(
       [],
       "
-
-    let gameState = 'start';
-
-
-
-
-
     let paddle_1 = document.querySelector('#paddle_1');
     let paddle_2 = document.querySelector('#paddle_2');
 
@@ -120,14 +153,6 @@ pub fn game_page(player1name: String, player2name: String) -> String {
     let score_1 = document.querySelector('#player_1_score');
     let score_2 = document.querySelector('#player_2_score');
 
-    let instruction = document.querySelector('#instruction');
-
-
-
-
-
-
-
     let paddle_1_coord = paddle_1.getBoundingClientRect();
     let paddle_2_coord = paddle_2.getBoundingClientRect();
     let initial_ball_coord = ball.getBoundingClientRect();
@@ -136,87 +161,33 @@ pub fn game_page(player1name: String, player2name: String) -> String {
     let paddle_common =
       document.querySelector('.paddle').getBoundingClientRect();
 
-
-
-
-
-
-
-
-
     let dx = Math.floor(Math.random() * 4) + 3;
     let dy = Math.floor(Math.random() * 4) + 3;
     let dxd = Math.floor(Math.random() * 2);
     let dyd = Math.floor(Math.random() * 2);
 
-
-
-
-
+    function extraInfoFill(simulateKeyHit){
+      document.getElementsByName('extraInfo')[0].value = JSON.stringify(
+        {
+board_coord: board_coord,
+window_innerHeight: window.innerHeight,
+paddle_1_coord: paddle_1_coord,
+paddle_2_coord: paddle_2_coord,
+paddle_common: paddle_common
+        }
+      );
+      if (simulateKeyHit){
+        htmx.trigger(\"#Enter\", \"pageLoaded\")
+      }
+    }
 
     document.addEventListener('keydown', (e) => {
-
-
-
-
-      if (e.key == 'Enter') {
-
-        gameState = gameState == 'start' ? 'play' : 'start';
-
-        if (gameState == 'play') {
-          instruction.innerHTML = '';
-          requestAnimationFrame(() => {
-            dx = Math.floor(Math.random() * 4) + 3;
-            dy = Math.floor(Math.random() * 4) + 3;
-            dxd = Math.floor(Math.random() * 2);
-            dyd = Math.floor(Math.random() * 2);
-            moveBall(dx, dy, dxd, dyd);
-          });
-        }
-      }
-
-
-
-
-
-      if (gameState == 'play') {
-        if (e.key == 'w') {
-          paddle_1.style.top =
-            Math.max(
-              board_coord.top,
-              paddle_1_coord.top - window.innerHeight * 0.06
-            ) + 'px';
-          paddle_1_coord = paddle_1.getBoundingClientRect();
-        }
-
-        if (e.key == 's') {
-          paddle_1.style.top =
-            Math.min(
-              board_coord.bottom - paddle_common.height,
-              paddle_1_coord.top + window.innerHeight * 0.06
-            ) + 'px';
-          paddle_1_coord = paddle_1.getBoundingClientRect();
-        }
-
-        if (e.key == 'ArrowUp') {
-          paddle_2.style.top =
-            Math.max(
-              board_coord.top,
-              paddle_2_coord.top - window.innerHeight * 0.1
-            ) + 'px';
-          paddle_2_coord = paddle_2.getBoundingClientRect();
-        }
-
-        if (e.key == 'ArrowDown') {
-          paddle_2.style.top =
-            Math.min(
-              board_coord.bottom - paddle_common.height,
-              paddle_2_coord.top + window.innerHeight * 0.1
-            ) + 'px';
-          paddle_2_coord = paddle_2.getBoundingClientRect();
-        }
+      if (e.key == 'Enter' || e.key == 'w' || e.key == 's' || e.key == 'ArrowUp' || e.key == 'ArrowDown'){
+        extraInfoFill(false);
       }
     });
+
+
 
     function moveBall(dx, dy, dxd, dyd) {
       if (ball_coord.top <= board_coord.top) {
@@ -225,8 +196,6 @@ pub fn game_page(player1name: String, player2name: String) -> String {
       if (ball_coord.bottom >= board_coord.bottom) {
         dyd = 0;
       }
-
-
 
       if (
         ball_coord.left <= paddle_1_coord.right &&
@@ -238,8 +207,6 @@ pub fn game_page(player1name: String, player2name: String) -> String {
         dy = Math.floor(Math.random() * 4) + 3;
       }
 
-
-
       if (
         ball_coord.right >= paddle_2_coord.left &&
         ball_coord.top >= paddle_2_coord.top &&
@@ -250,9 +217,6 @@ pub fn game_page(player1name: String, player2name: String) -> String {
         dy = Math.floor(Math.random() * 4) + 3;
       }
 
-
-
-
       if (
         ball_coord.left <= board_coord.left ||
         ball_coord.right >= board_coord.right
@@ -262,17 +226,11 @@ pub fn game_page(player1name: String, player2name: String) -> String {
         } else {
           score_1.innerHTML = +score_1.innerHTML + 1;
         }
-        gameState = 'start';
-
         ball_coord = initial_ball_coord;
         ball.style = initial_ball.style;
-        instruction.innerHTML = 'Press Enter to Start';
+        extraInfoFill(true);
         return;
       }
-
-
-
-
 
       ball.style.top = ball_coord.top + dy * (dyd == 0 ? -1 : 1) + 'px';
       ball.style.left = ball_coord.left + dx * (dxd == 0 ? -1 : 1) + 'px';
@@ -285,4 +243,35 @@ pub fn game_page(player1name: String, player2name: String) -> String {
     ),
   ])
   |> element.to_string
+}
+
+pub fn instruction(show: Bool) {
+  case show {
+    True -> {
+      html.h1(
+        [
+          attribute.class(
+            " absolute left-0 -translate-y-1/2 min-w-full text-center top-10",
+          ),
+          attribute.id("instruction"),
+        ],
+        [html.text("Press Enter to Start")],
+      )
+    }
+    _ -> {
+      html.h1(
+        [
+          attribute.class(
+            " absolute left-0 -translate-y-1/2 min-w-full text-center top-10",
+          ),
+          attribute.id("instruction"),
+        ],
+        [html.text("")],
+      )
+    }
+  }
+}
+
+pub fn inject_js(script: String) {
+  html.script([attribute.id("inject_js")], script)
 }
