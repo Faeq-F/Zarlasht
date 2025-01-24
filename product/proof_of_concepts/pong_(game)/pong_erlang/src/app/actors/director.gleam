@@ -5,8 +5,6 @@ import app/actors/actor_types.{
   EnqueueUser,
 }
 import app/actors/game
-import carpenter/table
-import gleam/dict.{drop, get, insert}
 import gleam/erlang/process.{type Subject}
 import gleam/otp/actor.{type Next}
 

@@ -1,9 +1,7 @@
 //// All types relating to the different actors
 
-import gleam/dict.{type Dict}
 import gleam/erlang/process.{type Subject}
 import gleam/option.{type Option}
-import juno
 import mist
 
 /// The state for a WebSocket Actor
@@ -129,5 +127,14 @@ pub type Rect {
     right: Float,
     bottom: Float,
     left: Float,
+  )
+}
+
+pub type LeaderboardInformation {
+  LeaderboardInformation(
+    player1name: String,
+    player2name: String,
+    player1score: Int,
+    player2score: Int,
   )
 }

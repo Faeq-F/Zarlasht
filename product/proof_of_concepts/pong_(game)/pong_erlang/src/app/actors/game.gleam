@@ -2,10 +2,11 @@
 
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  DownHit, EnterHit, ExtraInfo, GameActorState, JoinGame, Play, Rect, SHit,
-  SendToClient, SetNames, Start, UpHit, UserDisconnected, WHit,
+  DownHit, EnterHit, ExtraInfo, GameActorState, JoinGame, LeaderboardInformation,
+  Play, Rect, SHit, SendToClient, SetNames, Start, UpHit, UserDisconnected, WHit,
 }
 import app/pages/game.{inject_js, instruction}
+import carpenter/table
 import gleam/dict.{type Dict}
 import gleam/dynamic
 import gleam/erlang/process.{type Subject}
@@ -249,13 +250,40 @@ fn handle_message(
 
     UserDisconnected -> {
       io.debug("User disconnected from the game")
-      io.debug(
-        state.player1name
-        <> int.to_string(state.player1score)
-        <> state.player2name
-        <> int.to_string(state.player2score),
-      )
       //save names & scores to ETS table (as cache) and Valkey db (long-term storage)
+      let assert Ok(leaderboard) = table.ref("leaderboard")
+      //check keys as player1name <> player2name and player2name <> player1name -> want to avoid duplicates
+      let key1 = state.player1name <> state.player2name
+      let key2 = state.player2name <> state.player1name
+      let val =
+        LeaderboardInformation(
+          player1name: state.player1name,
+          player2name: state.player2name,
+          player1score: state.player1score,
+          player2score: state.player2score,
+        )
+      case leaderboard |> table.lookup(key1) {
+        [] -> {
+          //check other key
+          case leaderboard |> table.lookup(key2) {
+            [] -> {
+              //save using first key
+              leaderboard
+              |> table.insert([#(key1, val)])
+            }
+            _ -> {
+              //override key
+              leaderboard
+              |> table.insert([#(key2, val)])
+            }
+          }
+        }
+        _ -> {
+          //override key
+          leaderboard
+          |> table.insert([#(key1, val)])
+        }
+      }
       actor.Stop(process.Killed)
     }
   }

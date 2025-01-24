@@ -11,22 +11,22 @@ import mist
 import valkey.{radish_flush_db, valkey_client}
 
 // TODO
-// Need to check the entire program for load balancing dependencies - e.g., ETS data sharing
+// Need to check the entire program for load balancing dependencies - e.g., ETS data sharing - save to db for long-term & sync using pub/sub
 
 /// The entry-point for the program
 ///
 pub fn main() {
   let director = director.start()
   // Set up and configure a helper ETS table
-  // for holding games that have been created but need a second player
-  // let _ =
-  //   table.build("games")
-  //   |> table.privacy(table.Public)
-  //   |> table.write_concurrency(table.AutoWriteConcurrency)
-  //   |> table.read_concurrency(True)
-  //   |> table.decentralized_counters(True)
-  //   |> table.compression(False)
-  //   |> table.set
+  // for holding scores that should appear on the leaderboard
+  let _ =
+    table.build("leaderboard")
+    |> table.privacy(table.Public)
+    |> table.write_concurrency(table.AutoWriteConcurrency)
+    |> table.read_concurrency(True)
+    |> table.decentralized_counters(True)
+    |> table.compression(False)
+    |> table.set
   //load .env vars
   let _ = dotenv.load()
   // configure server
