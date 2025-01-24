@@ -2,11 +2,10 @@
 
 import app/actors/actor_types.{
   type DirectorActorMessage, type PlayerSocket, type WebsocketActorState,
-  DequeueUser, JoinGame, PlayerSocket, SendToClient, UserDisconnected,
-  WebsocketActorState,
+  JoinGame, PlayerSocket, SendToClient, UserDisconnected, WebsocketActorState,
 }
 import app/lib/create_game.{on_create_game}
-import app/lib/game_actions
+import app/lib/game_actions.{close_leaderboard, show_leaderboard}
 import app/lib/name_set.{set_name}
 import app/pages/set_name.{set_name_page}
 import gleam/dict
@@ -18,9 +17,6 @@ import gleam/option.{None, Some}
 import gleam/otp/actor
 import juno
 import logging.{Alert, Info}
-import lustre/attribute
-import lustre/element
-import lustre/element/html
 import mist.{type Connection, Custom}
 
 ///See [here](https://hexdocs.pm/mist/mist.html#websocket)
@@ -39,7 +35,6 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
       // Set state for the connection with empty defaults
       #(
         WebsocketActorState(
-          game_code: 0,
           ws_subject: ws_subject,
           game_subject: None,
           director_subject: director,
@@ -86,6 +81,10 @@ fn handle_ws_message(state, conn, message) {
         "create" -> on_create_game(PlayerSocket(conn, state)) |> actor.continue
         "set-name-form" ->
           set_name(message, PlayerSocket(conn, state)) |> actor.continue
+        "trophy" ->
+          show_leaderboard(PlayerSocket(conn, state)) |> actor.continue
+        "Xleaderboard" ->
+          close_leaderboard(PlayerSocket(conn, state)) |> actor.continue
         "Enter" -> {
           game_actions.on_enter(PlayerSocket(conn, state), message)
           state |> actor.continue
