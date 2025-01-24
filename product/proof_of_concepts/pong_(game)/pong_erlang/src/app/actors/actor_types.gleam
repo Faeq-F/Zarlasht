@@ -12,7 +12,6 @@ import mist
 ///
 pub type WebsocketActorState {
   WebsocketActorState(
-    game_code: Int,
     ws_subject: Subject(CustomWebsocketMessage),
     game_subject: Option(Subject(GameActorMessage)),
     director_subject: Subject(DirectorActorMessage),
@@ -42,10 +41,10 @@ pub type PlayerSocket {
 
 /// The state for the Director Actor
 ///
-/// Holds all games managed by this server
+/// Holds all games (connections) managed by this server
 ///
 pub type DirectorActorState {
-  DirectorActorState(games: Dict(Int, Subject(CustomWebsocketMessage)))
+  DirectorActorState
 }
 
 /// Custom message for the Director actor
@@ -53,13 +52,7 @@ pub type DirectorActorState {
 pub type DirectorActorMessage {
   ///Adds a game for a user
   ///
-  EnqueueUser(
-    game_code: Int,
-    participant_subject: Subject(CustomWebsocketMessage),
-  )
-  ///Deletes a game
-  ///
-  DequeueUser(game_code: Int)
+  EnqueueUser(participant_subject: Subject(CustomWebsocketMessage))
 }
 
 //----------------------------------------------------------------------
@@ -110,6 +103,8 @@ pub type GameActorMessage {
   DownHit(message: String)
 }
 
+/// The JSON information appended to websocket messages when the user is playing the game
+///
 pub type ExtraInfo {
   ExtraInfo(
     board_coord: Rect,
@@ -117,9 +112,13 @@ pub type ExtraInfo {
     paddle_1_coord: Rect,
     paddle_2_coord: Rect,
     paddle_common: Rect,
+    player_1_score: Int,
+    player_2_score: Int,
   )
 }
 
+/// The bounding rectangle of a DOM object
+///
 pub type Rect {
   Rect(
     x: Float,
@@ -132,41 +131,3 @@ pub type Rect {
     left: Float,
   )
 }
-// "{\"extraInfo\":\"{
-//   \\\"board_coord\\\":{
-//     \\\"x\\\":152.796875,
-//     \\\"y\\\":68.25,
-//     \\\"width\\\":1222.390625,
-//     \\\"height\\\":773.5,
-//     \\\"top\\\":68.25,
-//     \\\"right\\\":1375.1875,
-//     \\\"bottom\\\":841.75,
-//     \\\"left\\\":152.796875},
-//   \\\"window_innerHeight\\\":910,
-//   \\\"paddle_1_coord\\\":{
-//     \\\"x\\\":182.796875,
-//     \\\"y\\\":68.640625,
-//     \\\"width\\\":18,
-//     \\\"height\\\":100,
-//     \\\"top\\\":68.640625,
-//     \\\"right\\\":200.796875,
-//     \\\"bottom\\\":168.640625,
-//     \\\"left\\\":182.796875},
-//   \\\"paddle_2_coord\\\":{
-//     \\\"x\\\":1327.203125,
-//     \\\"y\\\":686.75,
-//     \\\"width\\\":18,
-//     \\\"height\\\":100,
-//     \\\"top\\\":686.75,
-//     \\\"right\\\":1345.203125,
-//     \\\"bottom\\\":786.75,
-//     \\\"left\\\":1327.203125},
-//   \\\"paddle_common\\\":{
-//     \\\"x\\\":182.796875,
-//     \\\"y\\\":123.25,
-//     \\\"width\\\":18,
-//     \\\"height\\\":100,
-//     \\\"top\\\":123.25,
-//     \\\"right\\\":200.796875,
-//     \\\"bottom\\\":223.25,
-//     \\\"left\\\":182.796875}}\"

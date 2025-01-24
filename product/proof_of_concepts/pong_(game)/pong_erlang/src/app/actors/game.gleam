@@ -5,16 +5,14 @@ import app/actors/actor_types.{
   DownHit, EnterHit, ExtraInfo, GameActorState, JoinGame, Play, Rect, SHit,
   SendToClient, SetNames, Start, UpHit, UserDisconnected, WHit,
 }
-import app/pages/game.{game_page, inject_js, instruction}
+import app/pages/game.{inject_js, instruction}
 import gleam/dict.{type Dict}
 import gleam/dynamic
 import gleam/erlang/process.{type Subject}
 import gleam/float
-import gleam/int.{to_float}
+import gleam/int.{parse, to_float}
 import gleam/io
-import gleam/list
 import gleam/otp/actor.{type Next}
-import gleam/result
 import gleam/string
 import juno
 import logging.{Info}
@@ -47,7 +45,7 @@ fn handle_message(
   logging.log(Info, "A Game Actor got the message")
   io.debug(message)
   case message {
-    EnterHit(_message) -> {
+    EnterHit(message) -> {
       case state.state {
         Start -> {
           process.send(
@@ -74,11 +72,26 @@ fn handle_message(
           GameActorState(..state, state: Play) |> actor.continue
         }
         _ -> {
+          //Save current score
+          let extra_info_dict = get_extra_info_dict(message)
+          let assert Ok(juno.String(player1score_string)) =
+            extra_info_dict |> dict.get("player_1_score")
+          let assert Ok(juno.String(player2score_string)) =
+            extra_info_dict |> dict.get("player_2_score")
+          let assert Ok(player1score) = parse(player1score_string)
+          let assert Ok(player2score) = parse(player2score_string)
+          //Let the player get ready
           process.send(
             state.user,
             SendToClient(instruction(True) |> element.to_string),
           )
-          GameActorState(..state, state: Start) |> actor.continue
+          GameActorState(
+            ..state,
+            state: Start,
+            player1score: player1score,
+            player2score: player2score,
+          )
+          |> actor.continue
         }
       }
     }
@@ -235,7 +248,15 @@ fn handle_message(
     }
 
     UserDisconnected -> {
-      actor.Stop(process.Abnormal("User disconnected from the game"))
+      io.debug("User disconnected from the game")
+      io.debug(
+        state.player1name
+        <> int.to_string(state.player1score)
+        <> state.player2name
+        <> int.to_string(state.player2score),
+      )
+      //save names & scores to ETS table (as cache) and Valkey db (long-term storage)
+      actor.Stop(process.Killed)
     }
   }
 }
@@ -259,13 +280,15 @@ fn get_extra_info_dict(message: String) {
     )
 
   let extra_info_decoder =
-    dynamic.decode5(
+    dynamic.decode7(
       ExtraInfo,
       dynamic.field("board_coord", rect_decoder),
       dynamic.field("window_inner_height", dynamic.float),
       dynamic.field("paddle_1_coord", rect_decoder),
       dynamic.field("paddle_2_coord", rect_decoder),
       dynamic.field("paddle_common", rect_decoder),
+      dynamic.field("player_1_score", dynamic.int),
+      dynamic.field("player_2_score", dynamic.int),
     )
 
   let assert Ok(juno.Object(extra_info_dict)) =

@@ -1,6 +1,6 @@
 //// Layout for all pages the site renders
 
-import lucide_lustre.{github, moon, sun}
+import lucide_lustre.{github, moon, sun, trophy}
 import lustre/attribute.{attribute, class}
 import lustre/element.{type Element}
 import lustre/element/html
@@ -107,6 +107,15 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
           attribute.id("app"),
         ],
         [
+          html.label(
+            [
+              attribute.class("right-0 m-4 fixed z-10 bottom-0 cursor-pointer"),
+              attribute.id("trophy"),
+              attribute.attribute("ws-send", ""),
+            ],
+            [trophy([])],
+          ),
+          html.div([attribute.id("overlay")], []),
           html.script([], "window.onbeforeunload = function() {return true;};"),
           html.div([attribute.id("page")], elements),
         ],

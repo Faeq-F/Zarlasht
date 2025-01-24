@@ -173,7 +173,9 @@ board_coord: board_coord,
 window_innerHeight: window.innerHeight,
 paddle_1_coord: paddle_1_coord,
 paddle_2_coord: paddle_2_coord,
-paddle_common: paddle_common
+paddle_common: paddle_common,
+player_1_score: score_1.innerHTML,
+player_2_score: score_2.innerHTML,
         }
       );
       if (simulateKeyHit){
