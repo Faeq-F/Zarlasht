@@ -1,12 +1,10 @@
-import app/actors/actor_types.{DownHit, EnterHit, SHit, UpHit, WHit}
+import app/actors/actor_types.{DownHit, EnterHit, Leaderboard, SHit, UpHit, WHit}
+import gleam/erlang/process
+import gleam/option.{Some}
 import lustre/attribute
 import lustre/element
 import lustre/element/html
 import mist
-
-import app/pages/leaderboard.{leaderboard}
-import gleam/erlang/process
-import gleam/option.{Some}
 
 pub fn on_enter(player: actor_types.PlayerSocket, message: String) {
   let assert Some(game_subject) = player.state.game_subject
@@ -34,7 +32,10 @@ pub fn on_down(player: actor_types.PlayerSocket, message: String) {
 }
 
 pub fn show_leaderboard(player: actor_types.PlayerSocket) {
-  let assert Ok(_) = mist.send_text_frame(player.socket, leaderboard())
+  process.send(
+    player.state.director_subject,
+    Leaderboard(player.state.ws_subject),
+  )
   player.state
 }
 

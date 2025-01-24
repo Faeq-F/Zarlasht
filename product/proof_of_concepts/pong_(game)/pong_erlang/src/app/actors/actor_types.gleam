@@ -2,6 +2,7 @@
 
 import gleam/erlang/process.{type Subject}
 import gleam/option.{type Option}
+import gleam/set.{type Set}
 import mist
 
 /// The state for a WebSocket Actor
@@ -39,18 +40,27 @@ pub type PlayerSocket {
 
 /// The state for the Director Actor
 ///
-/// Holds all games (connections) managed by this server
+/// Holds all keys for leaderboard rows
 ///
 pub type DirectorActorState {
-  DirectorActorState
+  DirectorActorState(leaderboard_keys: Set(String))
 }
 
 /// Custom message for the Director actor
 ///
 pub type DirectorActorMessage {
-  ///Adds a game for a user
+  /// Adds a game for a user
   ///
-  EnqueueUser(participant_subject: Subject(CustomWebsocketMessage))
+  EnqueueUser(
+    participant_subject: Subject(CustomWebsocketMessage),
+    director_subject: Subject(DirectorActorMessage),
+  )
+  /// The user wishes to see the leaderboard
+  ///
+  Leaderboard(participant_subject: Subject(CustomWebsocketMessage))
+  /// Add a key to the state
+  ///
+  AddKey(key: String)
 }
 
 //----------------------------------------------------------------------
@@ -66,6 +76,7 @@ pub type GameState {
 ///
 pub type GameActorState {
   GameActorState(
+    director: Subject(DirectorActorMessage),
     user: Subject(CustomWebsocketMessage),
     player1name: String,
     player2name: String,
@@ -130,7 +141,11 @@ pub type Rect {
   )
 }
 
+///Information required for rows on the leaderboard
+///
 pub type LeaderboardInformation {
+  ///Information required for rows on the leaderboard
+  ///
   LeaderboardInformation(
     player1name: String,
     player2name: String,

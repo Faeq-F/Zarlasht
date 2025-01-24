@@ -21,9 +21,13 @@ import lustre/element
 
 /// Creates the actor
 ///
-pub fn start(user: Subject(CustomWebsocketMessage)) -> Subject(GameActorMessage) {
+pub fn start(
+  user: Subject(CustomWebsocketMessage),
+  director: Subject(actor_types.DirectorActorMessage),
+) -> Subject(GameActorMessage) {
   let state =
     GameActorState(
+      director:,
       user: user,
       player1name: "",
       player2name: "",
@@ -270,11 +274,13 @@ fn handle_message(
               //save using first key
               leaderboard
               |> table.insert([#(key1, val)])
+              process.send(state.director, actor_types.AddKey(key1))
             }
             _ -> {
               //override key
               leaderboard
               |> table.insert([#(key2, val)])
+              process.send(state.director, actor_types.AddKey(key2))
             }
           }
         }
@@ -282,6 +288,7 @@ fn handle_message(
           //override key
           leaderboard
           |> table.insert([#(key1, val)])
+          process.send(state.director, actor_types.AddKey(key1))
         }
       }
       actor.Stop(process.Killed)
@@ -331,9 +338,7 @@ fn get_juno_value_as_float(
 ) {
   let assert Ok(value_of_unknown_juno_type) = juno_dict |> dict.get(field)
 
-  let value = case
-    string.inspect(value_of_unknown_juno_type) |> string.contains("Float")
-  {
+  case string.inspect(value_of_unknown_juno_type) |> string.contains("Float") {
     True -> {
       let assert juno.Float(float_num) = value_of_unknown_juno_type
       float_num
