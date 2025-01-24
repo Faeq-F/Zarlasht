@@ -10,7 +10,7 @@ import lustre/attribute
 import lustre/element
 import lustre/element/html
 
-pub fn leaderboard() {
+pub fn leaderboard(information: List(LeaderboardInformation)) {
   html.div(
     [
       attribute.id("overlay"),
@@ -44,7 +44,7 @@ pub fn leaderboard() {
         [
           html.table([attribute.class("table table-pin-rows table-pin-cols")], [
             html.thead([], [
-              html.tr([], [
+              html.tr([attribute.class("border-current")], [
                 html.th([], []),
                 html.th([], [html.text("Player 1")]),
                 html.th([], [html.text("Player 2")]),
@@ -53,7 +53,7 @@ pub fn leaderboard() {
                 html.th([], [html.text("Difference")]),
               ]),
             ]),
-            html.tbody([], table_rows()),
+            html.tbody([], table_rows(information)),
           ]),
         ],
       ),
@@ -62,48 +62,8 @@ pub fn leaderboard() {
   |> element.to_string
 }
 
-fn table_rows() {
-  sort(
-    [
-      LeaderboardInformation(
-        player1name: "Faeq",
-        player2name: "John",
-        player1score: 3,
-        player2score: 8,
-      ),
-      LeaderboardInformation(
-        player1name: "Hi",
-        player2name: "k",
-        player1score: 8,
-        player2score: 3,
-      ),
-      LeaderboardInformation(
-        player1name: "Hi",
-        player2name: "k",
-        player1score: 8,
-        player2score: 3,
-      ),
-      LeaderboardInformation(
-        player1name: "Person 1",
-        player2name: "Person 2",
-        player1score: 5,
-        player2score: 6,
-      ),
-      LeaderboardInformation(
-        player1name: "Person 1",
-        player2name: "Person 2",
-        player1score: 5,
-        player2score: 6,
-      ),
-      LeaderboardInformation(
-        player1name: "Person 1",
-        player2name: "Person 2",
-        player1score: 5,
-        player2score: 6,
-      ),
-    ],
-    compare_leaderboard_information,
-  )
+fn table_rows(information: List(LeaderboardInformation)) {
+  sort(information, compare_leaderboard_information)
   |> from_list
   |> index
   |> map(fn(information) { create_row(information.0, information.1) })
@@ -136,7 +96,7 @@ fn compare_leaderboard_information(
 
 fn create_row(information: LeaderboardInformation, index: Int) {
   let index = index + 1
-  html.tr([], [
+  html.tr([attribute.class("border-current")], [
     html.th([], [prize(index), html.text(nth_number(index))]),
     html.td([], [
       html.text(information.player1name),

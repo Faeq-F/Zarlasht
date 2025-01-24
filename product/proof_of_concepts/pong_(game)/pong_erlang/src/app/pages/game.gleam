@@ -1,9 +1,8 @@
 //// The page seen when the user has entered the game
 
-import app/actors/actor_types
 import lustre/attribute.{attribute}
 import lustre/element
-import lustre/element/html.{text}
+import lustre/element/html
 
 /// The game page - where users play the game
 ///
