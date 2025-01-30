@@ -37,6 +37,7 @@ pub fn main() {
     router.handle_request(_, ctx, director)
     |> mist.new
     |> mist.port(8000)
+    // Todo
     // could randomize for recovery scenarios (in case new app takes over) & restarting for errors & see wisp recovery - 500 for handler?
     |> mist.start_https("pong.crt", "pong.key")
 

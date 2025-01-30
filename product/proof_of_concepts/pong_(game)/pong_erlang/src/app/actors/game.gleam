@@ -1,5 +1,8 @@
 //// The game actor - process to manage a single game being played between two players
 
+//Todo
+// seperate intop different functions & doc them
+
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
   DownHit, EnterHit, ExtraInfo, GameActorState, JoinGame, LeaderboardInformation,
@@ -296,6 +299,8 @@ fn handle_message(
   }
 }
 
+///Decodes the websocket message to get the dictionary representing the extra_info dict that gets appended when the user is playing the game
+///
 fn get_extra_info_dict(message: String) {
   let assert Ok(juno.Object(message_dict)) = juno.decode(message, [])
   let assert Ok(juno.String(stringified_extra_info)) =
@@ -332,6 +337,10 @@ fn get_extra_info_dict(message: String) {
   extra_info_dict
 }
 
+/// Gets a Int or Float value from a dict, as a Float
+///
+/// Used when you do not know the type the decoded dict has it saved as
+///
 fn get_juno_value_as_float(
   juno_dict: Dict(String, juno.Value(a)),
   field: String,

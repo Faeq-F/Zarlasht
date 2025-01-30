@@ -4,6 +4,10 @@ import lustre/attribute.{attribute}
 import lustre/element
 import lustre/element/html
 
+// Todo
+//seperate page into functions
+// add hint for spin on the ball
+
 /// The game page - where users play the game
 ///
 /// Modified from [GeeksForGeeks](https://www.geeksforgeeks.org/pong-game-in-javascript/)<br>
@@ -246,6 +250,8 @@ player_2_score: score_2.innerHTML,
   |> element.to_string
 }
 
+/// The instruction for the user to start the game
+///
 pub fn instruction(show: Bool) {
   case show {
     True -> {
@@ -273,6 +279,10 @@ pub fn instruction(show: Bool) {
   }
 }
 
+/// The script element used to update the client DOM, based off server events
+///
+/// updates to the DOM via this function, occurs by running JS that manipulates the DOM
+///
 pub fn inject_js(script: String) {
   html.script([attribute.id("inject_js")], script)
 }
