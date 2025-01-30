@@ -10,6 +10,8 @@ import lustre/attribute
 import lustre/element
 import lustre/element/html
 
+///The leaderboard for all games
+///
 pub fn leaderboard(information: List(LeaderboardInformation)) {
   html.div(
     [
@@ -62,6 +64,8 @@ pub fn leaderboard(information: List(LeaderboardInformation)) {
   |> element.to_string
 }
 
+///All leaderboard rows
+///
 fn table_rows(information: List(LeaderboardInformation)) {
   sort(information, compare_leaderboard_information)
   |> from_list
@@ -70,6 +74,8 @@ fn table_rows(information: List(LeaderboardInformation)) {
   |> to_list
 }
 
+///Comparator used to sort the games played
+///
 fn compare_leaderboard_information(
   information1: LeaderboardInformation,
   information2: LeaderboardInformation,
@@ -94,17 +100,19 @@ fn compare_leaderboard_information(
   }
 }
 
+///A row on the leaderboard
+///
 fn create_row(information: LeaderboardInformation, index: Int) {
   let index = index + 1
   html.tr([attribute.class("border-current")], [
     html.th([], [prize(index), html.text(nth_number(index))]),
     html.td([], [
       html.text(information.player1name),
-      winnder_badge(information, True),
+      winner_badge(information, True),
     ]),
     html.td([], [
       html.text(information.player2name),
-      winnder_badge(information, False),
+      winner_badge(information, False),
     ]),
     html.td([], [
       html.text(
@@ -122,7 +130,9 @@ fn create_row(information: LeaderboardInformation, index: Int) {
   ])
 }
 
-fn winnder_badge(information: LeaderboardInformation, player1: Bool) {
+///The badge to indicate if a player won the game they played
+///
+fn winner_badge(information: LeaderboardInformation, player1: Bool) {
   case
     int.max(information.player1score, information.player2score)
     == information.player1score
@@ -150,6 +160,10 @@ fn winnder_badge(information: LeaderboardInformation, player1: Bool) {
   }
 }
 
+///Adds a suffix to the leaderboard position
+///
+/// e.g., 1st, 2nd, 3rd, 4th, 5th, etc.
+///
 fn nth_number(number: Int) {
   let assert Ok(remainder) = int.modulo(number, 10)
   to_string(number)
@@ -161,6 +175,10 @@ fn nth_number(number: Int) {
   }
 }
 
+///Determines whether the position requires a prize
+///
+/// If the position is 1st place, then a trophy is provided. For 2nd or 3rd, it is a medal
+///
 fn prize(number: Int) {
   case number {
     1 -> trophy([])

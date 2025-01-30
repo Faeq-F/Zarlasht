@@ -14,7 +14,9 @@ import gleam/set
 import gleam/yielder.{from_list, map, to_list}
 
 /// Creates the Actor
+///
 pub fn start() -> Subject(DirectorActorMessage) {
+  // Todo
   //need to get keys from db & fill ETS table with info
   let assert Ok(actor) =
     actor.start(DirectorActorState(set.new()), handle_message)
