@@ -1,3 +1,5 @@
+//// The leaderboard for the game
+
 import app/actors/actor_types.{
   type LeaderboardInformation, LeaderboardInformation,
 }

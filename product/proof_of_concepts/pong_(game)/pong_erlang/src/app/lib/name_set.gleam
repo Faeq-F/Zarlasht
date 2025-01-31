@@ -1,4 +1,4 @@
-//// Setting the name of a user
+//// Setting the name of the players
 
 import app/actors/actor_types.{
   type PlayerSocket, type WebsocketActorState, SetNames, WebsocketActorState,

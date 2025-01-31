@@ -1,3 +1,5 @@
+//// User actions when playing the game
+
 import app/actors/actor_types.{DownHit, EnterHit, Leaderboard, SHit, UpHit, WHit}
 import gleam/erlang/process
 import gleam/option.{Some}

@@ -1,12 +1,8 @@
 //// The page seen when the user has entered the game
 
 import lustre/attribute.{attribute}
-import lustre/element
+import lustre/element.{fragment}
 import lustre/element/html
-
-// Todo
-//seperate page into functions
-// add hint for spin on the ball
 
 /// The game page - where users play the game
 ///
@@ -17,6 +13,49 @@ import lustre/element/html
 ///
 pub fn game_page(player1name: String, player2name: String) -> String {
   html.div([attribute.class("bg-base-100 min-h-full"), attribute.id("page")], [
+    htmx_elements(),
+    html.div(
+      [
+        attribute.class(
+          "divider lg:divider-horizontal absolute min-w-full left-0 top-1/2 -translate-y-1/2 h-96 m-0",
+        ),
+      ],
+      [],
+    ),
+    html.div(
+      [attribute.class(" border border-current"), attribute.id("board")],
+      [
+        html.div([attribute.class("bg-base-content"), attribute.id("ball")], []),
+        html.div(
+          [
+            attribute.class(" paddle bg-secondary border border-neutral"),
+            attribute.id("paddle_1"),
+          ],
+          [],
+        ),
+        html.div(
+          [
+            attribute.class("  paddle bg-accent border border-neutral"),
+            attribute.id("paddle_2"),
+          ],
+          [],
+        ),
+        player_1(player1name),
+        player_2(player2name),
+        instruction(True),
+        hint(),
+      ],
+    ),
+    inject_js(""),
+    html.script([], elements_values() <> htmx_info() <> move_ball()),
+  ])
+  |> element.to_string
+}
+
+/// The extra elements that facilitate messaging through htmx when the user is playing the game
+///
+fn htmx_elements() {
+  fragment([
     html.div(
       [
         attribute.id("Enter"),
@@ -65,110 +104,116 @@ pub fn game_page(player1name: String, player2name: String) -> String {
     html.div([attribute.class("hidden")], [
       html.input([attribute.type_("text"), attribute.name("extraInfo")]),
     ]),
-    html.div(
-      [
-        attribute.class(
-          "divider lg:divider-horizontal absolute min-w-full left-0 top-1/2 -translate-y-1/2 h-96 m-0",
-        ),
-      ],
-      [],
-    ),
-    html.div(
-      [attribute.class(" border border-current"), attribute.id("board")],
-      [
-        html.div([attribute.class("bg-base-content"), attribute.id("ball")], []),
-        html.div(
-          [
-            attribute.class(" paddle bg-secondary border border-neutral"),
-            attribute.id("paddle_1"),
-          ],
-          [],
-        ),
-        html.div(
-          [
-            attribute.class("  paddle bg-accent border border-neutral"),
-            attribute.id("paddle_2"),
-          ],
-          [],
-        ),
-        html.div(
-          [
-            attribute.class(
-              "fixed left-1/4 mt-[30px]  grid grid-cols-3 grid-rows-2 gap-0",
-            ),
-          ],
-          [
-            html.div([attribute.class("col-span-2")], [
-              html.p([], [html.text(player1name)]),
-            ]),
-            html.div([attribute.class("col-span-2 col-start-1 row-start-2")], [
-              html.kbd([attribute.class("kbd mr-1")], [html.text("W")]),
-              html.kbd([attribute.class("kbd")], [html.text("S")]),
-            ]),
-            html.div(
-              [
-                attribute.class(
-                  "row-span-2 col-start-3 row-start-1 ml-4 text-6xl pl-4",
-                ),
-              ],
-              [html.p([attribute.id("player_1_score")], [html.text("0")])],
-            ),
-          ],
-        ),
-        html.div(
-          [
-            attribute.class(
-              "fixed right-1/4 mt-[30px]   grid grid-cols-3 grid-rows-2 gap-0",
-            ),
-          ],
-          [
-            html.div([attribute.class("col-span-2")], [
-              html.p([], [html.text(player2name)]),
-            ]),
-            html.div([attribute.class("col-span-2 col-start-1 row-start-2")], [
-              html.kbd([attribute.class("kbd mr-1")], [html.text("↑")]),
-              html.kbd([attribute.class("kbd")], [html.text("↓")]),
-            ]),
-            html.div(
-              [
-                attribute.class(
-                  "row-span-2 col-start-3 row-start-1 ml-4 text-6xl pl-4",
-                ),
-              ],
-              [html.p([attribute.id("player_2_score")], [html.text("0")])],
-            ),
-          ],
-        ),
-        instruction(True),
-      ],
-    ),
-    inject_js(""),
-    html.script(
-      [],
-      "
-    let paddle_1 = document.querySelector('#paddle_1');
-    let paddle_2 = document.querySelector('#paddle_2');
+  ])
+}
 
-    let board = document.querySelector('#board');
-    let initial_ball = document.querySelector('#ball');
-    let ball = document.querySelector('#ball');
+/// Information for Player 1
+///
+fn player_1(name: String) {
+  html.div(
+    [
+      attribute.class(
+        "fixed left-1/4 mt-[30px]  grid grid-cols-3 grid-rows-2 gap-0",
+      ),
+    ],
+    [
+      html.div([attribute.class("col-span-2")], [html.p([], [html.text(name)])]),
+      html.div([attribute.class("col-span-2 col-start-1 row-start-2")], [
+        html.kbd([attribute.class("kbd mr-1")], [html.text("W")]),
+        html.kbd([attribute.class("kbd")], [html.text("S")]),
+      ]),
+      html.div(
+        [
+          attribute.class(
+            "row-span-2 col-start-3 row-start-1 ml-4 text-6xl pl-4",
+          ),
+        ],
+        [html.p([attribute.id("player_1_score")], [html.text("0")])],
+      ),
+    ],
+  )
+}
 
-    let score_1 = document.querySelector('#player_1_score');
-    let score_2 = document.querySelector('#player_2_score');
+/// Information for Player 2
+///
+fn player_2(name: String) {
+  html.div(
+    [
+      attribute.class(
+        "fixed right-1/4 mt-[30px]   grid grid-cols-3 grid-rows-2 gap-0",
+      ),
+    ],
+    [
+      html.div([attribute.class("col-span-2")], [html.p([], [html.text(name)])]),
+      html.div([attribute.class("col-span-2 col-start-1 row-start-2")], [
+        html.kbd([attribute.class("kbd mr-1")], [html.text("↑")]),
+        html.kbd([attribute.class("kbd")], [html.text("↓")]),
+      ]),
+      html.div(
+        [
+          attribute.class(
+            "row-span-2 col-start-3 row-start-1 ml-4 text-6xl pl-4",
+          ),
+        ],
+        [html.p([attribute.id("player_2_score")], [html.text("0")])],
+      ),
+    ],
+  )
+}
 
-    let paddle_1_coord = paddle_1.getBoundingClientRect();
-    let paddle_2_coord = paddle_2.getBoundingClientRect();
-    let initial_ball_coord = ball.getBoundingClientRect();
-    let ball_coord = initial_ball_coord;
-    let board_coord = board.getBoundingClientRect();
-    let paddle_common =
-      document.querySelector('.paddle').getBoundingClientRect();
+/// The instruction for the user to start the game
+///
+pub fn instruction(show: Bool) {
+  case show {
+    True -> {
+      html.h1(
+        [
+          attribute.class(
+            " absolute left-0 -translate-y-1/2 min-w-full text-center top-10",
+          ),
+          attribute.id("instruction"),
+        ],
+        [html.text("Press Enter to Start")],
+      )
+    }
+    _ -> {
+      html.h1(
+        [
+          attribute.class(
+            " absolute left-0 -translate-y-1/2 min-w-full text-center top-10",
+          ),
+          attribute.id("instruction"),
+        ],
+        [html.text("")],
+      )
+    }
+  }
+}
 
-    let dx = Math.floor(Math.random() * 4) + 3;
-    let dy = Math.floor(Math.random() * 4) + 3;
-    let dxd = Math.floor(Math.random() * 2);
-    let dyd = Math.floor(Math.random() * 2);
+/// The hint for playing the game
+///
+fn hint() {
+  html.h1(
+    [
+      attribute.class("absolute left-0 min-w-full text-center bottom-10"),
+      attribute.id("hint"),
+    ],
+    [html.text("hint: hit the ball on the edges of the paddle to add spin")],
+  )
+}
 
+/// The script element used to update the client DOM, based off server events
+///
+/// updates to the DOM via this function, occurs by running JS that manipulates the DOM
+///
+pub fn inject_js(script: String) {
+  html.script([attribute.id("inject_js")], script)
+}
+
+/// The scripting required to send extra information with htmx messages
+///
+fn htmx_info() {
+  "
     function extraInfoFill(simulateKeyHit){
       document.getElementsByName('extraInfo')[0].value = JSON.stringify(
         {
@@ -191,9 +236,42 @@ player_2_score: score_2.innerHTML,
         extraInfoFill(false);
       }
     });
+  "
+}
 
+/// All of the elements and values required to make the client-side scripting work
+///
+fn elements_values() {
+  "
+    let paddle_1 = document.querySelector('#paddle_1');
+    let paddle_2 = document.querySelector('#paddle_2');
 
+    let board = document.querySelector('#board');
+    let initial_ball = document.querySelector('#ball');
+    let ball = document.querySelector('#ball');
 
+    let score_1 = document.querySelector('#player_1_score');
+    let score_2 = document.querySelector('#player_2_score');
+
+    let paddle_1_coord = paddle_1.getBoundingClientRect();
+    let paddle_2_coord = paddle_2.getBoundingClientRect();
+    let initial_ball_coord = ball.getBoundingClientRect();
+    let ball_coord = initial_ball_coord;
+    let board_coord = board.getBoundingClientRect();
+    let paddle_common =
+      document.querySelector('.paddle').getBoundingClientRect();
+
+    let dx = Math.floor(Math.random() * 4) + 3;
+    let dy = Math.floor(Math.random() * 4) + 3;
+    let dxd = Math.floor(Math.random() * 2);
+    let dyd = Math.floor(Math.random() * 2);
+  "
+}
+
+/// The moveBall function for the ball element
+///
+fn move_ball() {
+  "
     function moveBall(dx, dy, dxd, dyd) {
       if (ball_coord.top <= board_coord.top) {
         dyd = 1;
@@ -244,45 +322,5 @@ player_2_score: score_2.innerHTML,
         moveBall(dx, dy, dxd, dyd);
       });
     }
-  ",
-    ),
-  ])
-  |> element.to_string
-}
-
-/// The instruction for the user to start the game
-///
-pub fn instruction(show: Bool) {
-  case show {
-    True -> {
-      html.h1(
-        [
-          attribute.class(
-            " absolute left-0 -translate-y-1/2 min-w-full text-center top-10",
-          ),
-          attribute.id("instruction"),
-        ],
-        [html.text("Press Enter to Start")],
-      )
-    }
-    _ -> {
-      html.h1(
-        [
-          attribute.class(
-            " absolute left-0 -translate-y-1/2 min-w-full text-center top-10",
-          ),
-          attribute.id("instruction"),
-        ],
-        [html.text("")],
-      )
-    }
-  }
-}
-
-/// The script element used to update the client DOM, based off server events
-///
-/// updates to the DOM via this function, occurs by running JS that manipulates the DOM
-///
-pub fn inject_js(script: String) {
-  html.script([attribute.id("inject_js")], script)
+  "
 }
