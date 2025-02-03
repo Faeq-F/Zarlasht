@@ -1,15 +1,27 @@
-import app/pages/game.{game_page}
+import app/pages/game.{game_page, instruction}
 import glacier/should
+import lustre/element
 
-pub fn game_page_test() {
-  game_page("", "")
-  |> should.equal(
-    "<div id=\"page\" class=\"bg-base-100 min-h-full\"><div id=\"Enter\" ws-send hx-trigger=\"pageLoaded, keyup[key==&#39;Enter&#39;] from:body\" hx-include=\"[name=&#39;extraInfo&#39;]\"></div><div id=\"Wkey\" ws-send hx-trigger=\"keyup[key==&#39;w&#39;] from:body\" hx-include=\"[name=&#39;extraInfo&#39;]\"></div><div id=\"Skey\" ws-send hx-trigger=\"keyup[key==&#39;s&#39;] from:body\" hx-include=\"[name=&#39;extraInfo&#39;]\"></div><div id=\"UpArrowKey\" ws-send hx-trigger=\"keyup[key==&#39;ArrowUp&#39;] from:body\" hx-include=\"[name=&#39;extraInfo&#39;]\"></div><div id=\"DownArrowKey\"
-ws-send hx-trigger=\"keyup[key==&#39;ArrowDown&#39;] from:body\" hx-include=\"[name=&#39;extraInfo&#39;]\"></div><div class=\"hidden\"><input type=\"text\" name=\"extraInfo\"></div><div class=\"divider lg:divider-horizontal absolute min-w-full left-0 top-1/2 -translate-y-1/2 h-96 m-0\"></div><div id=\"board\" class=\" border border-current\"><div id=\"ball\" class=\"bg-base-content\"></div><div id=\"paddle_1\" class=\" paddle bg-secondary border border-neutral\"></div><div id=\"paddle_2\" class=\"  paddle bg-accent border border-neutral\"></div><div class=\"fixed left-1/4 mt-[30px]  grid grid-cols-3 grid-rows-2 gap-0\"><div class=\"col-span-2\"><p></p></div><div class=\"col-span-2 col-start-1 row-start-2\"><kbd class=\"kbd mr-1\">W</kbd><kbd class=\"kbd\">S</kbd></div><div class=\"row-span-2 col-start-3 row-start-1 ml-4 text-6xl pl-4\"><p id=\"player_1_score\">0</p></div></div><div class=\"fixed right-1/4 mt-[30px]   grid grid-cols-3 grid-rows-2 gap-0\"><div class=\"col-span-2\"><p></p></div><div class=\"col-span-2 col-start-1 row-start-2\"><kbd class=\"kbd mr-1\">↑</kbd><kbd class=\"kbd\">↓</kbd></div><div class=\"row-span-2 col-start-3 row-start-1 ml-4 text-6xl pl-4\"><p id=\"player_2_score\">0</p></div></div><h1 id=\"instruction\" class=\" absolute left-0 -translate-y-1/2 min-w-full text-center top-10\">Press Enter to Start</h1></div><script id=\"inject_js\"></script><script>\n    let paddle_1 = document.querySelector('#paddle_1');\n    let paddle_2 = document.querySelector('#paddle_2');\n\n
-   let board = document.querySelector('#board');\n    let initial_ball = document.querySelector('#ball');\n    let ball = document.querySelector('#ball');\n\n    let score_1 = document.querySelector('#player_1_score');\n    let score_2 = document.querySelector('#player_2_score');\n\n    let paddle_1_coord = paddle_1.getBoundingClientRect();\n    let paddle_2_coord = paddle_2.getBoundingClientRect();\n    let initial_ball_coord = ball.getBoundingClientRect();\n    let ball_coord = initial_ball_coord;\n    let board_coord = board.getBoundingClientRect();\n    let paddle_common =\n      document.querySelector('.paddle').getBoundingClientRect();\n\n    let dx = Math.floor(Math.random() * 4) + 3;\n    let dy = Math.floor(Math.random() * 4) + 3;\n    let dxd = Math.floor(Math.random() * 2);\n    let dyd = Math.floor(Math.random() * 2);\n\n    function extraInfoFill(simulateKeyHit){\n      document.getElementsByName('extraInfo')[0].value = JSON.stringify(\n        {\nboard_coord: board_coord,\nwindow_innerHeight: window.innerHeight,\npaddle_1_coord: paddle_1_coord,\npaddle_2_coord: paddle_2_coord,\npaddle_common: paddle_common,\nplayer_1_score: score_1.innerHTML,\nplayer_2_score: score_2.innerHTML,\n
-    }\n      );\n      if (simulateKeyHit){\n        htmx.trigger(\"#Enter\", \"pageLoaded\")\n      }\n    }\n\n    document.addEventListener('keydown', (e) => {\n      if (e.key == 'Enter' || e.key == 'w' || e.key == 's' || e.key == 'ArrowUp' || e.key == 'ArrowDown'){\n        extraInfoFill(false);\n
-     }\n    });\n\n\n\n    function moveBall(dx, dy, dxd, dyd) {\n      if (ball_coord.top <= board_coord.top) {\n        dyd = 1;\n      }\n      if (ball_coord.bottom >= board_coord.bottom) {\n        dyd = 0;\n      }\n\n      if (\n        ball_coord.left <= paddle_1_coord.right &&\n        ball_coord.top >= paddle_1_coord.top &&\n        ball_coord.bottom <= paddle_1_coord.bottom\n      ) {\n        dxd = 1;\n        dx = Math.floor(Math.random()
-* 4) + 3;\n        dy = Math.floor(Math.random() * 4) + 3;\n      }\n\n      if (\n        ball_coord.right >= paddle_2_coord.left &&\n        ball_coord.top >= paddle_2_coord.top &&\n        ball_coord.bottom <= paddle_2_coord.bottom\n      ) {\n        dxd = 0;\n        dx = Math.floor(Math.random() * 4) + 3;\n        dy = Math.floor(Math.random() * 4) + 3;\n      }\n\n      if (\n        ball_coord.left <= board_coord.left ||\n        ball_coord.right >= board_coord.right\n      ) {\n        if (ball_coord.left <= board_coord.left) {\n          score_2.innerHTML = +score_2.innerHTML + 1;\n        } else {\n          score_1.innerHTML = +score_1.innerHTML + 1;\n        }\n        ball_coord = initial_ball_coord;\n        ball.style = initial_ball.style;\n        extraInfoFill(true);\n        return;\n      }\n\n      ball.style.top = ball_coord.top + dy * (dyd == 0 ? -1 : 1) + 'px';\n      ball.style.left = ball_coord.left + dx * (dxd == 0 ? -1 : 1) + 'px';\n      ball_coord = ball.getBoundingClientRect();\n      requestAnimationFrame(() => {\n
-      moveBall(dx, dy, dxd, dyd);\n      });\n    }\n  </script></div>",
-  )
+pub fn show_instruction_test() {
+  should.equal(instruction(True) |> element.to_string, "")
+}
+
+pub fn hide_instruction_test() {
+  should.equal(instruction(False) |> element.to_string, "")
+}
+
+pub fn empty_page_test() {
+  should.equal(game_page("", ""), "")
+}
+
+pub fn page_1_test() {
+  should.equal(game_page("Faeq", "John"), "")
+}
+
+pub fn page_2_test() {
+  should.equal(game_page("Mubz", "Faeq"), "")
+}
+
+pub fn randomized_page_test() {
+  should.equal(game_page(), "")
 }

@@ -25,8 +25,6 @@ pub fn valkey_subscribe(
   )
 }
 
-// can pub a message on game creation so all servers are aware of the game (also applys for actions in it)
-
 /// Creates a new client process for the database using credentials from the .env file
 ///
 pub fn valkey_client() {
