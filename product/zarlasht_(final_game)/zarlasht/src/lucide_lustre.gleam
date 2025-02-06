@@ -1,3 +1,5 @@
+//// The icons from <https://github.com/dinkelspiel/lucide_lustre>
+
 import lustre/attribute.{type Attribute, attribute}
 import lustre/element/svg
 

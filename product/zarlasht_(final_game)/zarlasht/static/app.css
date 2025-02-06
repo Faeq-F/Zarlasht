@@ -1,42 +1,226 @@
-[data-theme=emerald] [data-theme=forest],
-[data-theme=emerald] {
-  color-scheme: light;
-  --b2: 17.522% 0.007709 17.911578;
-  --b3: 16.2032% 0.007129 17.911578;
-  --in: 72.06% 0.191 231.6;
-  --su: 64.8% 0.150 160;
-  --wa: 84.71% 0.199 83.87;
-  --er: 71.76% 0.221 22.18;
-  --sc: 13.9553% 0.027077 168.327128;
-  --ac: 14.1257% 0.02389 185.713193;
-  --nc: 86.1397% 0.007806 171.364646;
-  --inc: 0% 0 0;
-  --suc: 0% 0 0;
-  --wac: 0% 0 0;
-  --erc: 0% 0 0;
-  --rounded-box: 1rem;
-  --rounded-badge: 1.9rem;
-  --animation-btn: 0.25s;
-  --animation-input: .2s;
-  --btn-focus-scale: 0.95;
-  --border-btn: 1px;
-  --tab-border: 1px;
-  --tab-radius: 0.5rem;
-  --p: 68.6283% 0.185567 148.958922;
-  --pc: 0% 0 0;
-  --s: 69.7764% 0.135385 168.327128;
-  --a: 70.6285% 0.119451 185.713193;
-  --n: 30.6985% 0.039032 171.364646;
-  --rounded-btn: 1.9rem;
+/* color palette from <https://github.com/vuejs/theme> */
+:root {
+  --vt-c-white: #ffffff;
+  --vt-c-white-soft: #f8f8f8;
+  --vt-c-white-mute: #f2f2f2;
+
+  --vt-c-black: #181818;
+  --vt-c-black-soft: #222222;
+  --vt-c-black-mute: #282828;
+
+  --vt-c-indigo: #2c3e50;
+
+  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+
+  --vt-c-text-light-1: var(--vt-c-indigo);
+  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+  --vt-c-text-dark-1: var(--vt-c-white);
+  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 }
 
-* {
-  font-family: "Varela Round", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+/* semantic color variables for this project */
+:root {
+  --color-background: var(--vt-c-white);
+  --color-background-soft: var(--vt-c-white-soft);
+  --color-background-mute: var(--vt-c-white-mute);
+
+  --color-border: var(--vt-c-divider-light-2);
+  --color-border-hover: var(--vt-c-divider-light-1);
+
+  --color-heading: var(--vt-c-text-light-1);
+  --color-text: var(--vt-c-text-light-1);
+
+  --section-gap: 160px;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: var(--vt-c-black);
+    --color-background-soft: var(--vt-c-black-soft);
+    --color-background-mute: var(--vt-c-black-mute);
+
+    --color-border: var(--vt-c-divider-dark-2);
+    --color-border-hover: var(--vt-c-divider-dark-1);
+
+    --color-heading: var(--vt-c-text-dark-1);
+    --color-text: var(--vt-c-text-dark-2);
+  }
+}
+
+/* My styles */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+  user-select: none;
+}
+
+/* app mount */
+
+#app,
+body {
+  overflow: hidden;
+  min-height: 100vh;
+  max-height: 100vh;
+  height: 100vh;
+
+  min-width: 100vw;
+  max-width: 100vw;
+  width: 100vw;
+
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 20px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  padding: 1rem;
+  background: white;
+}
+
+html.dark #app {
+  background: black;
+}
+
+/* The site container */
+
+html #page {
+  background-image: url('/static/bg.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+#page {
+  overflow: hidden;
+  text-align: left;
+  clip-path: xywh(0 0 100% 100% round 1.5rem 1.5rem)
+}
+
+#page:before {
+  content: '';
+  position: absolute;
+  width: calc(100% - 2rem);
+  height: calc(100% - 2rem);
+  background: inherit;
+  border-radius: 1.5rem;
+  transition: filter 1s;
+}
+
+html.dark #page:before {
+  transition: filter 1s;
+  filter: invert(1);
+}
+
+/* Titles */
+
+#Faeq:before {
+  content: '';
+  background: url(/underline.png) no-repeat;
+  position: absolute;
+  width: 288px;
+  height: 20px;
+  bottom: 2.7rem;
+}
+
+/* after is in scoped styles - extends underline */
+html.dark #Faeq:after,
+html.dark #Faeq:before {
+  filter: invert(1) brightness(1.5);
+}
+
+/* Tailwind-esque classes */
 
 .text-2xs {
   font-size: 0.55rem;
   line-height: 1rem;
+}
+
+.font-header {
+  font-family: 'Header', sans-serif;
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: 'Header';
+  src: url('Requiem.ttf') format('truetype');
+}
+
+.font-subheader {
+  font-family: 'SubHeader', sans-serif;
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: 'SubHeader';
+  src: url('IM FELL DW Pica SC.ttf') format('truetype');
+}
+
+.font-text {
+  font-family: 'Text', sans-serif;
+  font-weight: 100;
+  margin-bottom: -4px;
+}
+
+@font-face {
+  font-family: 'Text';
+  src: url('IM FELL DW Pica Roman.ttf') format('truetype');
+}
+
+/**/
+
+.slide-enter-active,
+.slide-leave-active {
+  transition:
+    opacity 1s,
+    transform 1s;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  opacity: 0;
+  transform: translateX(-30%);
+}
+
+.fogWrap {
+  perspective-origin: 50% 50%;
+}
+
+.fogWrap img {
+  position: absolute;
+  bottom: -100vh;
+  transform-style: preserve-3d;
+  z-index: -1;
+  max-width: 20px;
+}
+
+html.dark {
+  .fogWrap img {
+    filter: invert(1);
+  }
 }

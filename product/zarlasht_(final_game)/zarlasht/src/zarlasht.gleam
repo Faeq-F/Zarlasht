@@ -41,7 +41,7 @@ pub fn main() {
     |> mist.port(8000)
     // Todo
     // could randomize for recovery scenarios (in case new app takes over) & restarting for errors & see wisp recovery - 500 for handler?
-    |> mist.start_https("pong.crt", "pong.key")
+    |> mist.start_https("zarlasht.crt", "zarlasht.key")
 
   // The web server runs in new Erlang process
   // so put this one to sleep while it works concurrently
