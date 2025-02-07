@@ -18,9 +18,14 @@ pub fn root() -> Element(t) {
       ],
       [
         html.div([attribute.class("max-w-md")], [
-          html.h1([attribute.class("text-5xl font-bold mb-3 font-header")], [
-            element.text("Zarlasht"),
-          ]),
+          html.h1(
+            [
+              attribute.class(
+                "dark:text-white text-5xl font-bold mb-3 font-header",
+              ),
+            ],
+            [element.text("Zarlasht")],
+          ),
           html.div([attribute.class("join"), attribute.id("pageInputs")], [
             html.button(
               [

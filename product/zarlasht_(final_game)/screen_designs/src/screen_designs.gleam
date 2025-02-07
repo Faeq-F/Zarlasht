@@ -49,7 +49,7 @@ pub fn main() {
 }
 
 fn respond(page) {
-  page
+  [page]
   |> layout()
   |> element.to_document_string_builder
   |> wisp.html_response(200)
