@@ -61,7 +61,6 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
       ),
     ]),
     body([], [
-      div([class("absolute top-0 right-0 m-4 z-10")], [theme_switch()]),
       label([class("left-0 m-4 fixed z-10 top-0")], [
         a(
           [

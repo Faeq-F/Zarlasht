@@ -1,15 +1,27 @@
 import components/lucide_lustre.{laptop, moon, sun_medium, sun_moon}
-import lustre/attribute.{attribute, class, id}
+import gleam/string.{join}
+import lustre/attribute.{attribute, class, id, src, style}
 import lustre/element.{fragment}
-import lustre/element/html.{div, label}
+import lustre/element/html.{button, div, img, label, text}
 
 pub fn theme_switch() {
   fragment([
-    div([class("popover popover-hover")], [
-      label([class("popover-trigger my-2 btn btn-solid-primary")], [
-        sun_moon([]),
-      ]),
-      div([class("popover-content w-32 popover-bottom-left")], [
+    div([class("popover popover-hover contents")], [
+      label(
+        [
+          class(join(
+            [
+              "popover-trigger btn border rounded-r-none rounded-full",
+              "bg-black/15 hover:bg-black/30",
+              "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+              "border-black/40 text-current", "transition-all duration-500",
+            ],
+            " ",
+          )),
+        ],
+        [sun_moon([])],
+      ),
+      div([class("popover-content w-32 popover-top-right")], [
         div([class("popover-arrow")], []),
         div([], [
           div(
@@ -19,17 +31,20 @@ pub fn theme_switch() {
               ),
             ],
             [
-              html.button([class("btn w-full flex"), id("setLight")], [
-                sun_medium([]),
-                div([class("flex-1 text-center")], [html.text("Light")]),
+              button([class("btn w-full flex"), id("setLight")], [
+                img([src("/static/sun.png"), style([#("height", "inherit")])]),
+                div([class("flex-1 text-center")], [text("Light")]),
               ]),
-              html.button([class("btn w-full"), id("setDark")], [
-                moon([]),
-                div([class("flex-1 text-center")], [html.text("Dark")]),
+              button([class("btn w-full"), id("setDark")], [
+                img([
+                  src("/static/moon.png"),
+                  style([#("height", "calc(100% - 10%)")]),
+                ]),
+                div([class("flex-1 text-center")], [text("Dark")]),
               ]),
-              html.button([class("btn w-full"), id("setSystem")], [
+              button([class("btn w-full"), id("setSystem")], [
                 laptop([]),
-                div([class("flex-1 text-right")], [html.text("System")]),
+                div([class("flex-1 text-right")], [text("System")]),
               ]),
             ],
           ),
