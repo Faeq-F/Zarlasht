@@ -11,7 +11,7 @@ pub fn theme_switch() {
         [
           class(join(
             [
-              "popover-trigger btn border rounded-r-none rounded-full",
+              "popover-trigger btn border !rounded-r-none !rounded-full",
               "bg-black/15 hover:bg-black/30",
               "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
               "border-black/40 text-current", "transition-all duration-500",
@@ -21,35 +21,38 @@ pub fn theme_switch() {
         ],
         [sun_moon([])],
       ),
-      div([class("popover-content w-32 popover-top-right")], [
-        div([class("popover-arrow")], []),
-        div([], [
-          div(
-            [
-              class(
-                "btn-group btn-group-vertical btn-group-scrollable w-full max-w-full",
-              ),
-            ],
-            [
-              button([class("btn w-full flex"), id("setLight")], [
-                img([src("/static/sun.png"), style([#("height", "inherit")])]),
-                div([class("flex-1 text-center")], [text("Light")]),
-              ]),
-              button([class("btn w-full"), id("setDark")], [
-                img([
-                  src("/static/moon.png"),
-                  style([#("height", "calc(100% - 10%)")]),
+      div(
+        [
+          class("popover-content w-32 popover-top-right !fixed"),
+          style([#("width", "fit-content")]),
+        ],
+        [
+          div([class("popover-arrow")], []),
+          div([], [
+            div(
+              [
+                class(
+                  "btn-group btn-group-vertical btn-group-scrollable w-full max-w-full",
+                ),
+              ],
+              [
+                button([class("btn w-full flex"), id("setLight")], [
+                  sun_medium([]),
+                  div([class("flex-1 text-center")], [text("Light")]),
                 ]),
-                div([class("flex-1 text-center")], [text("Dark")]),
-              ]),
-              button([class("btn w-full"), id("setSystem")], [
-                laptop([]),
-                div([class("flex-1 text-right")], [text("System")]),
-              ]),
-            ],
-          ),
-        ]),
-      ]),
+                button([class("btn w-full"), id("setDark")], [
+                  moon([]),
+                  div([class("flex-1 text-center")], [text("Dark")]),
+                ]),
+                button([class("btn w-full"), id("setSystem")], [
+                  laptop([]),
+                  div([class("flex-1 text-right")], [text("System")]),
+                ]),
+              ],
+            ),
+          ]),
+        ],
+      ),
     ]),
     functionality(),
   ])
