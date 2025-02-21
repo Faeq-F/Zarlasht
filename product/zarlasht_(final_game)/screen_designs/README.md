@@ -5,8 +5,11 @@ Install [Gleam](https://gleam.run/getting-started/installing/)
 Within the `priv/static` folder, you will need a `libraries` folder with the
 following:
 
-- `daisyui.min.css`
+
 - `tailwind.min.js`
+
+v4 tailwind required
+require alpine js v3
 
 ## Development
 

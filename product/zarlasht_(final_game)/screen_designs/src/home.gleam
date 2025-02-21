@@ -1,30 +1,19 @@
 import components/bottom_bar.{bottom_bar}
-import lustre/attribute.{attribute}
+import lustre/attribute.{attribute, class, style}
 import lustre/element.{type Element}
-import lustre/element/html
+import lustre/element/html.{div, h1, text}
 
 pub fn home() -> Element(t) {
-  html.div([attribute.id("app")], [
-    html.div(
-      [attribute.class("hero bg-base-100 min-h-full"), attribute.id("page")],
-      [
-        html.div(
-          [
-            attribute.class(
-              "hero-content text-left absolute top-1/2 -translate-y-1/2 w-full",
-            ),
-          ],
-          [
-            html.div([attribute.class("w-full")], [
-              bottom_bar(),
-              html.h1(
-                [attribute.class("text-9xl font-bold mb-3 font-header ")],
-                [html.text("Zarlasht")],
-              ),
-            ]),
-          ],
-        ),
-      ],
-    ),
-  ])
+  div(
+    [
+      class("!text-left !absolute"),
+      style([#("width", "calc(100% - 2rem)"), #("height", "calc(100% - 2rem)")]),
+    ],
+    [
+      div([class("!w-full")], [
+        bottom_bar(),
+        h1([class("!text-9xl font-header ")], [text("Zarlasht")]),
+      ]),
+    ],
+  )
 }
