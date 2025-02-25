@@ -92,27 +92,45 @@ fn home_buttons() {
 
 fn created_game_buttons(game_code) {
   [
-    button(
-      [
-        class(
-          "btn whitespace-nowrap rounded-sm bg-green-500 px-4 py-2 text-center text-sm font-medium tracking-wide text-white transition hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 active:opacity-100 active:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-75",
-        ),
-        type_("button"),
-        attribute(
-          "x-on:click",
-          "$dispatch('notify', { variant: 'success', title: 'Success!',  message: 'Your changes have been saved. Keep up the great work!' })",
-        ),
-      ],
-      [copy([])],
-    ),
+    div([class("popover popover-border contents")], [
+      label(
+        [
+          class(join(
+            [
+              "popover-trigger btn border !rounded-r-none !rounded-full",
+              "bg-black/15 hover:bg-black/30",
+              "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+              "border-black/40 text-current", "transition-all duration-500",
+            ],
+            " ",
+          )),
+          attribute("tabindex", "0"),
+        ],
+        [copy([])],
+      ),
+      div(
+        [
+          class(
+            "popover-content w-32 popover-top-left !fixed font-text !bg-green-300",
+          ),
+          attribute("tabindex", "0"),
+          style([#("width", "fit-content")]),
+        ],
+        [div([], [text("Copied game code")])],
+      ),
+    ]),
     button([class(join(["btn !rounded-r-full"], " "))], [text("Start Game")]),
   ]
 }
 
 fn home_info() {
-  div([class("btn !bg-gray-100 font-header")], [text("Zarlasht")])
+  div([class("btn !bg-gray-100 font-header"), style([#("cursor", "default")])], [
+    text("Zarlasht"),
+  ])
 }
 
 fn created_game_info() {
-  div([class("btn !bg-gray-100")], [text("minimum of 5 players")])
+  div([class("btn !bg-gray-100"), style([#("cursor", "default")])], [
+    text("minimum of 5 players"),
+  ])
 }
