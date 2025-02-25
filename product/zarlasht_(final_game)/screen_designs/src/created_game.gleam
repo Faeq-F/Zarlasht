@@ -20,24 +20,24 @@ pub fn created_game() -> Element(t) {
         p([class("!text-2xl text-center font-subheader")], [
           text("Share this code with friends!"),
         ]),
-        div([class("game-container")], [
+        div([class("game-container"), style([#("cursor", "grab")])], [
           ul([class("!grid"), id("player-container")], [
             form([class("row")], [
-              li([class("!item")], [text("name1")]),
-              li([class("!item")], [text("name2")]),
-              li([class("!item")], [text("name3")]),
-              li([class("!item")], [text("name4")]),
-              li([class("!item")], [text("name5")]),
-              li([class("!item")], [text("name6")]),
-              li([class("!item")], [text("name7")]),
-              li([class("!item")], [text("name8")]),
-              li([class("!item")], [text("name9")]),
-              li([class("!item")], [text("name10")]),
-              li([class("!item")], [text("name11")]),
-              li([class("!item")], [text("name12")]),
-              li([class("!item")], [text("name13")]),
-              li([class("!item")], [text("name14")]),
-              li([class("!item")], [text("name15")]),
+              li([class("item text-center font-subheader")], [text("Faeq")]),
+              li([class("item text-center font-subheader")], [text("Mubz")]),
+              li([class("item text-center font-subheader")], [text("Mahid")]),
+              li([class("item text-center font-subheader")], [text("Dennis")]),
+              li([class("item text-center font-subheader")], [text("Hossam")]),
+              li([class("item text-center font-subheader")], [text("Faeq2")]),
+              li([class("item text-center font-subheader")], [text("Mubz2")]),
+              li([class("item text-center font-subheader")], [text("Mahid2")]),
+              li([class("item text-center font-subheader")], [text("Dennis2")]),
+              li([class("item text-center font-subheader")], [text("Hossam2")]),
+              li([class("item text-center font-subheader")], [text("Faeq3")]),
+              li([class("item text-center font-subheader")], [text("Mubz3")]),
+              li([class("item text-center font-subheader")], [text("Mahid3")]),
+              li([class("item text-center font-subheader")], [text("Dennis3")]),
+              li([class("item text-center font-subheader")], [text("Hossam3")]),
             ]),
             form(
               [
@@ -46,21 +46,51 @@ pub fn created_game() -> Element(t) {
                 class("sortable  !row"),
               ],
               [
-                div([], [input([value("1"), name("item"), type_("hidden")])]),
-                div([], [input([value("2"), name("item"), type_("hidden")])]),
-                div([], [input([value("3"), name("item"), type_("hidden")])]),
-                div([], [input([value("4"), name("item"), type_("hidden")])]),
-                div([], [input([value("5"), name("item"), type_("hidden")])]),
-                div([], [input([value("1"), name("item"), type_("hidden")])]),
-                div([], [input([value("2"), name("item"), type_("hidden")])]),
-                div([], [input([value("3"), name("item"), type_("hidden")])]),
-                div([], [input([value("4"), name("item"), type_("hidden")])]),
-                div([], [input([value("5"), name("item"), type_("hidden")])]),
-                div([], [input([value("1"), name("item"), type_("hidden")])]),
-                div([], [input([value("2"), name("item"), type_("hidden")])]),
-                div([], [input([value("3"), name("item"), type_("hidden")])]),
-                div([], [input([value("4"), name("item"), type_("hidden")])]),
-                div([], [input([value("5"), name("item"), type_("hidden")])]),
+                div([class("bg-red-500/20")], [
+                  input([value("1"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-orange-500/20")], [
+                  input([value("2"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-amber-500/20")], [
+                  input([value("3"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-yellow-500/20")], [
+                  input([value("4"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-lime-500/20")], [
+                  input([value("5"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-green-500/20")], [
+                  input([value("1"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-emerald-500/20")], [
+                  input([value("2"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-teal-500/20")], [
+                  input([value("3"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-cyan-500/20")], [
+                  input([value("4"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-sky-500/20")], [
+                  input([value("5"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-blue-500/20")], [
+                  input([value("1"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-indigo-500/20")], [
+                  input([value("2"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-violet-500/20")], [
+                  input([value("3"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-purple-500/20")], [
+                  input([value("4"), name("item"), type_("hidden")]),
+                ]),
+                div([class("bg-fuchsia-500/20")], [
+                  input([value("5"), name("item"), type_("hidden")]),
+                ]),
               ],
             ),
           ]),
@@ -68,6 +98,34 @@ pub fn created_game() -> Element(t) {
         script(
           [],
           "
+    let mouseDown = false;
+    let startX, scrollLeft;
+    const slider = document.querySelector('.game-container');
+
+    const startDragging = (e) => {
+      mouseDown = true;
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
+    }
+
+    const stopDragging = (e) => {
+      mouseDown = false;
+    }
+
+    const move = (e) => {
+      e.preventDefault();
+      if(!mouseDown) { return; }
+      const x = e.pageX - slider.offsetLeft;
+      const scroll = x - startX;
+      slider.scrollLeft = scrollLeft - scroll;
+    }
+
+    // Add the event listeners
+    slider.addEventListener('mousemove', move, false);
+    slider.addEventListener('mousedown', startDragging, false);
+    slider.addEventListener('mouseup', stopDragging, false);
+    slider.addEventListener('mouseleave', stopDragging, false);
+
     htmx.onLoad(function (content) {
     var sortables = content.querySelectorAll(\".sortable\");
     for (var i = 0; i < sortables.length; i++) {

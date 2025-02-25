@@ -3,7 +3,7 @@
 
 
 .game-container {
-  width: 90vw;
+  width: calc(100vw - 2rem);
   overflow-x: scroll;
 }
 
@@ -23,7 +23,7 @@
 
 #player-container {
   margin: 0 auto;
-  width: 90vw;
+
 }
 
 .sortable div,
@@ -37,7 +37,7 @@
 }
 
 .row .item {
-  height: 30em !important;
+  height: 60vh !important;
 }
 
 .sortable {
