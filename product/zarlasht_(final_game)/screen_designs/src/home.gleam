@@ -11,8 +11,8 @@ pub fn home() -> Element(t) {
     ],
     [
       div([class("!w-full")], [
-        bottom_bar(),
-        h1([class("!text-9xl font-header ")], [text("Zarlasht")]),
+        bottom_bar("home"),
+        h1([class("!text-9xl font-header p-4")], [text("Zarlasht")]),
       ]),
     ],
   )

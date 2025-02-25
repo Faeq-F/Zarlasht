@@ -1,208 +1,75 @@
-import lustre/attribute.{attribute}
+import components/bottom_bar.{bottom_bar}
+import lustre/attribute.{attribute, class, id, name, style, type_, value}
 import lustre/element.{type Element, fragment}
-import lustre/element/html
+import lustre/element/html.{
+  button, div, form, input, li, p, script, span, text, ul,
+}
 
 pub fn created_game() -> Element(t) {
-  fragment([
-    html.div([attribute.id("app")], [
-      html.div(
-        [
-          attribute.class("hero bg-transparent min-h-full"),
-          attribute.id("page"),
-        ],
-        [
-          html.h1([attribute.class("text-5xl mt-4 font-header")], [
-            html.text("ZARLASHT"),
+  div(
+    [
+      class("!text-left !absolute"),
+      style([#("width", "calc(100% - 2rem)"), #("height", "calc(100% - 2rem)")]),
+    ],
+    [
+      div([class("!w-full")], [
+        bottom_bar("created_game"),
+        p([class(" !text-7xl text-center !mt-4 !text-teal-500 font-header")], [
+          text("3978"),
+        ]),
+        p([class("!text-2xl text-center font-subheader")], [
+          text("Share this code with friends!"),
+        ]),
+        div([class("game-container")], [
+          ul([class("!grid"), id("player-container")], [
+            form([class("row")], [
+              li([class("!item")], [text("name1")]),
+              li([class("!item")], [text("name2")]),
+              li([class("!item")], [text("name3")]),
+              li([class("!item")], [text("name4")]),
+              li([class("!item")], [text("name5")]),
+              li([class("!item")], [text("name6")]),
+              li([class("!item")], [text("name7")]),
+              li([class("!item")], [text("name8")]),
+              li([class("!item")], [text("name9")]),
+              li([class("!item")], [text("name10")]),
+              li([class("!item")], [text("name11")]),
+              li([class("!item")], [text("name12")]),
+              li([class("!item")], [text("name13")]),
+              li([class("!item")], [text("name14")]),
+              li([class("!item")], [text("name15")]),
+            ]),
+            form(
+              [
+                attribute("hx-trigger", "end"),
+                attribute("hx-post", "/items"),
+                class("sortable  !row"),
+              ],
+              [
+                div([], [input([value("1"), name("item"), type_("hidden")])]),
+                div([], [input([value("2"), name("item"), type_("hidden")])]),
+                div([], [input([value("3"), name("item"), type_("hidden")])]),
+                div([], [input([value("4"), name("item"), type_("hidden")])]),
+                div([], [input([value("5"), name("item"), type_("hidden")])]),
+                div([], [input([value("1"), name("item"), type_("hidden")])]),
+                div([], [input([value("2"), name("item"), type_("hidden")])]),
+                div([], [input([value("3"), name("item"), type_("hidden")])]),
+                div([], [input([value("4"), name("item"), type_("hidden")])]),
+                div([], [input([value("5"), name("item"), type_("hidden")])]),
+                div([], [input([value("1"), name("item"), type_("hidden")])]),
+                div([], [input([value("2"), name("item"), type_("hidden")])]),
+                div([], [input([value("3"), name("item"), type_("hidden")])]),
+                div([], [input([value("4"), name("item"), type_("hidden")])]),
+                div([], [input([value("5"), name("item"), type_("hidden")])]),
+              ],
+            ),
           ]),
-          html.div(
-            [
-              attribute.class(
-                "hero-content text-center absolute top-1/2 -translate-y-1/2 ",
-              ),
-            ],
-            [
-              html.div([], [
-                html.p(
-                  [attribute.class(" text-7xl text-success mx-auto my-0")],
-                  [
-                    html.text(
-                      "3978
-          ",
-                    ),
-                  ],
-                ),
-                html.p([attribute.class(" text-2xl")], [
-                  html.text(
-                    "Share this code with friends!
-          ",
-                  ),
-                ]),
-                html.div([attribute.class("game-container")], [
-                  html.ul(
-                    [attribute.class("grid"), attribute.id("player-container")],
-                    [
-                      html.form([attribute.class("row")], [
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                        html.li([attribute.class("item")], [html.text("test")]),
-                      ]),
-                      html.form(
-                        [
-                          attribute("hx-trigger", "end"),
-                          attribute("hx-post", "/items"),
-                          attribute.class("sortable  row"),
-                        ],
-                        [
-                          html.div([], [
-                            html.input([
-                              attribute.value("1"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("2"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("3"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("4"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("5"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("1"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("2"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("3"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("4"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("5"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("1"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("2"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("3"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("4"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                          html.div([], [
-                            html.input([
-                              attribute.value("5"),
-                              attribute.name("item"),
-                              attribute.type_("hidden"),
-                            ]),
-                          ]),
-                        ],
-                      ),
-                    ],
-                  ),
-                ]),
-                html.p([attribute.class(" text-xl")], [
-                  html.text(
-                    "(minimum of 5 players)
-          ",
-                  ),
-                ]),
-                html.button(
-                  [
-                    attribute.class(
-                      "btn join-item bg-transparent hover:bg-transparent border-0  text-secondary-content hover:text-secondary text-xl hover:text-shadow ",
-                    ),
-                    attribute.id("startButton"),
-                    attribute("data-theme", "forest"),
-                  ],
-                  [html.span([], [html.text("Start Game")])],
-                ),
-              ]),
-            ],
-          ),
-        ],
-      ),
-    ]),
-    html.script(
-      [],
-      "
-    // htmx.onLoad(function (content) {
-    //var sortables = content.querySelectorAll(\".sortable\");
-    var sortables = document.querySelectorAll(\".sortable\");
+        ]),
+        script(
+          [],
+          "
+    htmx.onLoad(function (content) {
+    var sortables = content.querySelectorAll(\".sortable\");
     for (var i = 0; i < sortables.length; i++) {
       var sortable = sortables[i];
       var sortableInstance = new Sortable(sortable, {
@@ -222,8 +89,10 @@ pub fn created_game() -> Element(t) {
         sortableInstance.option(\"disabled\", false);
       });
     }
-    // })
+    })
   ",
-    ),
-  ])
+        ),
+      ]),
+    ],
+  )
 }

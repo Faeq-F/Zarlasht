@@ -1,3 +1,4 @@
+@import url("created_game.css");
 
 *,
 *::before,
@@ -121,7 +122,7 @@ html.dark #Faeq:before {
 
 @font-face {
   font-family: 'SubHeader';
-  src: url('IM FELL DW Pica SC.ttf') format('truetype');
+  src: url('imFELLdwPicaSC.ttf') format('truetype');
 }
 
 .font-text {
@@ -132,7 +133,7 @@ html.dark #Faeq:before {
 
 @font-face {
   font-family: 'Text';
-  src: url('IM FELL DW Pica Roman.ttf') format('truetype');
+  src: url('imFELLdwPicaRoman.ttf') format('truetype');
 }
 
 .btn {
