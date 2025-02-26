@@ -66,7 +66,7 @@ pub fn info_modal() {
                       [github([])],
                     ),
                   ]),
-                  label([class("m-4 ")], [
+                  label([class("m-4 font-subheader")], [
                     p([], [
                       text("Created by "),
                       a(
@@ -108,7 +108,7 @@ pub fn info_modal() {
                   ),
                 ],
               ),
-              html.div([attribute.class("px-4 py-8")], [
+              html.div([attribute.class("px-4 py-8 font-text")], [
                 html.p([], [
                   text("IM Fell DW Pica font by "),
                   a(
