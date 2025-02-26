@@ -38,15 +38,21 @@ pub fn theme_switch() {
               [
                 button([class("btn w-full flex"), id("setLight")], [
                   sun_medium([]),
-                  div([class("flex-1 text-center")], [text("Light")]),
+                  div([class("flex-1 text-center font-text pl-2")], [
+                    text("Light"),
+                  ]),
                 ]),
                 button([class("btn w-full"), id("setDark")], [
                   moon([]),
-                  div([class("flex-1 text-center")], [text("Dark")]),
+                  div([class("flex-1 text-center font-text pl-2")], [
+                    text("Dark"),
+                  ]),
                 ]),
                 button([class("btn w-full"), id("setSystem")], [
                   laptop([]),
-                  div([class("flex-1 text-right")], [text("System")]),
+                  div([class("flex-1 text-right font-text pl-2")], [
+                    text("System"),
+                  ]),
                 ]),
               ],
             ),
