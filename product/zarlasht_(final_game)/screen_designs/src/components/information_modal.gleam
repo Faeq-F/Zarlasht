@@ -1,9 +1,7 @@
 import components/lucide_lustre.{github, info}
-import components/theme_switch.{theme_switch}
-import gleam/string.{join}
-import lustre/attribute.{attribute, class, href, id, rel, src, style, target}
+import lustre/attribute.{attribute, class, href, rel, target}
 import lustre/element.{fragment}
-import lustre/element/html.{a, br, button, div, img, label, p, text}
+import lustre/element/html.{a, br, label, p, text}
 import lustre/element/svg
 
 pub fn info_modal() {
@@ -12,7 +10,7 @@ pub fn info_modal() {
       html.button(
         [
           attribute.class(
-            "btn border rounded-full !rounded-l-none text-current transition-all duration-500",
+            "btn border !rounded-none text-current transition-all duration-500",
           ),
           attribute.type_("button"),
           attribute("x-on:click", "modalIsOpen = true"),

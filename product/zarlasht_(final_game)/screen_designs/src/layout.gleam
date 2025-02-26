@@ -1,17 +1,11 @@
 //// Layout for all pages the site renders
 
-import components/lucide_lustre.{github, moon, sun}
-import components/theme_switch.{theme_switch}
 import gleam/list
-import lustre/attribute.{
-  attribute, class, href, id, name, rel, src, style, target, type_,
-}
+import lustre/attribute.{attribute, class, href, id, name, rel, src, type_}
 import lustre/element.{type Element}
 import lustre/element/html.{
-  a, body, div, head, html, img, label, link, meta, p, script, text, title,
+  body, div, head, html, img, link, meta, script, title,
 }
-
-import lustre/element/svg
 
 /// Layout for all pages the site renders
 ///
@@ -70,35 +64,36 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
       html.style(
         [attribute("lang", "scss")],
         "
-@use 'sass:math';
+        @use 'sass:math';
 
-$bgAnimation: 100;
+        $bgAnimation: 100;
 
-@for $i from 1 through $bgAnimation {
-  $scale: math.random(2) - 0.4;
+        @for $i from 1 through $bgAnimation {
+          $scale: math.random(2) - 0.4;
 
-  .fogWrap img:nth-child(#{$i}) {
-    left: math.random(120) * 1% - 20;
-    animation: raise#{$i} 7 + math.random(15) + s linear infinite;
-    animation-delay: math.random(5) - 5 + s;
-    transform: scale(0.3 * $i - 0.6) rotate(math.random(360) + deg);
-    z-index: $i + 99;
+          .fogWrap img:nth-child(#{$i}) {
+            left: math.random(120) * 1% - 20;
+            animation: raise#{$i} 7 + math.random(15) + s linear infinite;
+            animation-delay: math.random(5) - 5 + s;
+            transform: scale(0.3 * $i - 0.6) rotate(math.random(360) + deg);
+            z-index: $i + 99;
 
-    @keyframes raise#{$i} {
-      to {
-        bottom: 150vh;
-        transform: scale(0.3 * $i - 0.6) rotate(math.random(360) + deg);
-      }
-    }
-  }
-}
-
-",
+            @keyframes raise#{$i} {
+              to {
+                bottom: 150vh;
+                transform: scale(0.3 * $i - 0.6) rotate(math.random(360) + deg);
+              }
+            }
+          }
+        }
+        ",
       ),
       script(
         [type_("module")],
-        "const sass = await import('https://jspm.dev/sass');
-        sass.compileString(document.querySelector(\"style[lang=scss]\").innerHTML);",
+        "
+        const sass = await import('https://jspm.dev/sass');
+        sass.compileString(document.querySelector(\"style[lang=scss]\").innerHTML);
+        ",
       ),
     ]),
   ])

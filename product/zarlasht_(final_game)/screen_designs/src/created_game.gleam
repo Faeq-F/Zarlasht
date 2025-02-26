@@ -1,8 +1,11 @@
 import components/bottom_bar.{bottom_bar}
+import components/lucide_lustre.{copy}
+import gleam/int
+import gleam/string.{join}
 import lustre/attribute.{attribute, class, id, name, style, type_, value}
-import lustre/element.{type Element, fragment}
+import lustre/element.{type Element}
 import lustre/element/html.{
-  button, div, form, input, li, p, script, span, text, ul,
+  button, div, form, input, label, li, p, script, text, ul,
 }
 
 pub fn created_game() -> Element(t) {
@@ -13,7 +16,7 @@ pub fn created_game() -> Element(t) {
     ],
     [
       div([class("!w-full")], [
-        bottom_bar("created_game"),
+        bottom_bar(info(), buttons(3978)),
         p([class(" !text-7xl text-center !mt-4 !text-teal-500 font-header")], [
           text("3978"),
         ]),
@@ -95,9 +98,66 @@ pub fn created_game() -> Element(t) {
             ),
           ]),
         ]),
-        script(
-          [],
-          "
+        script([], page_script()),
+      ]),
+    ],
+  )
+}
+
+fn info() {
+  div(
+    [
+      class("btn !bg-gray-100 font-text !text-lg"),
+      style([#("cursor", "default")]),
+    ],
+    [text("minimum of 5 players")],
+  )
+}
+
+fn buttons(game_code) {
+  [
+    div([class("popover popover-border contents")], [
+      label(
+        [
+          class(join(
+            [
+              "popover-trigger btn border !rounded-r-none !rounded-full",
+              "bg-black/15 hover:bg-black/30",
+              "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+              "border-black/40 text-current", "transition-all duration-500",
+            ],
+            " ",
+          )),
+          attribute("tabindex", "0"),
+          attribute(
+            "@click",
+            "navigator.clipboard.writeText(\""
+              <> int.to_string(game_code)
+              <> "\")",
+          ),
+        ],
+        [copy([])],
+      ),
+      div(
+        [
+          class(
+            "popover-content w-32 popover-top-left !fixed font-text !bg-green-300",
+          ),
+          attribute("tabindex", "0"),
+          style([#("width", "fit-content")]),
+        ],
+        [div([], [text("Copied game code")])],
+      ),
+    ]),
+    button([class(join(["btn !rounded-r-full font-text !text-xl"], " "))], [
+      text("Start Game"),
+    ]),
+  ]
+}
+
+fn page_script() {
+  let drag_scroll =
+    "
     let mouseDown = false;
     let startX, scrollLeft;
     const slider = document.querySelector('.game-container');
@@ -125,7 +185,10 @@ pub fn created_game() -> Element(t) {
     slider.addEventListener('mousedown', startDragging, false);
     slider.addEventListener('mouseup', stopDragging, false);
     slider.addEventListener('mouseleave', stopDragging, false);
+    "
 
+  let sortable_colors =
+    "
     htmx.onLoad(function (content) {
     var sortables = content.querySelectorAll(\".sortable\");
     for (var i = 0; i < sortables.length; i++) {
@@ -148,9 +211,6 @@ pub fn created_game() -> Element(t) {
       });
     }
     })
-  ",
-        ),
-      ]),
-    ],
-  )
+    "
+  drag_scroll <> sortable_colors
 }
