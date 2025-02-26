@@ -1,8 +1,8 @@
 import components/lucide_lustre.{laptop, moon, sun_medium, sun_moon}
 import gleam/string.{join}
-import lustre/attribute.{attribute, class, id, src, style}
+import lustre/attribute.{class, id, style}
 import lustre/element.{fragment}
-import lustre/element/html.{button, div, img, label, text}
+import lustre/element/html.{button, div, label, text}
 
 pub fn theme_switch() {
   fragment([

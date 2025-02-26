@@ -1,7 +1,8 @@
 import components/bottom_bar.{bottom_bar}
-import lustre/attribute.{attribute, class, style}
+import gleam/string.{join}
+import lustre/attribute.{class, style}
 import lustre/element.{type Element}
-import lustre/element/html.{div, h1, text}
+import lustre/element/html.{button, div, h1, text}
 
 pub fn home() -> Element(t) {
   div(
@@ -11,9 +12,52 @@ pub fn home() -> Element(t) {
     ],
     [
       div([class("!w-full")], [
-        bottom_bar("home"),
+        bottom_bar(info(), buttons()),
         h1([class("!text-9xl font-header p-4")], [text("Zarlasht")]),
       ]),
     ],
   )
+}
+
+fn info() {
+  div(
+    [
+      class("btn !bg-gray-100 font-header !text-lg"),
+      style([#("cursor", "default")]),
+    ],
+    [text("Zarlasht")],
+  )
+}
+
+fn buttons() {
+  [
+    button(
+      [
+        class(join(
+          [
+            "btn border font-text !text-xl lg:inline-flex",
+            "bg-black/15 hover:bg-black/30",
+            "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+            "border-black/40 text-current", "transition-all duration-500",
+          ],
+          " ",
+        )),
+      ],
+      [text("Create a Game")],
+    ),
+    button(
+      [
+        class(join(
+          [
+            "btn border font-text !text-xl lg:inline-flex !rounded-full !rounded-l-none",
+            "bg-black/15 hover:bg-black/30",
+            "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+            "border-black/40 text-current", "transition-all duration-500",
+          ],
+          " ",
+        )),
+      ],
+      [text("Join a Game")],
+    ),
+  ]
 }
