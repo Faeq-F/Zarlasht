@@ -3,16 +3,18 @@
 
 # But not these files...
 !.gitignore
-!fyp_interim_report.tex
-!fyp_plan.tex
-!interim_refs.bib
-!plan_refs.bib
-!project_interim.cls
-!project_plan.cls
+!interim.tex
+!plan.tex
+!final.tex
+!refs.bib
+!final.cls
+!interim.cls
+!plan.cls
 !rhul_logo.pdf
-!wordcounts.sh
-!fyp.drawio
-!FYP.pptx
+!words_counter.ps1
+!final.drawio
+!interim.drawio
+!interim.pptx
 
 !*.png
 faeq_faisal_signature.png
@@ -24,5 +26,5 @@ faeq_faisal_signature.png
 !sequence_playing.pdf
 !use_case.pdf
 
-# subdirs
-!.vscode/
+# even if they are in subdirs
+!*/
