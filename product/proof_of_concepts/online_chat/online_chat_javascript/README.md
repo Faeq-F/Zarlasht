@@ -34,3 +34,81 @@ gleam test --target javascript --runtime deno -- --glacier
 # Run just the browser automated tests
 gleam run & cd ../automated_browser_tests/ && gleam test ; cd ../online_chat_javascript ; pkill deno
 ```
+
+
+### Project structure
+
+#### Interesting files
+Files that would likely be more interesting;
+- sockets.gleam
+- those in `lib` for their respective actions<br>(mostly passing messages between the actors)
+
+#### Structure
+
+<!-- prettier-ignore-start -->
+
+```
+root
+├── src
+│   ├── lib
+|   |   |
+|   |   ├── chat.gleam
+|   |   |   (handles message sending)
+|   |   |
+|   |   ├── create_chat.gleam
+|   |   |   (handles creation of a new chat)
+|   |   |
+|   |   ├── join_chat.gleam
+|   |   |   (handles joining to a pre-existing chat)
+|   |   |
+|   |   └── name_set.gleam
+|   |       (handles setting a user's name & redirection to the chat)
+|   |
+|   ├── pages
+|   |   ├── layout.gleam
+|   |   |   (The general structure of the pages, including the app div
+|   |   |    with which the client requests a websocket connection)
+|   |   |
+|   |   └── ... (The different pages for the project & their UI elements)
+|   |
+│   ├── online_chat_javascript.gleam
+|   |   (The entry-point for the program & request handler)
+│   │
+│   ├── sockets.gleam
+│   │   (functions relating to the websocket connection, including
+|   |    open, close, and all events)
+│   │
+│   ├── utils.ffi.mjs
+│   │   (javascript functions, mostly for utilizing Valkey;
+|   |    util. functions that rely on JS for execution)
+│   │
+│   ├── utils.gleam
+│   │   (the FFI for the external util. functions)
+│   │
+|   └── ... (other files required for setup / execution)
+|
+├── static
+|   ├── libraries
+|   |   ├─── htmx-ext
+|   |   |   └── ws.js
+|   |   |       (the websocket extension for htmx)
+|   |   |
+|   |   └── ... (other required libraries; detailed in the setup section)
+|   └── ... (other required resources, like the favicon)
+|
+├── test
+│   ├── online_chat_javascript_test.gleam
+|   |   (setup for unit tests & base tests for the homepage 
+|   |   router and websocket connection)
+|   |
+|   └── ... (tests for all pages & their functions)
+|
+├── .env
+|   (contains the SERVICE_URI for Valkey)
+│
+├── gleam.toml (configuration for the project)
+|
+└── README.md (this file)
+```
+
+<!-- prettier-ignore-end -->
