@@ -46,7 +46,7 @@
 % A final project report is approximately 15,000 words
 %The project demonstration will be assessed by the second marker
 
-
+%TODO - update pong and zarlasht file structures
 
 % A "README.txt" file describing the DIRECTORY structure of your directory, - interesting files
 % ADD README DEPENDENCIES ISSUE
@@ -64,6 +64,8 @@
 %interactions like oif the user wants to see the leaderboard - game actions all done on the server
 
 %pong innovative / special requirements - hidden field with text that is sent in webasocket messages
+
+%logging - improvements, time, etc. - possible improvements but not priority
 
 %---
 
@@ -256,6 +258,23 @@ which allowed for earlier refinement of the system's design and functionality.
 %TODO
 %talk about this term, and add goals
 %Erlang -> Gleam
+
+
+\begin{itemize}
+  \item Produce a polished GUI for the game
+  \item Implement niceties and useful features like the chat room
+  \item Implement more advanced concepts;
+        \begin{itemize}
+          \item overriding actions in progress (players choosing a color)
+          \item 'racing' actions (taking the first action to settle as a value)\\(players in a fight scenario)
+          \item time limits for actions (players in a fight scenario)
+          \item compound actions (players in a fight scenario)
+          \item real-time dynamic world updates (viewing the map)
+        \end{itemize}
+  \item Implement further enhancements to reliability \& error handling\\(e.g., restoring state after a disconnection)
+  \item Ensure all code is well optimized, tested and documented
+  \item User testing and Address feedback
+\end{itemize}
 
 \section{Rationale}
 %TODO
