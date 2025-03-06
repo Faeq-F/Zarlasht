@@ -2,7 +2,83 @@
 
 <details><summary>Term 2</summary>
 
+<details><summary>Week 8</summary>
+
+### 04/03/2025 - 05/03/2025
+
+Updated the ReadMe files for all projects to include the directory descriptions and noted the interesting files, as suggested in the feedback.
+(goal 14)
+
+Continued to work on the final report, consolidating ideas about how to write the newer sections, like distribution, implementation of the final system, etc.
+
+</details>
+
+<details><summary>Week 7</summary>
+
+### 28/02/2025 - 03/03/2025
+
+Started to focus on the final report. Laid out what I wish to write about in the new sections and how I will add what was suggested in my feedback to pre-existing sections.
+
+### 25/02/2025 - 27/02/2025
+
+Produced the created_game, join_game and set_name pages, alongside transplanting the leaderboard from the Pong prototype.
+Made the leaderboard suitable for the game, modifying the construction functions to accept and use the game data correctly.
+Tested it with sample data. (aim 3, 6 & 7; goals 10 & 11)
+
+</details>
+
+<details><summary>Week 6</summary>
+
+### 21/02/2025 - 24/02/2025
+
+Concluded the creation of the bottom bar & will now shift focus to quickly creating the rest of the pages for the game so that I can move onto more advanced functionalities.
+(aim 6 & 7; goal 10)
+
+### 18/02/2025 - 20/02/2025
+
+Added Alpine.js to help with producing the UI, ensuring it is only used for a single client's local state 
+(like whether or not they are looking at the information modal - processing for the game should be done on the server) 
+Continued to produce the bottom bar and related UI that requires its use.
+(aim 6 & 7; goal 10)
+
+</details>
+
+<details><summary>Week 5</summary>
+
+### 13/02/2025 - 17/02/2025
+
+Continued to fix the issues with the UI. Focusing on the bottom bar - has all of the functionality for the user to play the game (input fields, buttons, etc.)
+(aim 6 & 7; goal 10)
+
+### 11/02/2025 - 12/02/2025
+
+Ran into some hurdles creating the pages in a reusable, modular way. Switched back to the screen_designs project to help simplify the process.
+Continued to produce the pages and refactor old ones so that elements are separated into components that are reusable.
+(aim 6 & 7; goal 10)
+
+</details>
+
+<details><summary>Week 4</summary>
+
+### 07/02/2025 - 10/02/2025
+
+Continued to adapt old screen designs to produce usable pages that can display all that is needed for the game (like a map, chat, etc.)
+(aim 6; goal 10)
+
+### 04/02/2025 - 06/02/2025
+
+Transplanted old components from other projects (the prototypes) into the final game.
+(aim 7; goal 8) Also started to finish off the screen designs from last term.
+
+</details>
+
 <details><summary>Week 3</summary>
+
+### 30/01/2025 - 03/02/2025
+
+Refactored the game page and game actor to help with readability and reusability - will be helpful for reproducing the use of the text field in messages in the final game, if needed. (aim 7; goal 8)
+
+Also setup the project for the final game.
 
 ### 27/01/2025 - 29/01/2025
 
