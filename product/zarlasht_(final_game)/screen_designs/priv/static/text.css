@@ -1,0 +1,36 @@
+
+.text-2xs {
+  font-size: 0.55rem;
+  line-height: 1rem;
+}
+
+.font-header {
+  font-family: 'Header', sans-serif;
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: 'Header';
+  src: url('Requiem.ttf') format('truetype');
+}
+
+.font-subheader {
+  font-family: 'SubHeader', sans-serif;
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: 'SubHeader';
+  src: url('imFELLdwPicaSC.ttf') format('truetype');
+}
+
+.font-text {
+  font-family: 'Text', sans-serif;
+  font-weight: 100;
+  margin-bottom: -4px;
+}
+
+@font-face {
+  font-family: 'Text';
+  src: url('imFELLdwPicaRoman.ttf') format('truetype');
+}
