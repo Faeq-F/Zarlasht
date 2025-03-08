@@ -1,0 +1,31 @@
+
+.btn {
+    --tw-bg-opacity: 1;
+    --tw-text-opacity: 1;
+    align-items: center;
+    background-color: rgb(var(--gray-3) / var(--tw-bg-opacity));
+    border-radius: .75rem;
+    color: rgb(var(--content1) / var(--tw-text-opacity));
+    cursor: pointer;
+    display: inline-flex;
+    border-color: rgba(0, 0, 0, .4);
+    font-size: .875rem;
+    font-weight: 500;
+    height: 2.5rem;
+    justify-content: center;
+    line-height: 1.25rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    text-align: center;
+    transition-duration: .15s;
+    transition-property: color, transform, background-color, border-color;
+    transition-timing-function: ease-in;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    will-change: transform;
+}
+
+.btn:hover{
+background-color: rgb(var(--gray-4) / var(--tw-bg-opacity));
+}

@@ -1,4 +1,7 @@
+@import url("tailwind_override.css");
+@import url("text.css");
 @import url("created_game.css");
+@import url("chat.css");
 
 *,
 *::before,
@@ -54,8 +57,6 @@ html.dark #app {
   background: black;
 }
 
-/* The site container */
-
 #page {
   overflow: hidden;
   text-align: left;
@@ -81,107 +82,6 @@ html.dark #page:before {
   filter: invert(1);
 }
 
-/* Titles */
-
-#Faeq:before {
-  content: '';
-  background: url(/underline.png) no-repeat;
-  position: absolute;
-  width: 288px;
-  height: 20px;
-  bottom: 2.7rem;
-}
-
-/* after is in scoped styles - extends underline */
-html.dark #Faeq:after,
-html.dark #Faeq:before {
-  filter: invert(1) brightness(1.5);
-}
-
-/* Tailwind-esque classes */
-
-.text-2xs {
-  font-size: 0.55rem;
-  line-height: 1rem;
-}
-
-.font-header {
-  font-family: 'Header', sans-serif;
-  font-weight: 100;
-}
-
-@font-face {
-  font-family: 'Header';
-  src: url('Requiem.ttf') format('truetype');
-}
-
-.font-subheader {
-  font-family: 'SubHeader', sans-serif;
-  font-weight: 100;
-}
-
-@font-face {
-  font-family: 'SubHeader';
-  src: url('imFELLdwPicaSC.ttf') format('truetype');
-}
-
-.font-text {
-  font-family: 'Text', sans-serif;
-  font-weight: 100;
-  margin-bottom: -4px;
-}
-
-@font-face {
-  font-family: 'Text';
-  src: url('imFELLdwPicaRoman.ttf') format('truetype');
-}
-
-.btn {
-    --tw-bg-opacity: 1;
-    --tw-text-opacity: 1;
-    align-items: center;
-    background-color: rgb(var(--gray-3) / var(--tw-bg-opacity));
-    border-radius: .75rem;
-    color: rgb(var(--content1) / var(--tw-text-opacity));
-    cursor: pointer;
-    display: inline-flex;
-    border-color: rgba(0, 0, 0, .4);
-    font-size: .875rem;
-    font-weight: 500;
-    height: 2.5rem;
-    justify-content: center;
-    line-height: 1.25rem;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-    text-align: center;
-    transition-duration: .15s;
-    transition-property: color, transform, background-color, border-color;
-    transition-timing-function: ease-in;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-    will-change: transform;
-}
-
-.btn:hover{
-background-color: rgb(var(--gray-4) / var(--tw-bg-opacity));
-}
-
-/**/
-
-.slide-enter-active,
-.slide-leave-active {
-  transition:
-    opacity 1s,
-    transform 1s;
-}
-
-.slide-enter-from,
-.slide-leave-to {
-  opacity: 0;
-  transform: translateX(-30%);
-}
-
 .fogWrap {
   perspective-origin: 50% 50%;
 }
@@ -194,8 +94,6 @@ background-color: rgb(var(--gray-4) / var(--tw-bg-opacity));
   max-width: 20px;
 }
 
-html.dark {
-  .fogWrap img {
-    filter: invert(1);
-  }
+html.dark .fogWrap img {
+  filter: invert(1);
 }

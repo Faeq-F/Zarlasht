@@ -4,7 +4,7 @@ import gleam/list
 import lustre/attribute.{attribute, class, href, id, name, rel, src, type_}
 import lustre/element.{type Element}
 import lustre/element/html.{
-  body, div, head, html, img, link, meta, script, title,
+  body, div, head, html, img, link, meta, p, script, text, title,
 }
 
 /// Layout for all pages the site renders
@@ -97,4 +97,8 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
       ),
     ]),
   ])
+}
+
+pub fn stats() {
+  p([class("font-text")], [text("Hearts: ")])
 }
