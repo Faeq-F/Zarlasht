@@ -23,14 +23,14 @@ gleam run
 Pages are accessible via the following `path_segments`:
 
 ```gleam
-[] | ["home"] 
+[] | ["home"]
 ["created_game"]
-["join_game"] 
-["set_name"] 
-["game"] 
-["roll_die"] 
-["chat"] 
-["player"]
+["join_game"]
+["set_name"]
+["game"]
+["roll_die"]
+["chat"]
+["map"]
 ```
 
 i.e., the homepage is accessible via http://127.0.0.1:8000/ or
@@ -56,7 +56,7 @@ root
 |   |   ├── lucide_lustre.gleam
 |   |   |   (Added through the command provided in the setup section;
 |   |   |    all icons in the lucide icon pack, for use within pages)
-|   |   |   
+|   |   |
 |   |   └── ... (other UI elements, for use within pages)
 │   │
 │   ├── screen_designs.gleam

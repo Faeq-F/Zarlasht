@@ -146,6 +146,7 @@ fn buttons(game_code) {
           attribute("tabindex", "0"),
           style([#("width", "fit-content")]),
         ],
+        //TODO
         [div([], [text("Copied game code")])],
       ),
     ]),

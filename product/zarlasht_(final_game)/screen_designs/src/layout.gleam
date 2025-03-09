@@ -1,10 +1,11 @@
 //// Layout for all pages the site renders
 
+import components/lucide_lustre.{biceps_flexed, dot, hand, heart, heart_crack}
 import gleam/list
 import lustre/attribute.{attribute, class, href, id, name, rel, src, type_}
 import lustre/element.{type Element}
 import lustre/element/html.{
-  body, div, head, html, img, link, meta, p, script, text, title,
+  body, div, head, html, img, link, meta, p, script, span, text, title,
 }
 
 /// Layout for all pages the site renders
@@ -100,5 +101,23 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
 }
 
 pub fn stats() {
-  p([class("font-text")], [text("Hearts: ")])
+  span([], [
+    heart([class("fill-[red]/40 !inline")]),
+    heart([class("fill-[red]/40 !inline")]),
+    heart([class("fill-[red]/40 !inline")]),
+    heart([class("fill-[red]/40 !inline")]),
+    heart([class("fill-[red]/40 !inline")]),
+    heart([class("fill-[red]/40 !inline")]),
+    heart([class("fill-[red]/40 !inline")]),
+    heart_crack([class(" !inline")]),
+    heart_crack([class(" !inline")]),
+    heart_crack([class(" !inline")]),
+    dot([class("!inline")]),
+    biceps_flexed([class("fill-[gray]/40 !inline")]),
+    biceps_flexed([class("fill-[gray]/40 !inline")]),
+    biceps_flexed([class("fill-[gray]/40 !inline")]),
+    biceps_flexed([class("fill-[gray]/40 !inline")]),
+    hand([class(" !inline")]),
+    hand([class(" !inline")]),
+  ])
 }
