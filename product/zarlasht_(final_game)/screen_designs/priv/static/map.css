@@ -1,0 +1,15 @@
+#map > div:nth-of-type(1) {
+  border-top-left-radius: 10px;
+}
+
+#map > div:nth-of-type(55) {
+  border-top-right-radius: 10px;
+}
+
+#map > div:nth-of-type(1156) {
+  border-bottom-left-radius: 10px;
+}
+
+#map > div:nth-of-type(1210) {
+  border-bottom-right-radius: 10px;
+}
