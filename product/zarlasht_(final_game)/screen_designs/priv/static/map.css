@@ -13,3 +13,9 @@
 #map > div:nth-of-type(1210) {
   border-bottom-right-radius: 10px;
 }
+
+@media(min-width: 1220px){
+  #map{
+    zoom: 87%;
+  }
+}
