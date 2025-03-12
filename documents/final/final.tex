@@ -37,33 +37,20 @@
 \newcommand{\bulletPoint}{\hspace{-3.1pt}$\bullet$ \hspace{5pt}}
 
 %--
+%submit as NAME.final.pdf
+%The project demonstration will be assessed by the second marker
+
 
 %TODO
 
+%check vid demo & improve
 %port-forward for demo - raspi as nginx, demo video like before but add new info. & new game
 
-%submit as NAME.final.pdf
-% A final project report is approximately 15,000 words
-%The project demonstration will be assessed by the second marker
-
-%TODO - update pong and zarlasht file structures
-
-% A "README.txt" file describing the DIRECTORY structure of your directory, - interesting files
-% ADD README DEPENDENCIES ISSUE
-
-% ask - A USER MANUAL for final programs
-% ask - An INSTALLATION MANUAL for final programs
-
-%diary - refer to goal number
+%structure of your directory, & interesting files for pong and zarlasht
 
 %fix bibliography formatting
 
-%check vid demo & improve
 
-%mix concurrency model, barely doing any asny awaiut on js - just client-specific
-%interactions like oif the user wants to see the leaderboard - game actions all done on the server
-
-%pong innovative / special requirements - hidden field with text that is sent in webasocket messages
 
 %logging - improvements, time, etc. - possible improvements but not priority
 
@@ -124,13 +111,12 @@ Signature:
   the ability to support multiple simultaneous game instances, simultaneous game actions
   and real-time communication.
 
+  I then investigated innovative concurrency-based features for my final game, focusing
+  on creating a flexible game environment that can support non-turn-based interactions.
+  I also worked to address challenges in system reliability, including
+  strategies for error handling and scalability.
+
   %TODO
-  %was a part of the paragraph before
-  I have begun an investigation into innovative concurrent
-  features, for my final game, focusing on creating a flexible game environment that can
-  support non-turn-based interactions. Preliminary work has also addressed potential
-  challenges in system reliability, including initial strategies for error handling and
-  scalability.
 
   %Include how my approach is useful, alongside the features of the final game
   The aim of this report is to document my process of building a game environment for
@@ -205,7 +191,10 @@ allowing for a exploration of new models and design patterns before
 undertaking a more comprehensive architectural implementation.
 
 %TODO
-%add paragraph about what I did after JS - chose erlang, actors, better concurrency, advanced concurrent features in the game, optimized reusable components from prototypes to form final architectural implementation
+%add paragraph about what I did after JS - chose erlang,
+% actors, better concurrency, advanced concurrent features in the game,
+% optimized reusable components from prototypes to form
+%final architectural implementation
 
 \section{Aims and Goals of the Project}
 The primary aim of this project was to develop a concurrent game environment that;
@@ -256,7 +245,7 @@ optimizations and initiating informal user testing and feedback integration,
 which allowed for earlier refinement of the system's design and functionality.
 
 %TODO
-%talk about this term, and add goals
+%talk about this term
 %Erlang -> Gleam
 
 
@@ -283,6 +272,11 @@ which allowed for earlier refinement of the system's design and functionality.
 % involved in your project will help in your future career.
 hi
 %about a page
+
+% include chosen technologies, including gleam
+
+%gleam - critical analysis - checked it was mature before moving forward, not worried about js since I can write ffi stuff easily
+
 
 \chapter{A Survey Report on Game Environments}
 
@@ -1386,6 +1380,9 @@ allowing the opponent to take their turn.
   \captionof{figure}{The functions to check if the game has ended and who won}\label{fig: 11}
 \end{minipage}
 
+%TODO
+%pong innovative / special requirements - hidden field with text that is sent in webasocket messages
+
 \section{Challenges faced}
 
 Since every technology in the code stack was new to me, I had to do a lot of learning.
@@ -1427,7 +1424,13 @@ the implementation did not seem too important - as long as it works.
 %TODO - Add pong issue above, in subheader and add the challenge to this section
 
 \chapter{A Description of the End Implementation}
-hi%TODO
+%TODO
+
+error handling, supervisors, tasks, etc.
+Split-brain (nodes as cluster, recovery of servers, etc.) - supervisors, let it fail philosophy
+
+mix concurrency model, barely doing any asny awaiut on js - just client-specific
+interactions like oif the user wants to see the leaderboard - game actions all done on the server
 \section{Architecture}
 hi%TODO
 \section{Code implementation}
@@ -1486,10 +1489,13 @@ Term 2:\\\\
 \newpage
 
 \section{Professional considerations for the project}
-s%TODO
+%TODO
 % A short section on professional issues that raised concern during the year,
 % particularly with respect to doing your project or the material contained
 % in your project.
+
+%legal, ethical, commercial, licensing, relying on services long-term
+%concrete
 
 \section{Reflection / self-evaluation}
 
