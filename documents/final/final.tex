@@ -4,6 +4,7 @@
 \usepackage{graphicx, wrapfig, listings, xcolor, caption}
 \usepackage{hyperref, cite}
 \usepackage[smartEllipses]{markdown}
+\usepackage{enumerate}
 
 \setcounter{tocdepth}{7}
 
@@ -111,14 +112,13 @@ Signature:
   the ability to support multiple simultaneous game instances, simultaneous game actions
   and real-time communication.
 
-  I then investigated innovative concurrency-based features for my final game, focusing
+  I then investigated innovative concurrency-based features, like real-time world
+  updates and 'racing' actions, for my final game, focusing
   on creating a flexible game environment that can support non-turn-based interactions.
   I also worked to address challenges in system reliability, including
-  strategies for error handling and scalability.
+  strategies for error handling and scalability, like using supervisors that
+  can pass state from older children to younger ones.
 
-  %TODO
-
-  %Include how my approach is useful, alongside the features of the final game
   The aim of this report is to document my process of building a game environment for
   high-concurrency, providing a comprehensive overview of the design challenges,
   implementation strategies, and key technical achievements.
@@ -187,18 +187,20 @@ To support simultaneous game instances and multi-player interactions,
 a robust concurrency model is essential. My approach initially involved
 transitioning from more familiar technologies, like JavaScript, to
 gradually understand and implement advanced concurrency concepts,
-allowing for a exploration of new models and design patterns before
+allowing for an exploration of new models and design patterns before
 undertaking a more comprehensive architectural implementation.
 
-%TODO
-%add paragraph about what I did after JS - chose erlang,
-% actors, better concurrency, advanced concurrent features in the game,
-% optimized reusable components from prototypes to form
-%final architectural implementation
+I found that actor-based concurrency would be best for my use-case,
+and so I moved to using Erlang's implementation in OTP.
+I reimplemented the prototypes in JavaScript, and wrote an extra one to
+get comfortable. I then moved to a final game that has advanced concurrency
+features. I optimized reusable components from the prototypes to form the
+base of the final game, and added to them to allow, for e.g., better system
+reliability.
 
 \section{Aims and Goals of the Project}
 The primary aim of this project was to develop a concurrent game environment that;
-\begin{itemize}
+\begin{enumerate}
   \item Supports multiple simultaneous game instances
   \item Enables real-time communication and dynamic world updates
   \item Provides a flexible, modular architecture for hosting different game types
@@ -206,7 +208,7 @@ The primary aim of this project was to develop a concurrent game environment tha
   \item Implements robust error handling and system reliability mechanisms
   \item Has a nice graphical interface with error reporting
   \item Is implemented according to modern software engineering principles
-\end{itemize}
+\end{enumerate}
 
 \newpage
 
@@ -217,7 +219,7 @@ concurrency models to enhance game interactivity, and evaluating different
 approaches to distributed system design, I established the following goals
 for last term;
 
-\begin{itemize}
+\begin{enumerate}
   \item Produce a survey report on game environments
   \item Learn how WebSockets work and how to use them effectively
   \item Learn the functional programming paradigm through the Gleam programming language
@@ -227,7 +229,7 @@ for last term;
   \item Implement my planned Online Chat and Tic-Tac-Toe and Pong proof of concepts in Gleam, targeting Erlang, to learn it's concurrency model
   \item Ensure all code is well tested and documented for future reuse and adaptation
   \item Implement the foundational concurrent features for the final game
-\end{itemize}
+\end{enumerate}
 
 In addition to designing a scalable environment,
 by exploring the Erlang ecosystem, with its actor model representing one of the
@@ -237,19 +239,19 @@ this project aimed to address the limitations of existing multiplayer
 game systems and create a more responsive game environment.
 
 Throughout the first term, I successfully completed all planned objectives,
-including developing proof-of-concept applications,
+including developing the proof-of-concept applications,
 establishing the core game environment architecture, and implementing initial
 concurrent features for the final game. Anticipating the project timeline,
 I had also began the next term's objectives, conducting comprehensive performance
 optimizations and initiating informal user testing and feedback integration,
 which allowed for earlier refinement of the system's design and functionality.
 
-%TODO
-%talk about this term
-%Erlang -> Gleam
+For the second term, I had the main objective of creating the final game, with
+advanced concurrency features, which showcases all that I have learnt during the
+project. This was broken down into the following objectives;
 
-
-\begin{itemize}
+\begin{enumerate}
+  \setcounter{enumi}{9}
   \item Produce a polished GUI for the game
   \item Implement niceties and useful features like the chat room
   \item Implement more advanced concepts;
@@ -263,20 +265,62 @@ which allowed for earlier refinement of the system's design and functionality.
   \item Implement further enhancements to reliability \& error handling\\(e.g., restoring state after a disconnection)
   \item Ensure all code is well optimized, tested and documented
   \item User testing and Address feedback
-\end{itemize}
+\end{enumerate}
+
+This project was very successful as all of these were met, though some objectives
+are subjective, like the consideration of 'well'. While I did make significant
+improvements to, for e.g., error handling, there are other actions I can take;
+this will be detailed later in the report.
+
+%TODO
+%revised timeline
 
 \section{Rationale}
-%TODO
-% A section motivating the project
-% This section must include a description of how you think that the work
-% involved in your project will help in your future career.
-hi
-%about a page
 
 % include chosen technologies, including gleam
 
 %gleam - critical analysis - checked it was mature before moving forward, not worried about js since I can write ffi stuff easily
+%gleam helps keep up-to-date with modern programming styles and practices.
+% commitment
 
+As previously mentioned, the motivation for this project stems from the
+rapidly evolving landscape of multiplayer, interactive gaming experiences,
+and their importance in the modern day.
+As the industry continues to grow, the need for scalable,
+efficient, and concurrent game environments has become increasingly
+critical, with pre-existing architectures used by large companies
+being swapped out for ones that better suite the need (talked about later in
+my distributions section). This project aims to address this demand by leveraging
+cutting-edge technologies and architectures
+to create a robust and scalable game environment. By focusing on
+concurrency mechanisms and the features that can be implemented with them,
+the project not only aligns with current industry trends but
+also pushes the boundaries of what is possible in real-time
+multiplayer gaming.
+
+In terms of my future career in software engineering, this project serves as
+a comprehensive learning experience that will undoubtedly enhance my
+adaptability and technical proficiency. The use of technologies that I am unfamiliar with,
+such as Gleam, Erlang, and Valkey, has provided me with a deep
+understanding of a variety of cencepts including functional programming,
+and concurrent systems. Additionally, integrating HTMX for dynamic web
+interfaces and NGINX for efficient load balancing has given me hands-on
+experience with modern web technologies and server management.
+
+The architecture of the project, which employs a Pub/Sub model with a pool
+of servers, has been particularly enlightening. This approach has allowed
+me to explore distributed systems and real-time communication, which are
+essential in today’s software engineering landscape. By designing and
+implementing the entire project from scratch, I have gained invaluable
+experience in system design, problem-solving, and the ability to work with
+a diverse set of tools and frameworks.
+
+Overall, this project not only fulfills a current industry need but also equips
+me with the technical expertise and adaptability required to excel in my future
+career. The skills I have developed, ranging from learning new programming
+languages to designing scalable architectures, will enable me to quickly
+adapt to new technologies and challenges in the workplace, making me a
+more versatile and capable software engineer.
 
 \chapter{A Survey Report on Game Environments}
 
