@@ -1,11 +1,13 @@
 //// Layout for all pages the site renders
 
 import components/lucide_lustre.{biceps_flexed, dot, hand, heart, heart_crack}
+import gleam/float
+import gleam/int
 import gleam/list
 import lustre/attribute.{attribute, class, href, id, name, rel, src, type_}
 import lustre/element.{type Element}
 import lustre/element/html.{
-  body, div, head, html, img, link, meta, p, script, span, text, title,
+  body, div, head, html, img, link, meta, script, span, title,
 }
 
 /// Layout for all pages the site renders
@@ -55,46 +57,20 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
         ],
         [
           script([], "window.onbeforeunload = function() {return true;};"),
-          div([id("page"), class("h-full w-full")], elements),
+          div(
+            [id("page"), class("h-full w-full")],
+            list.flatten([
+              elements,
+              fog_styles(),
+              [
+                div(
+                  [id("fogWrap"), class("fogWrap")],
+                  list.repeat(img([src("/static/cloud.png")]), 100),
+                ),
+              ],
+            ]),
+          ),
         ],
-      ),
-      div(
-        [id("fogWrap"), class("fogWrap")],
-        list.repeat(img([src("/static/cloud.png")]), 100),
-      ),
-      html.style(
-        [attribute("lang", "scss")],
-        "
-        @use 'sass:math';
-
-        $bgAnimation: 100;
-
-        @for $i from 1 through $bgAnimation {
-          $scale: math.random(2) - 0.4;
-
-          .fogWrap img:nth-child(#{$i}) {
-            left: math.random(120) * 1% - 20;
-            animation: raise#{$i} 7 + math.random(15) + s linear infinite;
-            animation-delay: math.random(5) - 5 + s;
-            transform: scale(0.3 * $i - 0.6) rotate(math.random(360) + deg);
-            z-index: $i + 99;
-
-            @keyframes raise#{$i} {
-              to {
-                bottom: 150vh;
-                transform: scale(0.3 * $i - 0.6) rotate(math.random(360) + deg);
-              }
-            }
-          }
-        }
-        ",
-      ),
-      script(
-        [type_("module")],
-        "
-        const sass = await import('https://jspm.dev/sass');
-        sass.compileString(document.querySelector(\"style[lang=scss]\").innerHTML);
-        ",
       ),
     ]),
   ])
@@ -120,4 +96,35 @@ pub fn stats() {
     hand([class(" !inline")]),
     hand([class(" !inline")]),
   ])
+}
+
+fn fog_styles() {
+  list.map(list.range(0, 100), fn(i) {
+    let left = float.floor(float.random() *. 120.0 -. 20.0)
+    let animation_duration = float.floor(7.0 +. float.random() *. 15.0)
+    let animation_delay = float.floor(float.random() *. 5.0 -. 5.0)
+    let rotation = float.floor(float.random() *. 360.0)
+    html.style([], "
+      .fogWrap img:nth-child(" <> int.to_string(i) <> ") {
+        left: " <> float.to_string(left) <> "%;
+        animation: raise" <> int.to_string(i) <> " " <> float.to_string(
+      animation_duration,
+    ) <> "s linear infinite;
+        animation-delay: " <> float.to_string(animation_delay) <> "s;
+        transform: scale(calc(0.3 * " <> int.to_string(i) <> " - 0.6)) rotate(" <> float.to_string(
+      rotation,
+    ) <> "deg);
+        z-index: calc(" <> int.to_string(i) <> " + 1);
+      }
+
+      @keyframes raise" <> int.to_string(i) <> " {
+        to {
+          bottom: 150vh;
+          transform: scale(calc(0.3 * " <> int.to_string(i) <> " - 0.6)) rotate(" <> float.to_string(
+      rotation,
+    ) <> "deg);
+        }
+      }
+      ")
+  })
 }
