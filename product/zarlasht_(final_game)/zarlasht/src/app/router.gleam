@@ -55,7 +55,7 @@ pub fn handle_request(
 ///
 pub fn serve_home_page() {
   let doc_string =
-    [home.root()]
+    [home.home()]
     |> layout
     |> element.to_document_string
   response.new(200)

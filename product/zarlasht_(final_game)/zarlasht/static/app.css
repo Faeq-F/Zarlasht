@@ -1,56 +1,8 @@
-/* color palette from <https://github.com/vuejs/theme> */
-:root {
-  --vt-c-white: #ffffff;
-  --vt-c-white-soft: #f8f8f8;
-  --vt-c-white-mute: #f2f2f2;
-
-  --vt-c-black: #181818;
-  --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
-
-  --vt-c-indigo: #2c3e50;
-
-  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
-  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
-  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
-
-  --vt-c-text-light-1: var(--vt-c-indigo);
-  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
-  --vt-c-text-dark-1: var(--vt-c-white);
-  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
-}
-
-/* semantic color variables for this project */
-:root {
-  --color-background: var(--vt-c-white);
-  --color-background-soft: var(--vt-c-white-soft);
-  --color-background-mute: var(--vt-c-white-mute);
-
-  --color-border: var(--vt-c-divider-light-2);
-  --color-border-hover: var(--vt-c-divider-light-1);
-
-  --color-heading: var(--vt-c-text-light-1);
-  --color-text: var(--vt-c-text-light-1);
-
-  --section-gap: 160px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
-
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
-
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
-  }
-}
-
-/* My styles */
+@import url("tailwind_override.css");
+@import url("text.css");
+@import url("created_game.css");
+@import url("chat.css");
+@import url("map.css");
 
 *,
 *::before,
@@ -60,8 +12,6 @@
   font-weight: normal;
   user-select: none;
 }
-
-/* app mount */
 
 #app,
 body {
@@ -108,14 +58,6 @@ html.dark #app {
   background: black;
 }
 
-/* The site container */
-
-html #page {
-  background-image: url('/static/bg.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
 #page {
   overflow: hidden;
   text-align: left;
@@ -125,86 +67,20 @@ html #page {
 #page:before {
   content: '';
   position: absolute;
-  width: calc(100% - 2rem);
-  height: calc(100% - 2rem);
-  background: inherit;
+  width: 100%;
+  height: 100%;
+  background-image: url('/static/bg.png');
+  background-size: cover;
+  background-repeat: no-repeat;
   border-radius: 1.5rem;
   transition: filter 1s;
+  top: 0;
+  left: 0;
 }
 
 html.dark #page:before {
   transition: filter 1s;
   filter: invert(1);
-}
-
-/* Titles */
-
-#Faeq:before {
-  content: '';
-  background: url(/underline.png) no-repeat;
-  position: absolute;
-  width: 288px;
-  height: 20px;
-  bottom: 2.7rem;
-}
-
-/* after is in scoped styles - extends underline */
-html.dark #Faeq:after,
-html.dark #Faeq:before {
-  filter: invert(1) brightness(1.5);
-}
-
-/* Tailwind-esque classes */
-
-.text-2xs {
-  font-size: 0.55rem;
-  line-height: 1rem;
-}
-
-.font-header {
-  font-family: 'Header', sans-serif;
-  font-weight: 100;
-}
-
-@font-face {
-  font-family: 'Header';
-  src: url('Requiem.ttf') format('truetype');
-}
-
-.font-subheader {
-  font-family: 'SubHeader', sans-serif;
-  font-weight: 100;
-}
-
-@font-face {
-  font-family: 'SubHeader';
-  src: url('IM FELL DW Pica SC.ttf') format('truetype');
-}
-
-.font-text {
-  font-family: 'Text', sans-serif;
-  font-weight: 100;
-  margin-bottom: -4px;
-}
-
-@font-face {
-  font-family: 'Text';
-  src: url('IM FELL DW Pica Roman.ttf') format('truetype');
-}
-
-/**/
-
-.slide-enter-active,
-.slide-leave-active {
-  transition:
-    opacity 1s,
-    transform 1s;
-}
-
-.slide-enter-from,
-.slide-leave-to {
-  opacity: 0;
-  transform: translateX(-30%);
 }
 
 .fogWrap {
@@ -219,8 +95,6 @@ html.dark #Faeq:before {
   max-width: 20px;
 }
 
-html.dark {
-  .fogWrap img {
-    filter: invert(1);
-  }
+html.dark .fogWrap img {
+  filter: invert(1);
 }
