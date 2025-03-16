@@ -2,7 +2,7 @@
 
 import app/actors/actor_types.{
   type DirectorActorMessage, type PlayerSocket, type WebsocketActorState,
-  DequeueParticipant, Disconnect, JoinGame, Neither, PlayerSocket, SendToClient,
+  DequeueParticipant, Disconnect, JoinGame, Player, PlayerSocket, SendToClient,
   UserDisconnected, Wait, WebsocketActorState,
 }
 import gleam/dict
@@ -18,6 +18,9 @@ import lustre/attribute
 import lustre/element
 import lustre/element/html
 import mist.{type Connection, Custom}
+
+import app/lib/create_game.{on_create_game}
+import app/pages/set_name.{set_name_page}
 
 ///See [here](https://hexdocs.pm/mist/mist.html#websocket)
 ///
@@ -37,7 +40,7 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
         WebsocketActorState(
           name: "",
           game_code: 0,
-          player: Neither,
+          player: Player(0, "", "", 10, 1),
           ws_subject: ws_subject,
           game_subject: None,
           director_subject: director,
@@ -85,13 +88,14 @@ fn handle_ws_message(state, conn, message) {
         headers_dict |> dict.get("HX-Trigger")
 
       case trigger {
-        // "create" -> on_create_game(PlayerSocket(conn, state)) |> actor.continue
+        "create" -> on_create_game(PlayerSocket(conn, state)) |> actor.continue
+
+        // "set-name-form" ->
+        //   set_name(message, PlayerSocket(conn, state)) |> actor.continue
         // "join" -> on_to_join_game(PlayerSocket(conn, state)) |> actor.continue
         // "join-game-form" ->
         //   on_join_game(message, PlayerSocket(conn, state))
         //   |> actor.continue
-        // "set-name-form" ->
-        //   set_name(message, PlayerSocket(conn, state)) |> actor.continue
         _ -> {
           logging.log(Alert, "Unknown Trigger")
           actor.continue(state)
@@ -102,7 +106,7 @@ fn handle_ws_message(state, conn, message) {
     mist.Custom(JoinGame(game_subject)) -> {
       let new_state =
         WebsocketActorState(..state, game_subject: Some(game_subject))
-      // let assert Ok(_) = mist.send_text_frame(conn, set_name_page())
+      let assert Ok(_) = mist.send_text_frame(conn, set_name_page())
       new_state |> actor.continue
     }
 
@@ -129,6 +133,11 @@ fn handle_ws_message(state, conn, message) {
     }
 
     mist.Closed | mist.Shutdown -> actor.Stop(process.Normal)
+
+    _ -> {
+      logging.log(Alert, "Unknown Message")
+      actor.continue(state)
+    }
   }
 }
 

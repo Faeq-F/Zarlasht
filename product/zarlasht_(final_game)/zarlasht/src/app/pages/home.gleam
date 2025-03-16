@@ -1,6 +1,6 @@
 import app/pages/components/bottom_bar.{bottom_bar}
 import gleam/string.{join}
-import lustre/attribute.{class, style}
+import lustre/attribute.{attribute, class, id, style}
 import lustre/element.{type Element}
 import lustre/element/html.{button, div, h1, text}
 
@@ -42,6 +42,8 @@ fn buttons() {
           ],
           " ",
         )),
+        id("create"),
+        attribute("ws-send", ""),
       ],
       [text("Create a Game")],
     ),
@@ -56,6 +58,8 @@ fn buttons() {
           ],
           " ",
         )),
+        id("join"),
+        attribute("ws-send", ""),
       ],
       [text("Join a Game")],
     ),

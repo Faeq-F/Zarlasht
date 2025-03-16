@@ -43,6 +43,9 @@ pub type CustomWebsocketMessage {
   /// Send this player an alert and then disconnect them too
   ///
   Disconnect
+  /// Response to GetColor
+  ///
+  Color(color: String)
 }
 
 /// A wrapper for a player's WebSocket Actor state and their connection
@@ -53,10 +56,10 @@ pub type PlayerSocket {
 
 /// The player a user is
 ///
+/// number is 1 if they are the creator of the game, 2 if they are the first to join, 3 if they are the second to join, etc.
+///
 pub type Player {
-  One
-  Two
-  Neither
+  Player(number: Int, name: String, color: String, health: Int, strength: Int)
 }
 
 //----------------------------------------------------------------------
@@ -67,7 +70,13 @@ pub type Player {
 ///
 pub type DirectorActorState {
   DirectorActorState(
-    games_waiting: Dict(Int, List(#(Player, Subject(CustomWebsocketMessage)))),
+    games_waiting: Dict(
+      Int,
+      #(
+        Subject(GameActorMessage),
+        List(#(Player, Subject(CustomWebsocketMessage))),
+      ),
+    ),
   )
 }
 
@@ -92,12 +101,13 @@ pub type DirectorActorMessage {
 ///
 /// Contains all participants in the game
 ///
+/// The colors are for identifying users (specifically for deciding which colors to use - not important for actual gameplay)
+///
 pub type GameActorState {
   GameActorState(
     participants: List(#(Player, Subject(CustomWebsocketMessage))),
-    names_set: Int,
-    player_one_name: String,
-    player_two_name: String,
+    colors: List(String),
+    used_colors: List(String),
   )
 }
 
@@ -112,4 +122,7 @@ pub type GameActorMessage {
   /// A player has set their name
   ///
   AddedName(player: Player, ws: Subject(CustomWebsocketMessage), name: String)
+  /// Ask for a color (to distinguish players)
+  ///
+  GetColor(ws: Subject(CustomWebsocketMessage))
 }

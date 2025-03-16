@@ -19,15 +19,15 @@ pub fn main() {
   let director = director.start()
   // Set up and configure a helper ETS table
 
-  // for ...
-  // let _ =
-  //   table.build("games")
-  //   |> table.privacy(table.Public)
-  //   |> table.write_concurrency(table.AutoWriteConcurrency)
-  //   |> table.read_concurrency(True)
-  //   |> table.decentralized_counters(True)
-  //   |> table.compression(False)
-  //   |> table.set
+  // for games that have been created but have not been started
+  let _ =
+    table.build("waiting_games")
+    |> table.privacy(table.Public)
+    |> table.write_concurrency(table.AutoWriteConcurrency)
+    |> table.read_concurrency(True)
+    |> table.decentralized_counters(True)
+    |> table.compression(False)
+    |> table.set
 
   //load .env vars
   let _ = dotenv.load()
