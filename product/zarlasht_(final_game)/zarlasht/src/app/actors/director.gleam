@@ -1,8 +1,9 @@
 //// The director actor - process to manage all tasks the server carries out
 
 import app/actors/actor_types.{
-  type DirectorActorMessage, type DirectorActorState, DequeueParticipant,
-  DirectorActorState, EnqueueParticipant,
+  type DirectorActorMessage, type DirectorActorState, AddPlayer,
+  DequeueParticipant, DirectorActorState, EnqueueParticipant, GetParticipants,
+  Participants,
 }
 
 import app/actors/game
@@ -29,15 +30,15 @@ fn handle_message(
       let participant = #(player, participant_subject)
 
       let new_queue = case state.games_waiting |> get(game_code) {
-        Ok(participants) -> {
+        Ok(game) -> {
           //They are joining a Game
-          //game.start([participant, ..participants]) - instead send 'added player'
-          //state.games_waiting |> drop([game_code]) - need new message for this
+          process.send(game.0, AddPlayer(participant))
           state.games_waiting
+          |> insert(game_code, #(game.0, [participant, ..game.1]))
         }
         _ -> {
           //They created the game
-          let game_subject = game.start([participant])
+          let game_subject = game.start(game_code, [participant])
           state.games_waiting
           |> insert(game_code, #(game_subject, [participant]))
         }
@@ -50,6 +51,15 @@ fn handle_message(
       //if array is 1 before drop of player
       // let assert Ok(waiting_games) = table.ref("waiting_games")
       // waiting_games |> table.delete(game_code)
+      //state.games_waiting |> drop([game_code])
+      state |> actor.continue
+    }
+    GetParticipants(asker, game_code) -> {
+      let participants = case state.games_waiting |> get(game_code) {
+        Ok(game) -> game.1
+        _ -> []
+      }
+      process.send(asker, Participants(participants))
       state |> actor.continue
     }
   }

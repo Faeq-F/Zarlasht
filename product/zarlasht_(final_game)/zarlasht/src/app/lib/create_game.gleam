@@ -2,15 +2,19 @@
 
 import app/actors/actor_types.{
   type PlayerSocket, type WebsocketActorState, EnqueueParticipant, Player,
-  WebsocketActorState,
+  UpdateColors, WebsocketActorState,
 }
 
 import app/pages/created_game.{created_game_page}
 import carpenter/table
+import gleam/dict
 import gleam/erlang/process
 import gleam/float
 import gleam/int
+import gleam/list
+import gleam/option.{Some}
 import gleam/string.{drop_end}
+import juno
 import logging.{Info}
 import mist
 
@@ -53,4 +57,18 @@ fn generate_game_code() -> Int {
     }
     _ -> generate_game_code()
   }
+}
+
+pub fn update_colors(message: String, player: PlayerSocket) {
+  let assert Ok(juno.Object(message_dict)) = juno.decode(message, [])
+  let assert Ok(juno.Array(colors)) = message_dict |> dict.get("colors")
+  let colors =
+    colors
+    |> list.map(fn(x) {
+      let assert juno.String(color) = x
+      color
+    })
+  let assert Some(game_subject) = player.state.game_subject
+  process.send(game_subject, UpdateColors(colors))
+  player.state
 }

@@ -19,8 +19,10 @@ import lustre/element
 import lustre/element/html
 import mist.{type Connection, Custom}
 
-import app/lib/create_game.{on_create_game}
-import app/pages/set_name.{set_name_page}
+import app/lib/create_game.{on_create_game, update_colors}
+import app/lib/join_game.{on_join_game, on_to_join_game}
+import app/lib/set_name.{set_name}
+import app/pages/set_name as sn_pg
 
 ///See [here](https://hexdocs.pm/mist/mist.html#websocket)
 ///
@@ -89,13 +91,14 @@ fn handle_ws_message(state, conn, message) {
 
       case trigger {
         "create" -> on_create_game(PlayerSocket(conn, state)) |> actor.continue
-
-        // "set-name-form" ->
-        //   set_name(message, PlayerSocket(conn, state)) |> actor.continue
-        // "join" -> on_to_join_game(PlayerSocket(conn, state)) |> actor.continue
-        // "join-game-form" ->
-        //   on_join_game(message, PlayerSocket(conn, state))
-        //   |> actor.continue
+        "set-name-form" ->
+          set_name(message, PlayerSocket(conn, state)) |> actor.continue
+        "join" -> on_to_join_game(PlayerSocket(conn, state)) |> actor.continue
+        "join-game-form" ->
+          on_join_game(message, PlayerSocket(conn, state))
+          |> actor.continue
+        "colors" ->
+          update_colors(message, PlayerSocket(conn, state)) |> actor.continue
         _ -> {
           logging.log(Alert, "Unknown Trigger")
           actor.continue(state)
@@ -106,7 +109,7 @@ fn handle_ws_message(state, conn, message) {
     mist.Custom(JoinGame(game_subject)) -> {
       let new_state =
         WebsocketActorState(..state, game_subject: Some(game_subject))
-      let assert Ok(_) = mist.send_text_frame(conn, set_name_page())
+      let assert Ok(_) = mist.send_text_frame(conn, sn_pg.set_name_page())
       new_state |> actor.continue
     }
 

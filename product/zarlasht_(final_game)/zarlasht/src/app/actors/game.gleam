@@ -2,8 +2,8 @@
 
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddedName, Color, Disconnect, GameActorState, GetColor, JoinGame,
-  SendToClient, UserDisconnected, Wait,
+  type Player, AddPlayer, AddedName, Color, Disconnect, GameActorState, GetColor,
+  JoinGame, SendToClient, UpdateColors, UserDisconnected, Wait,
 }
 import gleam/erlang/process.{type Subject}
 import gleam/io
@@ -11,13 +11,17 @@ import gleam/list
 import gleam/otp/actor.{type Next}
 import logging.{Info}
 
+import app/pages/created_game.{created_game_page}
+
 /// Creates the actor
 ///
 pub fn start(
+  code: Int,
   participants: List(#(Player, Subject(CustomWebsocketMessage))),
 ) -> Subject(GameActorMessage) {
   let state =
     GameActorState(
+      code: code,
       participants: participants,
       colors: [
         "bg-red-500/20", "bg-orange-500/20", "bg-amber-500/20",
@@ -50,7 +54,36 @@ fn handle_message(
   logging.log(Info, "A Game Actor got the message")
   io.debug(message_for_actor)
   case message_for_actor {
+    AddPlayer(player) -> {
+      //list.each(state.participants, fn(participant) {
+      // send them an update with players
+      //todo
+      //})
+
+      process.send(player.1, JoinGame(game_subject: process.new_subject()))
+      GameActorState(
+        ..state,
+        participants: state.participants |> list.append([player]),
+      )
+      |> actor.continue
+    }
     AddedName(player, socket, name) -> {
+      list.each(state.participants, fn(participant) {
+        case { participant.0 }.number == player.number {
+          True -> {
+            //send them the entire page - they are the new player
+            process.send(
+              participant.1,
+              SendToClient(created_game_page(state.code)),
+            )
+          }
+          _ -> {
+            // send them an update with players
+            todo
+          }
+        }
+      })
+      //
       state |> actor.continue
     }
     UserDisconnected(player) -> {
@@ -68,6 +101,12 @@ fn handle_message(
       //     }
       //   })
       actor.Stop(process.Abnormal("A player disconnected from the game"))
+    }
+    UpdateColors(colors) -> {
+      let new_participants = state.participants
+      //map participants to new participnats with updated colors
+      //send a message to every partcipant, updating the page
+      GameActorState(..state, participants: new_participants) |> actor.continue
     }
     GetColor(ws) -> {
       process.send(ws, Color(get_color(state)))

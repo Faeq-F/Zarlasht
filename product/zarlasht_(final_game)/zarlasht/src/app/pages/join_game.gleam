@@ -1,10 +1,10 @@
 import app/pages/components/bottom_bar.{bottom_bar}
 import gleam/string.{join}
-import lustre/attribute.{attribute, class, id, style}
+import lustre/attribute.{attribute, class, id, placeholder, style}
 import lustre/element.{type Element}
-import lustre/element/html.{button, div, h1, text}
+import lustre/element/html.{button, div, h1, input, text}
 
-pub fn set_name_page() {
+pub fn join_game_page() {
   div([id("page"), class("h-full w-full")], [
     div(
       [
@@ -28,22 +28,22 @@ pub fn set_name_page() {
 fn info() {
   div(
     [
-      id("name_info"),
+      id("join_info"),
       class("btn !bg-gray-100  font-text !text-lg"),
       style([#("cursor", "default")]),
     ],
-    [text("Please enter your name")],
+    [text("Please enter the game code")],
   )
 }
 
 pub fn incorrect_info() {
   div(
     [
-      id("name_info"),
+      id("join_info"),
       class("btn !bg-gray-100 !text-red-500 font-text !text-lg"),
       style([#("cursor", "default")]),
     ],
-    [text("You cannot have an empty name!")],
+    [text("A game does not exist for this code!")],
   )
 }
 
@@ -52,22 +52,22 @@ fn buttons() {
     html.form(
       [
         attribute("ws-send", ""),
-        id("set-name-form"),
+        id("join-game-form"),
         class("btn-group btn-group-scrollable"),
       ],
       [
-        html.input([
-          attribute.class(
+        input([
+          class(
             "input input-bordered bg-transparent join-item text-xl  w-full !border-0 font-text !text-xl",
           ),
-          attribute.placeholder("Your name"),
-          attribute.name("name"),
+          placeholder(" Game Code"),
+          attribute.name("gameCode"),
         ]),
         button(
           [
             class(join(
               [
-                "btn border lg:inline-flex !rounded-full !rounded-l-none w-40",
+                "btn border lg:inline-flex !rounded-full !rounded-l-none",
                 "bg-black/15 hover:bg-black/30",
                 "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
                 "border-black/40 text-current font-text !text-xl",
@@ -76,7 +76,7 @@ fn buttons() {
               " ",
             )),
           ],
-          [text("Set Name")],
+          [text("Join")],
         ),
       ],
     ),

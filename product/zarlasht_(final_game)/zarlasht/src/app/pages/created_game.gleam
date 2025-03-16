@@ -10,7 +10,7 @@ import lustre/element/html.{
   button, div, form, input, label, li, p, script, text, ul,
 }
 
-pub fn created_game_page(game_code: Int, player: PlayerSocket) {
+pub fn created_game_page(game_code: Int) {
   div([id("page"), class("h-full w-full")], [
     div(
       [
@@ -57,27 +57,35 @@ pub fn created_game_page(game_code: Int, player: PlayerSocket) {
                 ],
                 [
                   div([class("bg-red-500/20")], [
-                    input([value("bg-red-500"), name("item"), type_("hidden")]),
+                    input([value("bg-red-500"), name("colors"), type_("hidden")]),
                   ]),
                   div([class("bg-orange-500/20")], [
                     input([
                       value("bg-orange-500"),
-                      name("item"),
+                      name("colors"),
                       type_("hidden"),
                     ]),
                   ]),
                   div([class("bg-amber-500/20")], [
-                    input([value("bg-amber-500"), name("item"), type_("hidden")]),
+                    input([
+                      value("bg-amber-500"),
+                      name("colors"),
+                      type_("hidden"),
+                    ]),
                   ]),
                   div([class("bg-yellow-500/20")], [
                     input([
                       value("bg-yellow-500"),
-                      name("item"),
+                      name("colors"),
                       type_("hidden"),
                     ]),
                   ]),
                   div([class("bg-lime-500/20")], [
-                    input([value("bg-lime-500"), name("item"), type_("hidden")]),
+                    input([
+                      value("bg-lime-500"),
+                      name("colors"),
+                      type_("hidden"),
+                    ]),
                   ]),
                 ],
               ),
@@ -142,10 +150,6 @@ fn buttons(game_code) {
     ]),
   ]
 }
-
-// fn ask_for_color(player: PlayerSocket) {
-//   process.call_forever()
-// }
 
 fn page_script() {
   let drag_scroll =
