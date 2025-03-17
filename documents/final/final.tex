@@ -281,7 +281,9 @@ this will be detailed later in the report.
 
 %gleam - critical analysis - checked it was mature before moving forward, not worried about js since I can write ffi stuff easily
 %gleam helps keep up-to-date with modern programming styles and practices.
-% commitment
+% commitment - https://www.bcs.org/membership-and-registrations/become-a-member/bcs-code-of-conduct
+%As a part of the professional competence and integrity section of the BCS Code of Conduct
+%develop your professional knowledge, skills and competence on a continuing basis, maintaining awareness of technological developments, procedures, and standards that are relevant to your field;
 
 As previously mentioned, the motivation for this project stems from the
 rapidly evolving landscape of multiplayer, interactive gaming experiences,
@@ -659,7 +661,175 @@ a pool of servers within my architecture.
   \label{fig: 1}
 \end{figure*}
 
-\section{Architectural paradigms and design patterns}
+\section{Distribution}
+
+As well as the concurrency mechanisms themselves, distribution is a key
+thing to consider for highly concurrent5 game environments. This is so that
+if a server cannot handle the loads, like previously mentioned in the flash
+floods example, it can rely on other servers to take some of the load.
+I have explored major distribution patterns in systems that prioritize
+concvurreny, ultimately deciding to go with a pool of servers with a load
+balncer for my architecture.
+
+failure management pattern that helps establish consistency in distributed
+applications, and coordinates transactions between multiple services to
+maintain data consistency. Helps with split-brain
+
+\subsection{Saga interaction}
+
+Sagas allow for the implementation of long-running, distributed business
+transactions, executing a set of operations across multiple microservices,
+applying consistent all-or-nothing semantics.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+For the sake of decoupling, communication between microservices should preferably
+happen asynchronously, for instance using distributed commit logs like
+Apache Kafka.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+Saga interaction coordinates transactions between multiple microservices to maintain data
+consistency. A microservice publishes an event for every transaction, and
+the next transaction is initiated based on the event's outcome. It can
+take two different paths, depending on the success or failure of the
+transactions.
+%https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
+
+When moving to microservices, one of the first things to realize is that
+individual services don’t exist in isolation. While the goal is to create
+loosely coupled, independent services with as little interaction as
+possible, chances are high that one service needs a particular data set
+owned by another service, or that multiple services need to act in
+concert to achieve a consistent outcome of an operation in the domain
+of our business.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+The outbox pattern provides a solution for service authors to perform writes to
+their local database and send messages via Apache Kafka, without relying on
+unsafe “dual writes.”
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+
+
+You should consider using this pattern if:
+The application needs to maintain data consistency across multiple
+microservices without tight coupling.
+There are long-lived transactions and you don’t want other microservices
+to be blocked if one microservice runs for a long time.
+You need to be able to roll back if an operation fails in the sequence.
+%https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
+
+Thouhg amaonm warn,
+The saga pattern is difficult to debug and its complexity increases with the
+number of microservices. The pattern requires a complex programming model that
+develops and designs compensating transactions for rolling back and undoing
+changes.
+
+%https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
+
+
+
+For “rolling back” the overarching business transaction in case of a failure,
+Sagas rely on the notion of compensating transactions: each previously applied
+local transaction must be able to be “undone” by running another transaction
+which applies the inversion of the formerly done changes.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+There are two general ways for implementing distributed Sagas—choreography
+and orchestration. In the choreography approach, one participating service
+sends a message to the next after it has executed its local transaction.
+With orchestration, on the other hand, there’s one coordinating service
+that invokes one participant after the other.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+Both approaches have their pros and cons, (e.g., see this post by
+Chris Richardson and this one by Yves do Régo for a more detailed discussion).
+Personally, I prefer the orchestration approach, as it defines one central place
+that can be queried to obtain the current status of a particular Saga
+(the orchestrator, or “Saga execution coordinator,” SEC for short). Since
+it avoids point-to-point communication between participants, (other
+than the orchestrator), it also allows for the addition of further
+intermediary steps within the flow, without the need to adjust each
+participant.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+Let’s examine how Sagas satisfy the four classic ACID properties of
+transactions, as defined by Theo Härder and Andreas Reuter (based on
+earlier work by Jim Gray) in their fundamental paper Principles of
+Transaction-Oriented Database Recovery:
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+Atomicity: ✅ —The pattern ensures that either all services apply the
+local transactions or, in case of a failure, all already executed local
+transactions are compensated so that no data change is applied effectively.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+Consistency: ✅ —All local constraints are guaranteed to be satisfied
+after successful execution of all the transactions making up the Saga,
+transitioning the overall system from one consistent state to another.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+Isolation: ❌—As local transactions are committed while the Saga is running,
+their changes are already visible to other concurrent transactions, despite
+the possibility that the Saga will fail eventually, causing all previously
+applied transactions to be compensated. I.e., from the perspective of the
+overall Saga, the isolation level is comparable to “read uncommitted.”
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+Durability: ✅ —Once the local transactions of the Saga have been
+committed, their changes are persisted and durable, e.g., after a service
+failure and restart.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+From a service consumer point of view — e.g., a user placing a purchase order
+with the order service—the system is eventually consistent; i.e., it will
+take some time until the purchase order is in its correct state, as per
+the logic of the different participating services.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+As far as the communication between the participating services is concerned,
+this may happen either synchronously, e.g., via HTTP or gRPC, or
+asynchronously, e.g., via message brokers or distributed logs such as
+Apache Kafka. Whenever possible, asynchronous communication between services
+should be preferred, as it unties the sending service from the
+availability of consuming ones. And as we’ll see in the next section,
+not even the availability of Kafka itself is a concern, thanks to change
+data capture.
+
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+\subsection{Microservices}
+
+\subsection{Event driven architecture}
+
+kubernetes - playstation
+
+event vs message - pub/sub
+
+Delivery patterns for both events and messages include publish/subscribe
+(one-to-many) and point-to-point (one-to-one). While request/reply is
+technically possible, it is more commonly associated with messaging patterns
+rather than pure event-driven systems. Events excel at state propagation
+and decoupled notifications, while messages are better suited for command
+execution, workflow orchestration, and explicit coordination. [22][23]
+
+
+
+\section{My choice for distribution}
+
+Microservices are infamously bad, kubernetes is infamously complex, althpough
+that makes the apps easier to write. Due to me already using a bunch of new
+technologies, learning something complex like kubernetes in addition to
+everything else that I am using would be infeasible, letting me settle for
+a pool of servers. This is a nice choice as well as it is the one that
+is mostly implemented by everyone, including examples of games I have found
+online for my previous research, like ..., and ... . This means that help
+is readily available if needed, although that was a slight pain point still
+when it came configuring the load balancer. This seems like it would still
+be a less painful experience than being stressed about setting up kubernetes
+containers. Also, due to my use of erlang, it is likely that kubernetes is
+overkill due to the BEAM's incredible concurrency and performance, etc. which
+means that a pool of servers would be good enough. also this is a small project,
+that does not need to scale at the moment to massive amounts.
+a switch to kubernetes could always occur if my game does need to be in
+production in massive amounts, like worldwide.
+
+\subsection{Architectural paradigms and design patterns}
 
 For implementing the concurrent game environments themselves, there are various architectural approaches.
 To start, there is the choice between the peer-to-peer model or client-server model.
@@ -1532,16 +1702,125 @@ Term 2:\\\\
 
 \newpage
 
-\section{Professional considerations for the project}
-%TODO
-% A short section on professional issues that raised concern during the year,
-% particularly with respect to doing your project or the material contained
-% in your project.
+\chapter{Professional considerations for the project}
 
-%legal, ethical, commercial, licensing, relying on services long-term
-%concrete
+During the development of the project, I had to carefully consider many
+professional issues that could have potential long-term implications.
+This was especially due to the fact that I decided to learn completely
+new technologies for my entire tech stack, which meant that I relied
+on modern technologies that were unfamiliar to me at the conception of what
+the project would entail. This decision, while making the project challenging,
+allowed me to expand my skill set and adapt to industry trends,
+aligning with the BCS Code of Conduct, particularly the section on
+Professional competence and integrity, which emphasizes the need to
+"develop your professional knowledge, skills and competence on a continuing
+basis, maintaining awareness of technological developments, procedures,
+and standards that are relevant to your field".
 
-\section{Reflection / self-evaluation}
+%TODO cite https://www.bcs.org/membership-and-registrations/become-a-member/bcs-code-of-conduct/
+
+One of my concerns was the licensing of the different products I was using.
+While all of it was open source, they, for e.g., Gleam, NGINX, and Valkey,
+each have their own licenses.
+While they all generally permit free use, modification, and distribution,
+some had extra requirements that were important to meet,
+such as proper attribution and the inclusion of license notices in
+the project, which was especially the case for more creative works used
+like the icons and fonts for my game UIs.
+
+Not meeting these requirements
+could lead to the inability to commercialize the project
+in the future, and legal disputes, especially since some of my prototypes are
+already being hosted. To meet them, I, for e.g., decided to add 'information' sections on
+the games which provide the proper attribution of any product I used. I
+also added comments in my code, wherever I took inspiration from, or directly
+used something I found online, in an attempt to avoid unintentional plagiarism.
+
+%TODO link?
+%TODO information modal image
+
+The issue of licensing is a broad one, with many issues that may arise.
+For example, Redis Labs infamously faced backlash when it applied
+the Commons Clause to a set of modules, and extensions to the core Redis database.
+This overrode the existing open source license "to render the
+software effectively proprietary and source available while still leveraging
+the brand of the original open source license"
+
+%TODO cite https://redmonk.com/sogrady/2024/07/16/post-valkey-world/
+
+This decision raised questions about the sustainability of open-source projects
+and the balance between community contributions and commercial interests.
+This example highlighted the importance of understanding
+and respecting licensing terms, as well as considering the long-term
+implications of relying on open-source technologies. Thankfully, in the example's
+case, Valkey, the database I chose for this project, had a meaningful role.
+The Valkey project came together unusually quickly, recieving a suprising amount
+of attention, ending up as the leading alternative to Redis. Since it is a fork
+of Redis OSS, developers could use the same drivers as those with Redis, meaning
+that no changes to apps were required to switch to Valkey.
+
+%TODO cite https://redmonk.com/sogrady/2024/07/16/post-valkey-world/
+
+Another quick note to make is that, while I was using Gleam, which is open source,
+if I was using proprietary, new technologies, this project would have been a lot
+more difficult as I sometimes had to look at the source code of the libraries I was using
+due to immature and sometimes completely absent documentation. Understanding how
+to use a product by looking at it's internals like this, may count towards
+reverse engineering, which may be against the licence used for a proprietary
+product.
+
+Another issue was usability and accessibility.
+Ensuring that the games are accessible to a diverse
+audience, including those with disabilities, is not only a professional
+responsibility but also a moral one. For example, incorporating features like
+keyboard navigation, screen reader compatibility, and colorblind-friendly
+design would make the game more inclusive.
+
+Ignoring these aspects could
+alienate potential players and lead to criticism or worse, health effects, as
+seen in the backlash against games like Cyberpunk 2077, which not only lacked
+sufficient accessibility options but also lacked warnings that the game
+may cause seizures. The developers had to roll out updates which later added
+these warnings.%TODO cite https://www.polygon.com/2020/12/8/22163153/cyberpunk-2077-accessibility-epilepsy-seizure-warning
+The game was also criticized for being poorly optimized,
+resulting in a subpar experience for many players.
+%https://steamcommunity.com/app/1091500/discussions/7/4428814589383884489/
+%https://expertbeacon.com/why-does-my-cyberpunk-run-so-bad/
+
+In my project, I focused primarily on server architecture and concurrency,
+which meant that optimization for client-side performance was not a
+priority. As a result, I used libraries like TailwindCSS directly from
+their CDN, which gives me a warning in my console.%TODO image
+However, this decision could have practical implications,
+as poorly optimized games can lead to negative user experiences and
+damage the reputation of the developers. This serves as a reminder
+of the importance of balancing backend and frontend development to
+deliver a polished and accessible product. To make the game ready for
+deployment, I would need to account for this accessibility issue and optimize for production
+by, in this example, utilizing the Tailwind CLI, which would scan my source files for
+classes and build only the CSS I would need, reducing the size of
+the download.
+
+Browsers are inherently designed with accessibility in mind, as they serve
+as a universal platform for users across a wide range of devices and
+abilities, which is why I chose to make the games browser-based rather than
+developing desktop or mobile apps. This decision not only ensures broader
+accessibility but also leverages the built-in tools and standards that
+browsers provide, such as screen reader compatibility and keyboard navigation,
+making it easier to address accessibility concerns and deliver a more
+inclusive experience.
+
+Addressing these professional issues has been a valuable learning experience.
+It has taught me the importance of considering the broader societal and
+ethical implications of software development, beyond just technical
+functionality. By proactively addressing issues, that are not limited to
+licensing and accessibility concerns, I have not only ensured the integrity of my
+project but also developed a deeper understanding of the responsibilities
+that come with being a software engineer. These lessons will
+undoubtedly inform my approach to future projects and my professional
+practice as a whole.
+
+\chapter{Reflection / self-evaluation}
 
 As previously mentioned, and as can be seen within my project diary below,
 I have completed all of my goals for this term and have
