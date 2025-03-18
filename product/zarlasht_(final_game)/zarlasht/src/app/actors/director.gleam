@@ -3,7 +3,7 @@
 import app/actors/actor_types.{
   type DirectorActorMessage, type DirectorActorState, AddPlayer,
   DequeueParticipant, DirectorActorState, EnqueueParticipant, GetParticipants,
-  Participants,
+  JoinGame, Participants,
 }
 
 import app/actors/game
@@ -33,12 +33,17 @@ fn handle_message(
         Ok(game) -> {
           //They are joining a Game
           process.send(game.0, AddPlayer(participant))
+          process.send(participant_subject, JoinGame(game_subject: game.0))
           state.games_waiting
           |> insert(game_code, #(game.0, [participant, ..game.1]))
         }
         _ -> {
           //They created the game
           let game_subject = game.start(game_code, [participant])
+          process.send(
+            participant_subject,
+            JoinGame(game_subject: game_subject),
+          )
           state.games_waiting
           |> insert(game_code, #(game_subject, [participant]))
         }

@@ -24,24 +24,19 @@ pub fn start(
       code: code,
       participants: participants,
       colors: [
-        "bg-red-500/20", "bg-orange-500/20", "bg-amber-500/20",
-        "bg-yellow-500/20", "bg-lime-500/20", "bg-green-500/20",
-        "bg-emerald-500/20", "bg-teal-500/20", "bg-cyan-500/20", "bg-sky-500/20",
-        "bg-blue-500/20", "bg-indigo-500/20", "bg-violet-500/20",
-        "bg-purple-500/20", "bg-fuchsia-500/20", "bg-pink-500/20",
-        "bg-rose-500/20",
+        // available colors for players to be
+        "bg-orange-500/20", "bg-amber-500/20", "bg-yellow-500/20",
+        "bg-lime-500/20", "bg-emerald-500/20", "bg-teal-500/20", "bg-sky-500/20",
+        "bg-blue-500/20", "bg-violet-500/20", "bg-purple-500/20",
+        "bg-pink-500/20", "bg-rose-500/20",
       ],
-      used_colors: [],
+      used_colors: [
+        // default colors - minimum 5 players for the game
+        "bg-red-500/20", "bg-fuchsia-500/20", "bg-indigo-500/20",
+        "bg-cyan-500/20", "bg-green-500/20",
+      ],
     )
   let assert Ok(actor) = actor.start(state, handle_message)
-
-  //send everyone to the set_name page
-  //(by sending a message that holds the game_actor)
-  list.each(participants, fn(participant) {
-    process.send(participant.1, JoinGame(game_subject: actor))
-  })
-  // - do this on every added player - this would be only one anyway - refactor
-
   actor
 }
 
@@ -60,7 +55,6 @@ fn handle_message(
       //todo
       //})
 
-      process.send(player.1, JoinGame(game_subject: process.new_subject()))
       GameActorState(
         ..state,
         participants: state.participants |> list.append([player]),
@@ -119,9 +113,36 @@ fn handle_message(
 ///
 /// Colors will be random. If there are more players than colors, colors will repeat
 ///
-fn get_color(state: GameActorState) {
-  case state.colors |> list.is_empty {
-    True -> ""
-    _ -> ""
+fn get_color(player_num: Int, state: GameActorState) {
+  case player_num < 6 {
+    True -> {
+      //use default colors
+      let assert Ok(color_grabbed) =
+        state.used_colors
+        |> list.index_map(fn(color, i) { #(i, color) })
+        |> list.find(fn(color) { color.0 == player_num - 1 })
+      #(color_grabbed, state)
+    }
+    False -> {
+      //check if need to reuse colors
+      let colors = case state.colors |> list.is_empty {
+        True -> state.used_colors
+        _ -> state.colors
+      }
+      let used_colors = case state.colors |> list.is_empty {
+        True -> []
+        _ -> state.used_colors
+      }
+      //get color
+      let assert Ok(color_grabbed) = colors |> list.shuffle() |> list.first()
+      //update color lists
+      let colors = colors |> list.filter(fn(color) { color != color_grabbed })
+      let used_colors = used_colors |> list.append(color_grabbed)
+      //update state
+      #(
+        color_grabbed,
+        GameActorState(..state, colors: colors, used_colors: used_colors),
+      )
+    }
   }
 }

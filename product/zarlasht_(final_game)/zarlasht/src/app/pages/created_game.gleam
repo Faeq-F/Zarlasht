@@ -1,8 +1,11 @@
-import app/actors/actor_types.{type PlayerSocket}
+import app/actors/actor_types.{
+  type CustomWebsocketMessage, type Player, type PlayerSocket,
+}
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{copy}
-import gleam/erlang/process
+import gleam/erlang/process.{type Subject}
 import gleam/int.{to_string}
+import gleam/list
 import gleam/string.{join}
 import lustre/attribute.{attribute, class, id, name, style, type_, value}
 import lustre/element.{type Element}
@@ -30,6 +33,7 @@ pub fn created_game_page(game_code: Int) {
             text("Share this code with friends!"),
           ]),
           div([class("game-container"), style([#("cursor", "grab")])], [
+            player_container(),
             ul([class("!grid justify-center"), id("player-container")], [
               form([class("row")], [
                 li([class("item text-center font-subheader")], [
@@ -97,6 +101,71 @@ pub fn created_game_page(game_code: Int) {
     ),
   ])
   |> element.to_string
+}
+
+fn player_container(
+  participants: List(#(Player, Subject(CustomWebsocketMessage))),
+) {
+  ul([class("!grid justify-center"), id("player-container")], [
+    form([class("row")], generate_players(participants)),
+    form(
+      [
+        attribute("hx-trigger", "end"),
+        attribute("ws-send", ""),
+        id("colors"),
+        class("sortable  !row"),
+      ],
+      generate_colors(participants),
+    ),
+  ])
+}
+
+fn generate_players(
+  participants: List(#(Player, Subject(CustomWebsocketMessage))),
+) {
+  let items =
+    participants
+    |> list.map(fn(player) {
+      li([class("item text-center font-subheader")], [text({ player.0 }.name)])
+    })
+
+  case items |> list.length() >= 5 {
+    True -> items
+    _ -> {
+      items
+      |> list.append(list.repeat(
+        li([class("item text-center font-subheader")], [
+          text("Waiting for player to join..."),
+        ]),
+        5 - { items |> list.length() },
+      ))
+    }
+  }
+}
+
+fn generate_colors(
+  participants: List(#(Player, Subject(CustomWebsocketMessage))),
+) {
+  let items =
+    participants
+    |> list.map(fn(player) {
+      div([class({ player.0 }.color)], [
+        input([value({ player.0 }.color), name("colors"), type_("hidden")]),
+      ])
+    })
+
+  case items |> list.length() >= 5 {
+    True -> items
+    _ -> {
+      [1,2,3,4,5] |> list.drop_while(fn (num){ num <= items |> list.length() })
+      //map to use num in below - not repeat
+
+      5 - { items |> list.length() }
+      items
+      |> list.append(list.repeat(,
+      todo
+    }
+  }
 }
 
 fn info() {
