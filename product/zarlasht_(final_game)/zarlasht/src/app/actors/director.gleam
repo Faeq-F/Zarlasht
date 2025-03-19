@@ -32,14 +32,15 @@ fn handle_message(
       let new_queue = case state.games_waiting |> get(game_code) {
         Ok(game) -> {
           //They are joining a Game
-          process.send(game.0, AddPlayer(participant))
+          process.send(game.0, AddPlayer(participant, game.0))
           process.send(participant_subject, JoinGame(game_subject: game.0))
           state.games_waiting
           |> insert(game_code, #(game.0, [participant, ..game.1]))
         }
         _ -> {
           //They created the game
-          let game_subject = game.start(game_code, [participant])
+          let game_subject = game.start(game_code)
+          process.send(game_subject, AddPlayer(participant, game_subject))
           process.send(
             participant_subject,
             JoinGame(game_subject: game_subject),

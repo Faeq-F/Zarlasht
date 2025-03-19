@@ -1,5 +1,6 @@
 import app/actors/actor_types.{
-  type CustomWebsocketMessage, type Player, type PlayerSocket,
+  type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
+  type Player, type PlayerSocket, GameActorState, UpdateState,
 }
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{copy}
@@ -13,7 +14,10 @@ import lustre/element/html.{
   button, div, form, input, label, li, p, script, text, ul,
 }
 
-pub fn created_game_page(game_code: Int) {
+pub fn created_game_page(
+  state: GameActorState,
+  game_subject: Subject(GameActorMessage),
+) {
   div([id("page"), class("h-full w-full")], [
     div(
       [
@@ -25,75 +29,15 @@ pub fn created_game_page(game_code: Int) {
       ],
       [
         div([class("!w-full")], [
-          bottom_bar(info(), buttons(game_code)),
+          bottom_bar(info(), buttons(state.code)),
           p([class(" !text-7xl text-center !mt-4 !text-teal-500 font-header")], [
-            text(game_code |> to_string),
+            text(state.code |> to_string),
           ]),
           p([class("!text-2xl text-center font-subheader")], [
             text("Share this code with friends!"),
           ]),
           div([class("game-container"), style([#("cursor", "grab")])], [
-            player_container(),
-            ul([class("!grid justify-center"), id("player-container")], [
-              form([class("row")], [
-                li([class("item text-center font-subheader")], [
-                  text("Waiting for player to join..."),
-                ]),
-                li([class("item text-center font-subheader")], [
-                  text("Waiting for player to join..."),
-                ]),
-                li([class("item text-center font-subheader")], [
-                  text("Waiting for player to join..."),
-                ]),
-                li([class("item text-center font-subheader")], [
-                  text("Waiting for player to join..."),
-                ]),
-                li([class("item text-center font-subheader")], [
-                  text("Waiting for player to join..."),
-                ]),
-              ]),
-              form(
-                [
-                  attribute("hx-trigger", "end"),
-                  attribute("ws-send", ""),
-                  id("colors"),
-                  class("sortable  !row"),
-                ],
-                [
-                  div([class("bg-red-500/20")], [
-                    input([value("bg-red-500"), name("colors"), type_("hidden")]),
-                  ]),
-                  div([class("bg-orange-500/20")], [
-                    input([
-                      value("bg-orange-500"),
-                      name("colors"),
-                      type_("hidden"),
-                    ]),
-                  ]),
-                  div([class("bg-amber-500/20")], [
-                    input([
-                      value("bg-amber-500"),
-                      name("colors"),
-                      type_("hidden"),
-                    ]),
-                  ]),
-                  div([class("bg-yellow-500/20")], [
-                    input([
-                      value("bg-yellow-500"),
-                      name("colors"),
-                      type_("hidden"),
-                    ]),
-                  ]),
-                  div([class("bg-lime-500/20")], [
-                    input([
-                      value("bg-lime-500"),
-                      name("colors"),
-                      type_("hidden"),
-                    ]),
-                  ]),
-                ],
-              ),
-            ]),
+            player_container(state, game_subject),
           ]),
           script([], page_script()),
         ]),
@@ -103,11 +47,12 @@ pub fn created_game_page(game_code: Int) {
   |> element.to_string
 }
 
-fn player_container(
-  participants: List(#(Player, Subject(CustomWebsocketMessage))),
+pub fn player_container(
+  state: GameActorState,
+  game_subject: Subject(GameActorMessage),
 ) {
   ul([class("!grid justify-center"), id("player-container")], [
-    form([class("row")], generate_players(participants)),
+    form([class("row")], generate_players(state)),
     form(
       [
         attribute("hx-trigger", "end"),
@@ -115,16 +60,14 @@ fn player_container(
         id("colors"),
         class("sortable  !row"),
       ],
-      generate_colors(participants),
+      generate_colors(state, game_subject),
     ),
   ])
 }
 
-fn generate_players(
-  participants: List(#(Player, Subject(CustomWebsocketMessage))),
-) {
+fn generate_players(state: GameActorState) {
   let items =
-    participants
+    state.participants
     |> list.map(fn(player) {
       li([class("item text-center font-subheader")], [text({ player.0 }.name)])
     })
@@ -144,10 +87,11 @@ fn generate_players(
 }
 
 fn generate_colors(
-  participants: List(#(Player, Subject(CustomWebsocketMessage))),
+  state: GameActorState,
+  game_subject: Subject(GameActorMessage),
 ) {
   let items =
-    participants
+    state.participants
     |> list.map(fn(player) {
       div([class({ player.0 }.color)], [
         input([value({ player.0 }.color), name("colors"), type_("hidden")]),
@@ -157,13 +101,84 @@ fn generate_colors(
   case items |> list.length() >= 5 {
     True -> items
     _ -> {
-      [1,2,3,4,5] |> list.drop_while(fn (num){ num <= items |> list.length() })
-      //map to use num in below - not repeat
-
-      5 - { items |> list.length() }
       items
-      |> list.append(list.repeat(,
-      todo
+      |> list.append(
+        [1, 2, 3, 4, 5]
+        |> list.drop_while(fn(num) { num <= items |> list.length() })
+        |> list.map(fn(num) {
+          let color =
+            state.colors
+            |> list.index_map(fn(color, i) { #(i, color) })
+            |> list.find(fn(color) { color.0 == num - 1 })
+          #(num, color)
+        })
+        |> list.map(fn(x) {
+          let color = get_color(x.0, state, game_subject)
+          div([class(color)], [
+            input([value(color), name("colors"), type_("hidden")]),
+          ])
+        }),
+      )
+    }
+  }
+}
+
+/// Designed to get tailwind background  colors (e.g., "bg-red-500/20") to help identify players in the game
+///
+/// Colors will be random. If there are more players than colors, colors will repeat
+///
+/// Colors are stored in the game state, which is updated by this function
+///
+pub fn get_color(
+  player_num: Int,
+  state: GameActorState,
+  game_subject: Subject(GameActorMessage),
+) {
+  case player_num < 6 {
+    True -> {
+      //use default colors (minimum 5 player)
+      let assert Ok(color_grabbed) =
+        state.used_colors
+        |> list.index_map(fn(color, i) { #(i, color) })
+        |> list.find(fn(color) { color.0 == player_num - 1 })
+      color_grabbed.1
+    }
+    False -> {
+      //check if the player already has a color
+      case
+        {
+          state.used_colors
+          |> list.index_map(fn(color, i) { #(i, color) })
+          |> list.find(fn(color) { color.0 == player_num - 1 })
+        }
+      {
+        Ok(color_grabbed) -> color_grabbed.1
+        _ -> {
+          //check if need to reuse colors
+          let colors = case state.colors |> list.is_empty {
+            True -> state.used_colors
+            _ -> state.colors
+          }
+          let used_colors = case state.colors |> list.is_empty {
+            True -> []
+            _ -> state.used_colors
+          }
+          //get color
+          let assert Ok(color_grabbed) =
+            colors |> list.shuffle() |> list.first()
+          //update state
+          let colors =
+            colors |> list.filter(fn(color) { color != color_grabbed })
+          let used_colors = used_colors |> list.append([color_grabbed])
+          process.send(
+            game_subject,
+            UpdateState(
+              GameActorState(..state, colors: colors, used_colors: used_colors),
+            ),
+          )
+          color_grabbed
+        }
+      }
     }
   }
 }

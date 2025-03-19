@@ -2,7 +2,7 @@
 
 import app/actors/actor_types.{
   type PlayerSocket, type WebsocketActorState, EnqueueParticipant, Player,
-  UpdateColors, WebsocketActorState,
+  SwapColors, WebsocketActorState,
 }
 
 import app/pages/created_game.{created_game_page}
@@ -69,6 +69,6 @@ pub fn update_colors(message: String, player: PlayerSocket) {
       color
     })
   let assert Some(game_subject) = player.state.game_subject
-  process.send(game_subject, UpdateColors(colors))
+  process.send(game_subject, SwapColors(colors, game_subject))
   player.state
 }

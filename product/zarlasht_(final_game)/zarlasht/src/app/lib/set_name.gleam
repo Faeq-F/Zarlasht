@@ -1,7 +1,8 @@
 //// Setting the name of a user
 
 import app/actors/actor_types.{
-  type PlayerSocket, type WebsocketActorState, AddedName, WebsocketActorState,
+  type PlayerSocket, type WebsocketActorState, AddedName, Player,
+  WebsocketActorState,
 }
 import app/pages/set_name.{incorrect_info}
 import gleam/dict
@@ -31,9 +32,12 @@ pub fn set_name(message: String, player: PlayerSocket) -> WebsocketActorState {
       let assert Some(game_subject) = player.state.game_subject
       process.send(
         game_subject,
-        AddedName(player.state.player, player.state.ws_subject, name),
+        AddedName(player.state.player, game_subject, name),
       )
-      WebsocketActorState(..player.state, name: name)
+      WebsocketActorState(
+        ..player.state,
+        player: Player(..player.state.player, name: name),
+      )
     }
   }
 }

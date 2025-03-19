@@ -2,27 +2,26 @@
 
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddPlayer, AddedName, Color, Disconnect, GameActorState, GetColor,
-  JoinGame, SendToClient, UpdateColors, UserDisconnected, Wait,
+  type Player, AddPlayer, AddedName, Disconnect, GameActorState, JoinGame,
+  Player, SendToClient, SwapColors, UpdatePlayerState, UpdateState,
+  UserDisconnected, Wait,
 }
 import gleam/erlang/process.{type Subject}
 import gleam/io
 import gleam/list
 import gleam/otp/actor.{type Next}
 import logging.{Info}
+import lustre/element
 
-import app/pages/created_game.{created_game_page}
+import app/pages/created_game.{created_game_page, get_color, player_container}
 
 /// Creates the actor
 ///
-pub fn start(
-  code: Int,
-  participants: List(#(Player, Subject(CustomWebsocketMessage))),
-) -> Subject(GameActorMessage) {
+pub fn start(code: Int) -> Subject(GameActorMessage) {
   let state =
     GameActorState(
       code: code,
-      participants: participants,
+      participants: [],
       colors: [
         // available colors for players to be
         "bg-orange-500/20", "bg-amber-500/20", "bg-yellow-500/20",
@@ -49,36 +48,65 @@ fn handle_message(
   logging.log(Info, "A Game Actor got the message")
   io.debug(message_for_actor)
   case message_for_actor {
-    AddPlayer(player) -> {
-      //list.each(state.participants, fn(participant) {
-      // send them an update with players
-      //todo
-      //})
-
-      GameActorState(
-        ..state,
-        participants: state.participants |> list.append([player]),
+    AddPlayer(player, game_subject) -> {
+      let new_player = #(
+        Player(
+          ..player.0,
+          color: get_color({ player.0 }.number, state, game_subject),
+        ),
+        player.1,
       )
-      |> actor.continue
-    }
-    AddedName(player, socket, name) -> {
+
+      process.send(player.1, UpdatePlayerState(new_player.0))
+
+      let new_state =
+        GameActorState(
+          ..state,
+          participants: state.participants |> list.append([new_player]),
+        )
+
       list.each(state.participants, fn(participant) {
+        //send them an update with players
+        process.send(
+          participant.1,
+          SendToClient(
+            player_container(new_state, game_subject) |> element.to_string,
+          ),
+        )
+      })
+
+      new_state |> actor.continue
+    }
+    AddedName(player, game_subject, name) -> {
+      let participants =
+        list.map(state.participants, fn(participant) {
+          case { participant.0 }.number == player.number {
+            True -> #(Player(..player, name: name), participant.1)
+            _ -> participant
+          }
+        })
+      let new_state = GameActorState(..state, participants: participants)
+      list.each(participants, fn(participant) {
         case { participant.0 }.number == player.number {
           True -> {
             //send them the entire page - they are the new player
             process.send(
               participant.1,
-              SendToClient(created_game_page(state.code)),
+              SendToClient(created_game_page(new_state, game_subject)),
             )
           }
           _ -> {
-            // send them an update with players
-            todo
+            //send them an update with players
+            process.send(
+              participant.1,
+              SendToClient(
+                player_container(new_state, game_subject) |> element.to_string,
+              ),
+            )
           }
         }
       })
-      //
-      state |> actor.continue
+      new_state |> actor.continue
     }
     UserDisconnected(player) -> {
       //make other player disconnect
@@ -96,53 +124,46 @@ fn handle_message(
       //   })
       actor.Stop(process.Abnormal("A player disconnected from the game"))
     }
-    UpdateColors(colors) -> {
-      let new_participants = state.participants
-      //map participants to new participnats with updated colors
-      //send a message to every partcipant, updating the page
-      GameActorState(..state, participants: new_participants) |> actor.continue
-    }
-    GetColor(ws) -> {
-      process.send(ws, Color(get_color(state)))
-      state |> actor.continue
-    }
-  }
-}
-
-/// Designed to get tailwind background  colors (e.g., "bg-red-500/20") to help identify players in the game
-///
-/// Colors will be random. If there are more players than colors, colors will repeat
-///
-fn get_color(player_num: Int, state: GameActorState) {
-  case player_num < 6 {
-    True -> {
-      //use default colors
-      let assert Ok(color_grabbed) =
-        state.used_colors
+    SwapColors(colors, game_subject) -> {
+      let indexed_colors =
+        colors
         |> list.index_map(fn(color, i) { #(i, color) })
-        |> list.find(fn(color) { color.0 == player_num - 1 })
-      #(color_grabbed, state)
+
+      //map participants to new participants with updated colors & update players' state
+      let new_participants =
+        state.participants
+        |> list.map(fn(participant) {
+          let assert Ok(color) =
+            indexed_colors
+            |> list.find(fn(color) { color.0 == { participant.0 }.number - 1 })
+          let new_player = Player(..participant.0, color: color.1)
+          process.send(participant.1, UpdatePlayerState(new_player))
+          #(new_player, participant.1)
+        })
+
+      let new_state =
+        GameActorState(
+          ..state,
+          participants: new_participants,
+          used_colors: colors,
+        )
+      io.debug("new_state")
+      io.debug(new_state)
+      io.debug("new_state")
+      //send a message to every partcipant, updating the page
+      list.each(new_state.participants, fn(participant) {
+        process.send(
+          participant.1,
+          SendToClient(
+            player_container(new_state, game_subject) |> element.to_string,
+          ),
+        )
+      })
+
+      new_state |> actor.continue
     }
-    False -> {
-      //check if need to reuse colors
-      let colors = case state.colors |> list.is_empty {
-        True -> state.used_colors
-        _ -> state.colors
-      }
-      let used_colors = case state.colors |> list.is_empty {
-        True -> []
-        _ -> state.used_colors
-      }
-      //get color
-      let assert Ok(color_grabbed) = colors |> list.shuffle() |> list.first()
-      //update color lists
-      let colors = colors |> list.filter(fn(color) { color != color_grabbed })
-      let used_colors = used_colors |> list.append(color_grabbed)
-      //update state
-      #(
-        color_grabbed,
-        GameActorState(..state, colors: colors, used_colors: used_colors),
-      )
+    UpdateState(new_state) -> {
+      new_state |> actor.continue
     }
   }
 }

@@ -11,7 +11,6 @@ import mist
 ///
 pub type WebsocketActorState {
   WebsocketActorState(
-    name: String,
     game_code: Int,
     player: Player,
     ws_subject: Subject(CustomWebsocketMessage),
@@ -43,12 +42,12 @@ pub type CustomWebsocketMessage {
   /// Send this player an alert and then disconnect them too
   ///
   Disconnect
-  /// Response to GetColor
-  ///
-  Color(color: String)
   /// Response to GetParticipants
   ///
   Participants(participants: List(#(Player, Subject(CustomWebsocketMessage))))
+  ///
+  ///
+  UpdatePlayerState(player: Player)
 }
 
 /// A wrapper for a player's WebSocket Actor state and their connection
@@ -125,7 +124,10 @@ pub type GameActorState {
 pub type GameActorMessage {
   /// A player hqas joined the game
   ///
-  AddPlayer(player: #(Player, Subject(CustomWebsocketMessage)))
+  AddPlayer(
+    player: #(Player, Subject(CustomWebsocketMessage)),
+    game_subject: Subject(GameActorMessage),
+  )
   /// A player disconnected
   ///
   /// disconnects the other player after alerting them
@@ -133,11 +135,15 @@ pub type GameActorMessage {
   UserDisconnected(player: Player)
   /// A player has set their name
   ///
-  AddedName(player: Player, ws: Subject(CustomWebsocketMessage), name: String)
-  /// Ask for a color (to distinguish players)
+  AddedName(
+    player: Player,
+    game_subject: Subject(GameActorMessage),
+    name: String,
+  )
+  /// Update the colors players use - a client swapped colors around
   ///
-  GetColor(ws: Subject(CustomWebsocketMessage))
-  /// Update the colors players use
+  SwapColors(colors: List(String), game_subject: Subject(GameActorMessage))
+  /// Allow state updates
   ///
-  UpdateColors(colors: List(String))
+  UpdateState(state: GameActorState)
 }

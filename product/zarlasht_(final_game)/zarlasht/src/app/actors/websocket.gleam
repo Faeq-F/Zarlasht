@@ -3,7 +3,7 @@
 import app/actors/actor_types.{
   type DirectorActorMessage, type PlayerSocket, type WebsocketActorState,
   DequeueParticipant, Disconnect, JoinGame, Player, PlayerSocket, SendToClient,
-  UserDisconnected, Wait, WebsocketActorState,
+  UpdatePlayerState, UserDisconnected, Wait, WebsocketActorState,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
@@ -40,7 +40,6 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
       // Set state for the connection with empty defaults
       #(
         WebsocketActorState(
-          name: "",
           game_code: 0,
           player: Player(0, "", "", 10, 1),
           ws_subject: ws_subject,
@@ -113,9 +112,8 @@ fn handle_ws_message(state, conn, message) {
       new_state |> actor.continue
     }
 
-    mist.Custom(Wait) -> {
-      // let assert Ok(_) = mist.send_text_frame(conn, set_name.waiting())
-      actor.continue(state)
+    mist.Custom(UpdatePlayerState(player_state)) -> {
+      actor.continue(WebsocketActorState(..state, player: player_state))
     }
 
     mist.Custom(SendToClient(text)) -> {
