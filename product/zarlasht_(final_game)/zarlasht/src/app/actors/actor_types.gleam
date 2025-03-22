@@ -45,9 +45,12 @@ pub type CustomWebsocketMessage {
   /// Response to GetParticipants
   ///
   Participants(participants: List(#(Player, Subject(CustomWebsocketMessage))))
-  ///
+  /// Updates the state
   ///
   UpdatePlayerState(player: Player)
+  /// Response to GetState for the game actor
+  ///
+  GameState(state: GameActorState)
 }
 
 /// A wrapper for a player's WebSocket Actor state and their connection
@@ -60,8 +63,18 @@ pub type PlayerSocket {
 ///
 /// number is 1 if they are the creator of the game, 2 if they are the first to join, 3 if they are the second to join, etc.
 ///
+/// positions are x,y, where 0,0 is the top left corner of the map
+///
 pub type Player {
-  Player(number: Int, name: String, color: String, health: Int, strength: Int)
+  Player(
+    number: Int,
+    name: String,
+    color: String,
+    health: Int,
+    strength: Int,
+    position: #(Int, Int),
+    old_positions: List(#(Int, Int)),
+  )
 }
 
 //----------------------------------------------------------------------
@@ -85,16 +98,22 @@ pub type DirectorActorState {
 /// Custom message for the Director actor
 ///
 pub type DirectorActorMessage {
-  /// Adds a Player to a game
+  /// Adds a Player to a waiting game
   ///
   EnqueueParticipant(
     game_code: Int,
     player: Player,
     participant_subject: Subject(CustomWebsocketMessage),
   )
-  /// Deletes a Player from a game
+  /// Deletes a Player from a waiting game
   ///
-  DequeueParticipant(game_code: Int)
+  DequeueParticipant(player: Player, game_code: Int)
+  /// Update a waiting participant's data in director state
+  ///
+  UpdateParticipant(player: Player, game_code: Int)
+  /// Deletes the game from state (as it is no longer waiting)
+  ///
+  GameStarted(game_code: Int)
   /// Asks for the director to send the list of participants waiting for a game
   ///
   GetParticipants(asking: Subject(CustomWebsocketMessage), game_code: Int)
@@ -116,6 +135,20 @@ pub type GameActorState {
     participants: List(#(Player, Subject(CustomWebsocketMessage))),
     colors: List(String),
     used_colors: List(String),
+    player_chats: Dict(#(Int, Int), List(Message)),
+    ally_chats: Dict(List(Int), List(Message)),
+  )
+}
+
+/// Message for a chat
+///
+pub type Message {
+  Message(
+    sender: Int,
+    name: String,
+    color: String,
+    time: String,
+    message: String,
   )
 }
 
@@ -146,4 +179,10 @@ pub type GameActorMessage {
   /// Allow state updates
   ///
   UpdateState(state: GameActorState)
+  /// read state
+  ///
+  GetState(asking: Subject(CustomWebsocketMessage))
+  /// Prepare the game as it is about to start
+  ///
+  PrepareGame
 }

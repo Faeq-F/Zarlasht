@@ -2,10 +2,11 @@
 
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddPlayer, AddedName, Disconnect, GameActorState, JoinGame,
-  Player, SendToClient, SwapColors, UpdatePlayerState, UpdateState,
-  UserDisconnected, Wait,
+  type Player, AddPlayer, AddedName, Disconnect, GameActorState, GameState,
+  GetState, JoinGame, Player, PrepareGame, SendToClient, SwapColors,
+  UpdatePlayerState, UpdateState, UserDisconnected, Wait,
 }
+import gleam/dict
 import gleam/erlang/process.{type Subject}
 import gleam/io
 import gleam/list
@@ -24,16 +25,15 @@ pub fn start(code: Int) -> Subject(GameActorMessage) {
       participants: [],
       colors: [
         // available colors for players to be
-        "bg-orange-500/20", "bg-amber-500/20", "bg-yellow-500/20",
-        "bg-lime-500/20", "bg-emerald-500/20", "bg-teal-500/20", "bg-sky-500/20",
-        "bg-blue-500/20", "bg-violet-500/20", "bg-purple-500/20",
-        "bg-pink-500/20", "bg-rose-500/20",
+        "orange", "amber", "yellow", "lime", "emerald", "teal", "sky", "blue",
+        "violet", "purple", "pink", "rose",
       ],
       used_colors: [
         // default colors - minimum 5 players for the game
-        "bg-red-500/20", "bg-fuchsia-500/20", "bg-indigo-500/20",
-        "bg-cyan-500/20", "bg-green-500/20",
+        "red", "fuchsia", "indigo", "cyan", "green",
       ],
+      player_chats: dict.new(),
+      ally_chats: dict.new(),
     )
   let assert Ok(actor) = actor.start(state, handle_message)
   actor
@@ -109,20 +109,15 @@ fn handle_message(
       new_state |> actor.continue
     }
     UserDisconnected(player) -> {
-      //make other player disconnect
-      //   list.each(state.participants, fn(participant) {
-      //     case participant.0 == player {
-      //       True -> {
-      //         // they have already disconnected so can't send them a message
-      //         Nil
-      //       }
-      //       _ -> {
-      //         process.send(participant.1, Disconnect)
-      //         Nil
-      //       }
-      //     }
-      //   })
-      actor.Stop(process.Abnormal("A player disconnected from the game"))
+      //let other players know - custom message (health retreated, scared, etc.)
+      //remove from state
+      GameActorState(..state, participants: {
+        state.participants
+        |> list.filter(fn(participant) {
+          { participant.0 }.number != player.number
+        })
+      })
+      |> actor.continue
     }
     SwapColors(colors, game_subject) -> {
       let indexed_colors =
@@ -147,9 +142,6 @@ fn handle_message(
           participants: new_participants,
           used_colors: colors,
         )
-      io.debug("new_state")
-      io.debug(new_state)
-      io.debug("new_state")
       //send a message to every partcipant, updating the page
       list.each(new_state.participants, fn(participant) {
         process.send(
@@ -162,8 +154,34 @@ fn handle_message(
 
       new_state |> actor.continue
     }
+    PrepareGame -> {
+      let setup_player_chats =
+        state.participants
+        |> list.combination_pairs()
+        |> list.fold(dict.new(), fn(dict, pair) {
+          dict
+          |> dict.insert(#({ pair.0.0 }.number, { pair.1.0 }.number), [])
+        })
+      //no one has an ally yet
+      let setup_ally_chats =
+        state.participants
+        |> list.fold(dict.new(), fn(dict, player) {
+          dict
+          |> dict.insert([{ player.0 }.number], [])
+        })
+      GameActorState(
+        ..state,
+        player_chats: setup_player_chats,
+        ally_chats: setup_ally_chats,
+      )
+      |> actor.continue
+    }
     UpdateState(new_state) -> {
       new_state |> actor.continue
+    }
+    GetState(asker) -> {
+      process.send(asker, GameState(state))
+      state |> actor.continue
     }
   }
 }

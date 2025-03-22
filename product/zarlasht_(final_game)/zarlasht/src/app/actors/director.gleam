@@ -2,14 +2,17 @@
 
 import app/actors/actor_types.{
   type DirectorActorMessage, type DirectorActorState, AddPlayer,
-  DequeueParticipant, DirectorActorState, EnqueueParticipant, GetParticipants,
-  JoinGame, Participants,
+  DequeueParticipant, DirectorActorState, EnqueueParticipant, GameStarted,
+  GetParticipants, JoinGame, Participants, PrepareGame, SendToClient,
+  UpdateParticipant,
 }
 
 import app/actors/game
+import app/pages/game as game_page
 import carpenter/table
 import gleam/dict.{drop, get, insert}
 import gleam/erlang/process.{type Subject}
+import gleam/list
 import gleam/otp/actor.{type Next}
 
 /// Creates the Actor
@@ -52,13 +55,63 @@ fn handle_message(
 
       DirectorActorState(games_waiting: new_queue) |> actor.continue
     }
-    DequeueParticipant(game_code) -> {
-      state.games_waiting |> drop([game_code])
-      //if array is 1 before drop of player
-      // let assert Ok(waiting_games) = table.ref("waiting_games")
-      // waiting_games |> table.delete(game_code)
-      //state.games_waiting |> drop([game_code])
-      state |> actor.continue
+    DequeueParticipant(player, game_code) -> {
+      let assert Ok(game) = state.games_waiting |> get(game_code)
+      case game.1 |> list.length() == 1 {
+        True -> {
+          //remove from ETS table
+          let assert Ok(waiting_games) = table.ref("waiting_games")
+          waiting_games |> table.delete(game_code)
+          //remove from director state
+          DirectorActorState(state.games_waiting |> drop([game_code]))
+          |> actor.continue
+        }
+        _ -> {
+          //remove from director state
+          state.games_waiting
+          |> insert(game_code, #(
+            game.0,
+            game.1
+              |> list.filter(fn(participant) {
+                { participant.0 }.number != player.number
+              }),
+          ))
+          |> DirectorActorState
+          |> actor.continue
+        }
+      }
+    }
+    UpdateParticipant(player, game_code) -> {
+      let assert Ok(game) = state.games_waiting |> get(game_code)
+      state.games_waiting
+      |> insert(game_code, #(
+        game.0,
+        game.1
+          |> list.map(fn(participant) {
+            case { participant.0 }.number != player.number {
+              True -> participant
+              _ -> #(player, participant.1)
+            }
+          }),
+      ))
+      |> DirectorActorState
+      |> actor.continue
+    }
+    GameStarted(game_code) -> {
+      let assert Ok(game) = state.games_waiting |> get(game_code)
+      //prepare the game
+      process.send(game.0, PrepareGame)
+      //send everyone in the game to the game page
+      game.1
+      |> list.each(fn(player) {
+        process.send(player.1, SendToClient(game_page.game(player.0)))
+      })
+      //remove from ETS table
+      let assert Ok(waiting_games) = table.ref("waiting_games")
+      waiting_games |> table.delete(game_code)
+      //remove from director state
+      DirectorActorState(state.games_waiting |> drop([game_code]))
+      |> actor.continue
     }
     GetParticipants(asker, game_code) -> {
       let participants = case state.games_waiting |> get(game_code) {

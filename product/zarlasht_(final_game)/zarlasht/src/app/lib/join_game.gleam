@@ -61,13 +61,16 @@ pub fn on_join_game(
             player.state.director_subject,
             EnqueueParticipant(
               code,
-              Player(num, "Setting name...", "", 10, 1),
+              Player(num, "Setting name...", "", 10, 1, #(1, 21), [#(1, 21)]),
               player.state.ws_subject,
             ),
           )
           WebsocketActorState(
             ..player.state,
-            player: Player(num, "Setting name...", "", 10, 1),
+            player: Player(num, "Setting name...", "", 10, 1, #(1, 21), [
+              #(1, 21),
+            ]),
+            game_code: code,
           )
         }
       }

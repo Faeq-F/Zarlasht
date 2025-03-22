@@ -2,7 +2,7 @@
 
 import app/actors/actor_types.{
   type PlayerSocket, type WebsocketActorState, AddedName, Player,
-  WebsocketActorState,
+  UpdateParticipant, WebsocketActorState,
 }
 import app/pages/set_name.{incorrect_info}
 import gleam/dict
@@ -29,15 +29,17 @@ pub fn set_name(message: String, player: PlayerSocket) -> WebsocketActorState {
       player.state
     }
     _ -> {
+      let new_player_info = Player(..player.state.player, name: name)
+      process.send(
+        player.state.director_subject,
+        UpdateParticipant(new_player_info, player.state.game_code),
+      )
       let assert Some(game_subject) = player.state.game_subject
       process.send(
         game_subject,
         AddedName(player.state.player, game_subject, name),
       )
-      WebsocketActorState(
-        ..player.state,
-        player: Player(..player.state.player, name: name),
-      )
+      WebsocketActorState(..player.state, player: new_player_info)
     }
   }
 }

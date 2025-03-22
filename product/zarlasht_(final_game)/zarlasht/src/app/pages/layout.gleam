@@ -1,5 +1,6 @@
 //// Layout for all pages the site renders
 
+import app/actors/actor_types.{type Player}
 import app/pages/components/lucide_lustre.{
   biceps_flexed, dot, hand, heart, heart_crack,
 }
@@ -78,26 +79,37 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
   ])
 }
 
-pub fn stats() {
-  span([], [
-    heart([class("fill-[red]/40 !inline")]),
-    heart([class("fill-[red]/40 !inline")]),
-    heart([class("fill-[red]/40 !inline")]),
-    heart([class("fill-[red]/40 !inline")]),
-    heart([class("fill-[red]/40 !inline")]),
-    heart([class("fill-[red]/40 !inline")]),
-    heart([class("fill-[red]/40 !inline")]),
-    heart_crack([class(" !inline")]),
-    heart_crack([class(" !inline")]),
-    heart_crack([class(" !inline")]),
-    dot([class("!inline")]),
-    biceps_flexed([class("fill-[gray]/40 !inline")]),
-    biceps_flexed([class("fill-[gray]/40 !inline")]),
-    biceps_flexed([class("fill-[gray]/40 !inline")]),
-    biceps_flexed([class("fill-[gray]/40 !inline")]),
-    hand([class(" !inline")]),
-    hand([class(" !inline")]),
-  ])
+pub fn stats(stats: Player) {
+  let hearts =
+    heart([class("fill-[red]/40 !inline")]) |> list.repeat(stats.health)
+  let hearts = case hearts |> list.length() < 10 {
+    True -> {
+      hearts
+      |> list.append(
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        |> list.drop_while(fn(num) { num <= hearts |> list.length() })
+        |> list.map(fn(_num) { heart_crack([class(" !inline")]) }),
+      )
+    }
+    _ -> hearts
+  }
+
+  let strength =
+    biceps_flexed([class("fill-[gray]/40 !inline")])
+    |> list.repeat(stats.strength)
+  let strength = case strength |> list.length() < 6 {
+    True -> {
+      strength
+      |> list.append(
+        [1, 2, 3, 4, 5, 6]
+        |> list.drop_while(fn(num) { num <= strength |> list.length() })
+        |> list.map(fn(_num) { hand([class(" !inline")]) }),
+      )
+    }
+    _ -> strength
+  }
+
+  span([], list.flatten([hearts, [dot([class("!inline")])], strength]))
 }
 
 fn fog_styles() {

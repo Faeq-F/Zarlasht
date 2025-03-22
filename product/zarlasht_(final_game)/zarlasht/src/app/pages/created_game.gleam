@@ -93,7 +93,7 @@ fn generate_colors(
   let items =
     state.participants
     |> list.map(fn(player) {
-      div([class({ player.0 }.color)], [
+      div([class("bg-" <> { player.0 }.color <> "-500/20")], [
         input([value({ player.0 }.color), name("colors"), type_("hidden")]),
       ])
     })
@@ -114,7 +114,7 @@ fn generate_colors(
         })
         |> list.map(fn(x) {
           let color = get_color(x.0, state, game_subject)
-          div([class(color)], [
+          div([class("bg-" <> color <> "-500/20")], [
             input([value(color), name("colors"), type_("hidden")]),
           ])
         }),
@@ -186,10 +186,33 @@ pub fn get_color(
 fn info() {
   div(
     [
+      id("created_game_info"),
       class("btn !bg-gray-100 font-text !text-lg"),
       style([#("cursor", "default")]),
     ],
     [text("minimum of 5 players")],
+  )
+}
+
+pub fn info_error_player_count() {
+  div(
+    [
+      id("created_game_info"),
+      class("btn !bg-gray-100 !text-red-500 font-text !text-lg"),
+      style([#("cursor", "default")]),
+    ],
+    [text("You need a minimum of 5 players!")],
+  )
+}
+
+pub fn info_error_setting_name() {
+  div(
+    [
+      id("created_game_info"),
+      class("btn !bg-gray-100 !text-red-500 font-text !text-lg"),
+      style([#("cursor", "default")]),
+    ],
+    [text("A player is still setting their name!")],
   )
 }
 
@@ -229,9 +252,14 @@ fn buttons(game_code) {
         [div([], [text("Copied game code")])],
       ),
     ]),
-    button([class(join(["btn !rounded-r-full font-text !text-xl"], " "))], [
-      text("Start Game"),
-    ]),
+    button(
+      [
+        attribute("ws-send", ""),
+        id("start_game"),
+        class(join(["btn !rounded-r-full font-text !text-xl"], " ")),
+      ],
+      [text("Start Game")],
+    ),
   ]
 }
 

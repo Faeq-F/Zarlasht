@@ -5,7 +5,7 @@ import app/actors/actor_types.{
   SwapColors, WebsocketActorState,
 }
 
-import app/pages/created_game.{created_game_page}
+import app/pages/created_game
 import carpenter/table
 import gleam/dict
 import gleam/erlang/process
@@ -16,7 +16,6 @@ import gleam/option.{Some}
 import gleam/string.{drop_end}
 import juno
 import logging.{Info}
-import mist
 
 /// Creates a new game & updates the WebSocket state
 ///
@@ -26,13 +25,17 @@ pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
     player.state.director_subject,
     EnqueueParticipant(
       game_code,
-      Player(1, "", "", 10, 1),
+      Player(1, "", "", 10, 1, #(1, 21), [#(1, 21)]),
       player.state.ws_subject,
     ),
   )
   // let assert Ok(_) = - dont do this here
   //   mist.send_text_frame(player.socket, created_game_page(game_code, player))
-  WebsocketActorState(..player.state, player: Player(1, "", "", 10, 1))
+  WebsocketActorState(
+    ..player.state,
+    player: Player(1, "", "", 10, 1, #(1, 21), [#(1, 21)]),
+    game_code: game_code,
+  )
 }
 
 /// Creates a unique code for the game

@@ -1,27 +1,35 @@
-import components/bottom_bar.{bottom_bar}
-import components/lucide_lustre.{
+import app/actors/actor_types.{type Player}
+import app/pages/components/bottom_bar.{bottom_bar}
+import app/pages/components/lucide_lustre.{
   circle_user_round, circle_x, dices, messages_square, scan,
 }
-
+import app/pages/layout.{stats as info_stats}
 import gleam/list
 import gleam/result
 import gleam/string.{join}
-import layout.{stats}
 import lustre/attribute.{attribute, class, id, style}
 import lustre/element.{type Element}
 import lustre/element/html.{button, div, h1, text}
 
-pub fn map() -> Element(t) {
-  div(
-    [
-      class("!text-left !absolute !z-[999]"),
-      style([#("width", "calc(100% - 2rem)"), #("height", "calc(100% - 2rem)")]),
-    ],
-    [
-      div([class("!w-full z-30 absolute")], [bottom_bar(info(), buttons())]),
-      map_section(),
-    ],
-  )
+pub fn map(stats: Player) {
+  div([id("page"), class("h-full w-full")], [
+    div(
+      [
+        class("!text-left !absolute !z-[999]"),
+        style([
+          #("width", "calc(100% - 2rem)"),
+          #("height", "calc(100% - 2rem)"),
+        ]),
+      ],
+      [
+        div([class("!w-full z-30 absolute")], [
+          bottom_bar(info(stats), buttons()),
+        ]),
+        map_section(),
+      ],
+    ),
+  ])
+  |> element.to_string
 }
 
 fn header(chat: String) {
@@ -138,13 +146,13 @@ fn key() {
   ])
 }
 
-fn info() {
+fn info(stats: Player) {
   div(
     [
       class("btn !bg-gray-100 font-header !text-lg"),
       style([#("cursor", "default")]),
     ],
-    [stats()],
+    [info_stats(stats)],
   )
 }
 
@@ -161,6 +169,8 @@ fn buttons() {
           ],
           " ",
         )),
+        attribute("ws-send", ""),
+        id("go_to_chats"),
       ],
       [messages_square([])],
     ),
@@ -175,6 +185,8 @@ fn buttons() {
           ],
           " ",
         )),
+        attribute("ws-send", ""),
+        id("go_to_dice_roll"),
       ],
       [dices([])],
     ),
@@ -189,6 +201,8 @@ fn buttons() {
           ],
           " ",
         )),
+        attribute("ws-send", ""),
+        id("go_to_home"),
       ],
       [circle_x([])],
     ),
