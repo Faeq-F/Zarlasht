@@ -51,6 +51,12 @@ pub type CustomWebsocketMessage {
   /// Response to GetState for the game actor
   ///
   GameState(state: GameActorState)
+  /// Read state
+  ///
+  GetStateWS(asking: Subject(CustomWebsocketMessage))
+  /// response to GetStateWS
+  ///
+  StateWS(state: WebsocketActorState)
 }
 
 /// A wrapper for a player's WebSocket Actor state and their connection
@@ -129,6 +135,8 @@ pub type DirectorActorMessage {
 ///
 /// The code is only used while the game is waiting for players to join
 ///
+/// pages_in_view is used to track what page a player is looking at (for updates)
+///
 pub type GameActorState {
   GameActorState(
     code: Int,
@@ -137,7 +145,15 @@ pub type GameActorState {
     used_colors: List(String),
     player_chats: Dict(#(Int, Int), List(Message)),
     ally_chats: Dict(List(Int), List(Message)),
+    pages_in_view: Dict(Int, Page),
   )
+}
+
+pub type Page {
+  Home
+  Chat(chatting_to: Int)
+  Map
+  Dice
 }
 
 /// Message for a chat

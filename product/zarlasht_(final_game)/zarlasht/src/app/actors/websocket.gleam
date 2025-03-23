@@ -1,10 +1,10 @@
 //// All Websocket related functions for the app
 
 import app/actors/actor_types.{
-  type DirectorActorMessage, type PlayerSocket, type WebsocketActorState,
-  DequeueParticipant, Disconnect, GameState, GetState, JoinGame, Player,
-  PlayerSocket, SendToClient, UpdatePlayerState, UserDisconnected, Wait,
-  WebsocketActorState,
+  type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Chat,
+  DequeueParticipant, Dice, Disconnect, GameActorState, GameState, GetState,
+  GetStateWS, Home, JoinGame, Map, Player, PlayerSocket, SendToClient, StateWS,
+  UpdatePlayerState, UpdateState, UserDisconnected, Wait, WebsocketActorState,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
@@ -14,6 +14,7 @@ import gleam/int
 import gleam/io
 import gleam/option.{None, Some}
 import gleam/otp/actor
+import gleam/otp/supervisor
 import gleam/string
 import juno
 import logging.{Alert, Info}
@@ -41,8 +42,6 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
   mist.websocket(
     request: req,
     on_init: fn(_conn) {
-      // Create a new subject for the current websocket process
-      // that other actors will be able to send messages to
       let ws_subject = process.new_subject()
       let new_selector =
         process.new_selector()
@@ -125,21 +124,73 @@ fn handle_ws_message(state, conn, message) {
           start_game(PlayerSocket(conn, state))
           |> actor.continue
 
+        //TODO - refactor
         "go_to_home" -> {
+          let assert Some(game_subject) = state.game_subject
+          let assert GameState(game_state) =
+            process.call_forever(game_subject, GetState)
+          process.send(
+            game_subject,
+            UpdateState(
+              GameActorState(
+                ..game_state,
+                pages_in_view: game_state.pages_in_view
+                  |> dict.insert(state.player.number, Home),
+              ),
+            ),
+          )
           let assert Ok(_) =
             mist.send_text_frame(conn, game_page.game(state.player))
           state |> actor.continue
         }
         "go_to_chats" -> {
-          let assert Ok(_) =
-            mist.send_text_frame(conn, chat(PlayerSocket(conn, state)))
+          let assert Some(game_subject) = state.game_subject
+          let assert GameState(game_state) =
+            process.call_forever(game_subject, GetState)
+          process.send(
+            game_subject,
+            UpdateState(
+              GameActorState(
+                ..game_state,
+                pages_in_view: game_state.pages_in_view
+                  |> dict.insert(state.player.number, Chat(state.player.number)),
+              ),
+            ),
+          )
+          let assert Ok(_) = mist.send_text_frame(conn, chat(state))
           state |> actor.continue
         }
         "go_to_map" -> {
+          let assert Some(game_subject) = state.game_subject
+          let assert GameState(game_state) =
+            process.call_forever(game_subject, GetState)
+          process.send(
+            game_subject,
+            UpdateState(
+              GameActorState(
+                ..game_state,
+                pages_in_view: game_state.pages_in_view
+                  |> dict.insert(state.player.number, Map),
+              ),
+            ),
+          )
           let assert Ok(_) = mist.send_text_frame(conn, map(state.player))
           state |> actor.continue
         }
         "go_to_dice_roll" -> {
+          let assert Some(game_subject) = state.game_subject
+          let assert GameState(game_state) =
+            process.call_forever(game_subject, GetState)
+          process.send(
+            game_subject,
+            UpdateState(
+              GameActorState(
+                ..game_state,
+                pages_in_view: game_state.pages_in_view
+                  |> dict.insert(state.player.number, Dice),
+              ),
+            ),
+          )
           let assert Ok(_) = mist.send_text_frame(conn, roll_die(state.player))
           state |> actor.continue
         }
@@ -154,14 +205,24 @@ fn handle_ws_message(state, conn, message) {
               let assert GameState(game_state) =
                 process.call_forever(game_subject, GetState)
 
+              process.send(
+                game_subject,
+                UpdateState(
+                  GameActorState(
+                    ..game_state,
+                    pages_in_view: game_state.pages_in_view
+                      |> dict.insert(
+                        state.player.number,
+                        Chat(player_to_chat_to),
+                      ),
+                  ),
+                ),
+              )
+
               let assert Ok(_) =
                 mist.send_text_frame(
                   conn,
-                  chat_section(
-                    player_to_chat_to,
-                    PlayerSocket(conn, state),
-                    game_state,
-                  )
+                  chat_section(player_to_chat_to, state, game_state)
                     |> element.to_string,
                 )
               state |> actor.continue
@@ -172,10 +233,12 @@ fn handle_ws_message(state, conn, message) {
                 True -> {
                   let assert Ok(player_to_send_to) =
                     int.parse(trigger |> string.drop_start(13))
-                  // get messageText
-                  // update game state (correct dict)
-                  // update pages being viewed - poll?
-                  todo
+                  game.send_message(
+                    player_to_send_to,
+                    message,
+                    PlayerSocket(conn, state),
+                  )
+                  actor.continue(state)
                 }
                 _ -> {
                   logging.log(Alert, "Unknown Trigger")
@@ -197,6 +260,11 @@ fn handle_ws_message(state, conn, message) {
 
     mist.Custom(UpdatePlayerState(player_state)) -> {
       actor.continue(WebsocketActorState(..state, player: player_state))
+    }
+
+    mist.Custom(GetStateWS(asker)) -> {
+      process.send(asker, StateWS(state))
+      state |> actor.continue
     }
 
     mist.Custom(SendToClient(text)) -> {

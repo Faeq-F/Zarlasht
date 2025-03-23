@@ -1,5 +1,6 @@
 import app/actors/actor_types.{
-  type GameActorState, type Player, type PlayerSocket, GameState, GetState,
+  type GameActorState, type Player, type WebsocketActorState, GameState,
+  GetState,
 }
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{
@@ -16,8 +17,10 @@ import lustre/attribute.{attribute, class, id, name, role, style, type_}
 import lustre/element.{type Element}
 import lustre/element/html.{br, button, div, h1, label, p, span, text, textarea}
 
-pub fn chat(player: PlayerSocket) {
-  let assert Some(game_subject) = player.state.game_subject
+//TODO notification icon
+
+pub fn chat(player: WebsocketActorState) {
+  let assert Some(game_subject) = player.game_subject
   let assert GameState(game_state) =
     process.call_forever(game_subject, GetState)
   div([id("page"), class("h-full w-full")], [
@@ -33,17 +36,20 @@ pub fn chat(player: PlayerSocket) {
         div([class("!w-full z-30 absolute")], [
           bottom_bar(info(player, game_state), buttons()),
         ]),
-        chat_section(player.state.player.number, player, game_state),
+        chat_section(player.player.number, player, game_state),
       ],
     ),
   ])
   |> element.to_string
 }
 
-fn participants_to_chat_to(player: PlayerSocket, game_state: GameActorState) {
+fn participants_to_chat_to(
+  player: WebsocketActorState,
+  game_state: GameActorState,
+) {
   game_state.participants
   |> list.filter(fn(participant) {
-    { participant.0 }.number != player.state.player.number
+    { participant.0 }.number != player.player.number
   })
   |> list.map(fn(participant) {
     button(
@@ -68,14 +74,14 @@ fn participants_to_chat_to(player: PlayerSocket, game_state: GameActorState) {
   })
 }
 
-fn info(player: PlayerSocket, game_state: GameActorState) {
+fn info(player: WebsocketActorState, game_state: GameActorState) {
   div([class("flex")], [
     div(
       [
         class("btn !bg-gray-100 font-header !text-lg"),
         style([#("cursor", "default")]),
       ],
-      [info_stats(player.state.player)],
+      [info_stats(player.player)],
     ),
     div(
       [
@@ -129,7 +135,7 @@ fn info(player: PlayerSocket, game_state: GameActorState) {
               ],
               " ",
             )),
-            id("switch_chat_" <> int.to_string(player.state.player.number)),
+            id("switch_chat_" <> int.to_string(player.player.number)),
             attribute("ws-send", ""),
           ],
           [text("Allies")],
@@ -200,12 +206,12 @@ fn header(chat: String) {
 
 pub fn chat_section(
   to_chat_to: Int,
-  player: PlayerSocket,
+  player: WebsocketActorState,
   game_state: GameActorState,
 ) {
   //if we get our own number to chat to, we should chat to our allies
   //else chat to a specific person
-  let header_text = case to_chat_to == player.state.player.number {
+  let header_text = case to_chat_to == player.player.number {
     True -> "Allies"
     _ -> {
       let assert Ok(player_to_chat_to) =
@@ -338,8 +344,12 @@ fn send_message_section(to_chat_to: Int) {
   )
 }
 
-fn messages(to_chat_to: Int, player: PlayerSocket, game_state: GameActorState) {
-  let messages = case to_chat_to == player.state.player.number {
+fn messages(
+  to_chat_to: Int,
+  player: WebsocketActorState,
+  game_state: GameActorState,
+) {
+  let messages = case to_chat_to == player.player.number {
     True -> {
       //if we get our own number to chat to, we should chat to our allies
       let assert Ok(key) =
@@ -355,8 +365,8 @@ fn messages(to_chat_to: Int, player: PlayerSocket, game_state: GameActorState) {
         game_state.player_chats
         |> dict.keys()
         |> list.find(fn(key) {
-          { key.0 == to_chat_to && key.1 == player.state.player.number }
-          || { key.0 == player.state.player.number && key.1 == to_chat_to }
+          { key.0 == to_chat_to && key.1 == player.player.number }
+          || { key.0 == player.player.number && key.1 == to_chat_to }
         })
       let assert Ok(messages) = game_state.player_chats |> dict.get(key)
       messages
@@ -367,7 +377,7 @@ fn messages(to_chat_to: Int, player: PlayerSocket, game_state: GameActorState) {
   |> list.map(fn(message) {
     case message.sender == to_chat_to {
       True -> {
-        message_right(
+        message_left(
           message.message,
           message.name,
           "text-" <> message.color <> "-500",
@@ -375,7 +385,7 @@ fn messages(to_chat_to: Int, player: PlayerSocket, game_state: GameActorState) {
         )
       }
       _ -> {
-        message_left(
+        message_right(
           message.message,
           message.name,
           "text-" <> message.color <> "-500",

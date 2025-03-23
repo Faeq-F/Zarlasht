@@ -6,6 +6,7 @@ import app/actors/actor_types.{
   GetParticipants, JoinGame, Participants, PrepareGame, SendToClient,
   UpdateParticipant,
 }
+import gleam/function
 
 import app/actors/game
 import app/pages/game as game_page
@@ -16,10 +17,24 @@ import gleam/list
 import gleam/otp/actor.{type Next}
 
 /// Creates the Actor
-pub fn start() -> Subject(DirectorActorMessage) {
-  let assert Ok(actor) =
-    actor.start(DirectorActorState(dict.new()), handle_message)
-  actor
+pub fn start(
+  _input: Nil,
+  main_subject: Subject(Subject(DirectorActorMessage)),
+) -> Result(Subject(DirectorActorMessage), actor.StartError) {
+  actor.start_spec(actor.Spec(
+    init: fn() {
+      let director_subject = process.new_subject()
+      process.send(main_subject, director_subject)
+
+      let selector =
+        process.new_selector()
+        |> process.selecting(director_subject, function.identity)
+
+      actor.Ready(DirectorActorState(dict.new()), selector)
+    },
+    init_timeout: 1000,
+    loop: handle_message,
+  ))
 }
 
 /// Handles messages from other actors

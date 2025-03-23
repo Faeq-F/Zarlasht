@@ -1,12 +1,17 @@
 import app/actors/actor_types.{
-  type PlayerSocket, type WebsocketActorState, AddedName, GameStarted,
-  GetParticipants, Participants, Player, WebsocketActorState,
+  type GameActorState, type PlayerSocket, type WebsocketActorState, AddedName,
+  Chat, GameActorState, GameStarted, GameState, GetParticipants, GetState,
+  GetStateWS, Message, Participants, Player, SendToClient, StateWS, UpdateState,
+  WebsocketActorState,
 }
+import app/pages/chat.{chat_section}
 import app/pages/created_game.{info_error_player_count, info_error_setting_name}
+import birl
 import gleam/dict
 import gleam/erlang/process
 import gleam/list
 import gleam/option.{Some}
+import gleam/otp/actor
 import juno
 import lustre/element
 import mist
@@ -59,4 +64,110 @@ pub fn start_game(player: PlayerSocket) {
     }
   }
   player.state
+}
+
+pub fn send_message(
+  player_to_send_to: Int,
+  message: String,
+  player: PlayerSocket,
+) {
+  let time = birl.now() |> birl.to_naive_time_string()
+  let assert Ok(juno.Object(message_dict)) = juno.decode(message, [])
+  let assert Ok(juno.String(message_text)) =
+    message_dict |> dict.get("messageText")
+
+  let assert Some(game_subject) = player.state.game_subject
+  let assert GameState(game_state) =
+    process.call_forever(game_subject, GetState)
+
+  // update game state (correct dict)
+  case player_to_send_to == player.state.player.number {
+    True -> {
+      //allies
+      let assert Ok(key) =
+        game_state.ally_chats
+        |> dict.keys()
+        |> list.find(fn(key) { key |> list.contains(player_to_send_to) })
+      let assert Ok(messages) = game_state.ally_chats |> dict.get(key)
+
+      let sender = player.state.player.number
+      let name = player.state.player.name
+      let color = player.state.player.color
+      let messages =
+        messages
+        |> list.append([Message(sender, name, color, time, message_text)])
+
+      let new_game_state =
+        GameActorState(
+          ..game_state,
+          ally_chats: game_state.ally_chats |> dict.insert(key, messages),
+        )
+
+      process.send(game_subject, UpdateState(new_game_state))
+      // update pages being viewed
+      //update_chat_pages_in_view(player_to_send_to, new_game_state)
+    }
+    _ -> {
+      //specific player
+      let assert Ok(key) =
+        game_state.player_chats
+        |> dict.keys()
+        |> list.find(fn(key) {
+          { key.0 == player_to_send_to && key.1 == player.state.player.number }
+          || {
+            key.0 == player.state.player.number && key.1 == player_to_send_to
+          }
+        })
+      let assert Ok(messages) = game_state.player_chats |> dict.get(key)
+
+      let sender = player.state.player.number
+      let name = player.state.player.name
+      let color = player.state.player.color
+      let messages =
+        messages
+        |> list.append([Message(sender, name, color, time, message_text)])
+
+      let new_game_state =
+        GameActorState(
+          ..game_state,
+          player_chats: game_state.player_chats |> dict.insert(key, messages),
+        )
+
+      process.send(game_subject, UpdateState(new_game_state))
+      // update pages being viewed
+      //update_chat_pages_in_view(player_to_send_to, new_game_state)
+    }
+  }
+}
+
+//TODO - check if handled allies correctly
+fn update_chat_pages_in_view(player_to_send_to: Int, game_state: GameActorState) {
+  game_state.pages_in_view
+  |> dict.keys()
+  |> list.each(fn(key) {
+    let assert Ok(page) = game_state.pages_in_view |> dict.get(key)
+    case page == Chat(player_to_send_to) {
+      True -> {
+        let assert Ok(player_viewing) =
+          game_state.participants
+          |> list.find(fn(player) { { player.0 }.number == key })
+
+        //issue - call forever not ending
+        let assert StateWS(player_viewing_state) =
+          process.call(player_viewing.1, GetStateWS, 5000)
+
+        echo player_viewing_state
+
+        process.send(
+          player_viewing.1,
+          SendToClient(
+            chat_section(player_to_send_to, player_viewing_state, game_state)
+            |> element.to_string,
+          ),
+        )
+        Nil
+      }
+      _ -> Nil
+    }
+  })
 }

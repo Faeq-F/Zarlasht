@@ -3,7 +3,7 @@
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
   type Player, AddPlayer, AddedName, Disconnect, GameActorState, GameState,
-  GetState, JoinGame, Player, PrepareGame, SendToClient, SwapColors,
+  GetState, Home, JoinGame, Player, PrepareGame, SendToClient, SwapColors,
   UpdatePlayerState, UpdateState, UserDisconnected, Wait,
 }
 import gleam/dict
@@ -34,6 +34,7 @@ pub fn start(code: Int) -> Subject(GameActorMessage) {
       ],
       player_chats: dict.new(),
       ally_chats: dict.new(),
+      pages_in_view: dict.new(),
     )
   let assert Ok(actor) = actor.start(state, handle_message)
   actor
@@ -155,6 +156,7 @@ fn handle_message(
       new_state |> actor.continue
     }
     PrepareGame -> {
+      //setup chats
       let setup_player_chats =
         state.participants
         |> list.combination_pairs()
@@ -169,10 +171,20 @@ fn handle_message(
           dict
           |> dict.insert([{ player.0 }.number], [])
         })
+
+      //setup page state
+      let setup_pages =
+        state.participants
+        |> list.fold(dict.new(), fn(dict, player) {
+          dict
+          |> dict.insert({ player.0 }.number, Home)
+        })
+
       GameActorState(
         ..state,
         player_chats: setup_player_chats,
         ally_chats: setup_ally_chats,
+        pages_in_view: setup_pages,
       )
       |> actor.continue
     }

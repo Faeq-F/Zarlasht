@@ -4,7 +4,8 @@ import app/actors/director
 import app/router
 import app/web.{Context}
 import carpenter/table
-import gleam/erlang/process
+import gleam/erlang/process.{type Subject}
+import gleam/otp/supervisor
 import glenvy/dotenv
 import logging
 import mist
@@ -16,9 +17,14 @@ import valkey.{radish_flush_db, valkey_client}
 /// The entry-point for the program
 ///
 pub fn main() {
-  let director = director.start()
-  // Set up and configure a helper ETS table
+  //setup main supervisor
+  let main_subject = process.new_subject()
+  let main_child = supervisor.worker(director.start(_, main_subject))
+  let assert Ok(_supervisor_subject) =
+    supervisor.start(supervisor.add(_, main_child))
+  let assert Ok(director_subject) = process.receive(main_subject, 1000)
 
+  // Set up and configure a helper ETS table
   // for games that have been created but have not been started
   let _ =
     table.build("waiting_games")
@@ -35,8 +41,8 @@ pub fn main() {
   logging.configure()
   let ctx = Context(valkey_client(), valkey_client())
   let assert Ok(_) = radish_flush_db(ctx.publisher, 128)
-  let assert Ok(_) =
-    router.handle_request(_, ctx, director)
+  let assert Ok(_server_supervisor) =
+    router.handle_request(_, ctx, director_subject)
     |> mist.new
     |> mist.port(8000)
     // Todo
