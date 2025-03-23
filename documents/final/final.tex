@@ -423,8 +423,7 @@ the description of implementations section of this report.
 %check the sentence above
 %Talk about CAP theorem later w/ distribution
 
-\chapter{Concurrency Mechanisms}
-\section{State-of-the-art Concurrency}
+\chapter{State-of-the-art Concurrency}
 
 There is a critical need for robust concurrency mechanisms that can efficiently
 manage complex, interactive game environments while ensuring scalability
@@ -455,7 +454,7 @@ through handling all interleavings correctly,
 and providing an easy implementation of concurrent programs. As well as this, implementation efficiency
 is paramount for performance.
 
-\subsection{Event Loops}
+\section{Event Loops}
 Since I aim for a web interface for my games, to make
 accessibility an easier goal to achieve, I will first look at JavaScript's
 concurrency model, since it is a core technology of the Web.
@@ -502,7 +501,7 @@ intensive concurrent processes, making it less suitable for demanding game envir
 In contrast, more robust concurrency models that are well-suited for
 such environments will be discussed.
 
-\subsection{Coroutines}
+\section{Coroutines}
 
 Coroutines represent a more advanced concurrency mechanism that extends
 traditional function behavior by introducing suspend and resume operations \cite{belson_survey_2019}.
@@ -528,7 +527,7 @@ restricting the ability to suspend from subroutines or nested function calls
 \cite{belson_survey_2019}. This constraint introduces additional complexity
 in designing flexible concurrent systems using stackless coroutine implementations.
 
-\subsection{Goroutines}
+\section{Goroutines}
 
 An alternative is Go’s goroutines, offering a lightweight threading model,
 facilitating efficient concurrency through
@@ -570,7 +569,7 @@ introduce complexity for static verification, as channel bounds may not be
 statically determinable and the maximal capacity of
 asynchronous channels can often be reached in practice \cite{lange_empirical_2019}.
 
-\subsection{Actors}
+\section{Actors}
 The actor model, implemented in languages such as Erlang and frameworks
 like Akka for Scala, encapsulates state and behavior within independent actors.
 These actors communicate solely through message passing, ensuring high fault
@@ -661,7 +660,20 @@ a pool of servers within my architecture.
   \label{fig: 1}
 \end{figure*}
 
-\section{Distribution}
+
+\chapter{Architectural paradigms, distribution and design patterns}
+
+For implementing the concurrent game environments themselves, there are various architectural approaches.
+To start, there is the choice between the peer-to-peer model or client-server model.
+The peer-to-peer model eliminates the need for a central server, simplifying setup and
+reducing costs. While this model is resilient to server failures, it presents challenges
+in managing peer disconnections and potential cheating through data manipulation~\cite{franchetti_coping_2020}.
+Conversely, the client-server model allows the server to act as a neutral authority to govern the game,
+validating players' actions. The model does introduce more upfront challenges though, including cost,
+latency, and scaling. Mitigations exist, for example, using a load balancer with multiple servers," so
+that if a server goes down, another one can take its place without causing significant
+disruption for clients", or by having auto-scaling so that servers "can spin up or down
+based on usage" \cite{pandey_peer--peer_2022}.
 
 As well as the concurrency mechanisms themselves, distribution is a key
 thing to consider for highly concurrent5 game environments. This is so that
@@ -675,129 +687,80 @@ failure management pattern that helps establish consistency in distributed
 applications, and coordinates transactions between multiple services to
 maintain data consistency. Helps with split-brain
 
-\subsection{Saga interaction}
+\section{Microservices}
 
-Sagas allow for the implementation of long-running, distributed business
-transactions, executing a set of operations across multiple microservices,
-applying consistent all-or-nothing semantics.
+When moving to microservices, one of the first things to realize is that individual services don’t exist in isolation.
 %https://www.infoq.com/articles/saga-orchestration-outbox/
 
-For the sake of decoupling, communication between microservices should preferably
-happen asynchronously, for instance using distributed commit logs like
-Apache Kafka.
+\section{Saga interaction}
+
+When building applications with microservices, a key issue is maintaining data
+consistency across services. The Database per Service pattern is a common
+approach where each microservice has its own database, enabling loose coupling,
+and independent development, and scalability. However, this introduces the
+issue of handling transactions that span multiple services.
+%https://microservices.io/patterns/data/saga.html
+
+A Saga is a sequence of local transactions. %https://microservices.io/patterns/data/saga.html
+It allows long-running transactions to be distributed across multiple
+microservices while maintaining all-or-nothing semantics
+(either all the transactions in the sequence succeed, or the entire operation
+is rolled back to ensure data consistency).
 %https://www.infoq.com/articles/saga-orchestration-outbox/
 
-Saga interaction coordinates transactions between multiple microservices to maintain data
-consistency. A microservice publishes an event for every transaction, and
-the next transaction is initiated based on the event's outcome. It can
-take two different paths, depending on the success or failure of the
-transactions.
+Saga interaction works by coordinating transactions between microservices using
+asynchronous messaging.
+Messaging can be done using message brokers; asynchronous communication is
+preferred because it decouples services, ensuring that the failure of one
+service doesn’t block others. %https://microservices.io/post/sagas/2019/08/04/developing-sagas-part-2.html
+Each microservice publishes an event after completing its local transaction,
+and the next transaction is triggered based on the outcome of the previous
+one. If the transactions complete successfully, the operation is finalized
+but if any transaction fails, compensating transactions are executed to
+undo the changes made by previous transactions. %https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
+Compensating transactions undo the effects of a previously committed local
+transaction. For example, in e-commerce, if a payment is processed but an
+order cannot be fulfilled, a compensating transaction would refund the
+payment. However, designing compensating transactions can be complex as each
+service must define how to reverse its changes. This complexity grows as
+the number of microservices increases, making debugging and maintenance
+challenging.
 %https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
 
-When moving to microservices, one of the first things to realize is that
-individual services don’t exist in isolation. While the goal is to create
-loosely coupled, independent services with as little interaction as
-possible, chances are high that one service needs a particular data set
-owned by another service, or that multiple services need to act in
-concert to achieve a consistent outcome of an operation in the domain
-of our business.
+There are two main ways to implement Saga interaction; choreography and
+orchestration. In choreography, each service communicates directly with the
+next service in the sequence. After completing its local transaction, a
+service publishes an event that triggers the next transaction. This
+decentralized approach is simple but can become difficult to manage as the
+number of services grows. The logic of the Saga is scattered across
+services, making it harder to understand and debug. %https://www.infoq.com/articles/saga-orchestration-outbox/
+In orchestration, a central 'orchestrator' coordinates the Sagas. The orchestrator
+invokes each service in sequence and handles the flow of events. This approach
+centralizes the logic, making it easier to manage and extend. For example,
+adding a new step to the Saga only requires updating the orchestrator,
+not every participating service. %https://www.infoq.com/articles/saga-orchestration-outbox/
+While the pattern is useful, ensuring all transactions are atomic, consistent and
+durable (changes are permanent), there is a lack of isolation, meaning that
+changes from local transactions are visible immediately, even if the Saga fails
+later.
 %https://www.infoq.com/articles/saga-orchestration-outbox/
 
-The outbox pattern provides a solution for service authors to perform writes to
-their local database and send messages via Apache Kafka, without relying on
-unsafe “dual writes.”
-%https://www.infoq.com/articles/saga-orchestration-outbox/
+To avoid issues with dual-writes (writing to the database and sending a message
+simultaneously, causing multiple writes without an additional layer that
+ensures data consistency over both services), the outbox pattern is often used.
+This pattern ensures that messages are reliably sent by storing them in the
+local database first and then publishing them to the message broker. This
+guarantees that messages are not lost even if a service fails.
 
-
-
-You should consider using this pattern if:
-The application needs to maintain data consistency across multiple
-microservices without tight coupling.
-There are long-lived transactions and you don’t want other microservices
-to be blocked if one microservice runs for a long time.
-You need to be able to roll back if an operation fails in the sequence.
-%https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
-
-Thouhg amaonm warn,
-The saga pattern is difficult to debug and its complexity increases with the
-number of microservices. The pattern requires a complex programming model that
-develops and designs compensating transactions for rolling back and undoing
-changes.
-
-%https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
-
-
-
-For “rolling back” the overarching business transaction in case of a failure,
-Sagas rely on the notion of compensating transactions: each previously applied
-local transaction must be able to be “undone” by running another transaction
-which applies the inversion of the formerly done changes.
-%https://www.infoq.com/articles/saga-orchestration-outbox/
-
-There are two general ways for implementing distributed Sagas—choreography
-and orchestration. In the choreography approach, one participating service
-sends a message to the next after it has executed its local transaction.
-With orchestration, on the other hand, there’s one coordinating service
-that invokes one participant after the other.
-%https://www.infoq.com/articles/saga-orchestration-outbox/
-
-Both approaches have their pros and cons, (e.g., see this post by
-Chris Richardson and this one by Yves do Régo for a more detailed discussion).
-Personally, I prefer the orchestration approach, as it defines one central place
-that can be queried to obtain the current status of a particular Saga
-(the orchestrator, or “Saga execution coordinator,” SEC for short). Since
-it avoids point-to-point communication between participants, (other
-than the orchestrator), it also allows for the addition of further
-intermediary steps within the flow, without the need to adjust each
-participant.
-%https://www.infoq.com/articles/saga-orchestration-outbox/
-
-Let’s examine how Sagas satisfy the four classic ACID properties of
-transactions, as defined by Theo Härder and Andreas Reuter (based on
-earlier work by Jim Gray) in their fundamental paper Principles of
-Transaction-Oriented Database Recovery:
-%https://www.infoq.com/articles/saga-orchestration-outbox/
-Atomicity: ✅ —The pattern ensures that either all services apply the
-local transactions or, in case of a failure, all already executed local
-transactions are compensated so that no data change is applied effectively.
-%https://www.infoq.com/articles/saga-orchestration-outbox/
-Consistency: ✅ —All local constraints are guaranteed to be satisfied
-after successful execution of all the transactions making up the Saga,
-transitioning the overall system from one consistent state to another.
-%https://www.infoq.com/articles/saga-orchestration-outbox/
-Isolation: ❌—As local transactions are committed while the Saga is running,
-their changes are already visible to other concurrent transactions, despite
-the possibility that the Saga will fail eventually, causing all previously
-applied transactions to be compensated. I.e., from the perspective of the
-overall Saga, the isolation level is comparable to “read uncommitted.”
-%https://www.infoq.com/articles/saga-orchestration-outbox/
-Durability: ✅ —Once the local transactions of the Saga have been
-committed, their changes are persisted and durable, e.g., after a service
-failure and restart.
-%https://www.infoq.com/articles/saga-orchestration-outbox/
-
-From a service consumer point of view — e.g., a user placing a purchase order
-with the order service—the system is eventually consistent; i.e., it will
-take some time until the purchase order is in its correct state, as per
-the logic of the different participating services.
-%https://www.infoq.com/articles/saga-orchestration-outbox/
-
-As far as the communication between the participating services is concerned,
-this may happen either synchronously, e.g., via HTTP or gRPC, or
-asynchronously, e.g., via message brokers or distributed logs such as
-Apache Kafka. Whenever possible, asynchronous communication between services
-should be preferred, as it unties the sending service from the
-availability of consuming ones. And as we’ll see in the next section,
-not even the availability of Kafka itself is a concern, thanks to change
-data capture.
-
-%https://www.infoq.com/articles/saga-orchestration-outbox/
-
-\subsection{Microservices}
-
-\subsection{Event driven architecture}
+\section{Event driven architecture}
 
 kubernetes - playstation
+
+https://aws.amazon.com/event-driven-architecture/
+
+https://www.appvia.io/blog/why-is-kubernetes-so-complicated
+scalability, flexibility, and cost-effectiveness - Kubernetes
+https://sonyinteractive.com/en/innovation/technology/research-academia/research/fully-automated-kubernetes-operations/
 
 event vs message - pub/sub
 
@@ -807,8 +770,6 @@ technically possible, it is more commonly associated with messaging patterns
 rather than pure event-driven systems. Events excel at state propagation
 and decoupled notifications, while messages are better suited for command
 execution, workflow orchestration, and explicit coordination. [22][23]
-
-
 
 \section{My choice for distribution}
 
@@ -829,27 +790,14 @@ that does not need to scale at the moment to massive amounts.
 a switch to kubernetes could always occur if my game does need to be in
 production in massive amounts, like worldwide.
 
-\subsection{Architectural paradigms and design patterns}
+erlang has global or pg module but too complicated. Simpler is messaging
+%https://www.erlang.org/doc/system/distributed_applications.html
 
-For implementing the concurrent game environments themselves, there are various architectural approaches.
-To start, there is the choice between the peer-to-peer model or client-server model.
-The peer-to-peer model eliminates the need for a central server, simplifying setup and
-reducing costs. While this model is resilient to server failures, it presents challenges
-in managing peer disconnections and potential cheating through data manipulation~\cite{franchetti_coping_2020}.
-Conversely, the client-server model allows the server to act as a neutral authority to govern the game,
-validating players' actions. The model does introduce more upfront challenges though, including cost,
-latency, and scaling. Mitigations exist, for example, using a load balancer with multiple servers," so
-that if a server goes down, another one can take its place without causing significant
-disruption for clients", or by having auto-scaling so that servers "can spin up or down
-based on usage" \cite{pandey_peer--peer_2022}.
 
 I will opt for the client-server model, using WebSockets, along with using a OSS Redis based database as a cluster,
 as this seems to be the most common approach
 across my research, mitigating all forseeable risks via the use of a load balancers,
 Pub/Sub, etc.. This will be further discussed within the description of implementations section of this report.
-
-%TODO
-%expand section & include prev. mentioned parts, like distribution, possibly under different headings
 
 \chapter{Software Engineering}
 
