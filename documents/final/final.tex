@@ -688,13 +688,74 @@ applications, and coordinates transactions between multiple services to
 maintain data consistency. Helps with split-brain
 
 \section{Microservices}
+%https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/microservices
+Using microservices for your architecture is a fairly modern and common software
+design pattern in which you structure an application as a collection of small,
+autonomous services, each responsible for a specific function. This promotes
+decentralization and loose coupling by allowing each service to operate
+independently, enabling greater flexibility, scalability, and resilience,
+making it well-suited for complex, evolving systems.
 
-When moving to microservices, one of the first things to realize is that individual services don’t exist in isolation.
-%https://www.infoq.com/articles/saga-orchestration-outbox/
+A key principle while using microservices is the concept of bounded contexts,
+where each service encapsulates a distinct capability with clearly defined
+boundaries. This separation ensures that services remain loosely coupled,
+meaning changes to one service do not require modifications to others.
+Microservices should also be independently deployable, allowing development
+teams to update, scale, or replace individual services without disrupting
+the entire system. This modularity accelerates development cycles and
+reduces the risk associated with large-scale deployments.
+
+Communication between microservices tend to occur through APIs, allowing
+services to use different programming languages, databases, and frameworks,
+a concept known as polyglot persistence. For example, one service might use
+a relational database for transactional consistency, while another employs a
+NoSQL database for high-speed data retrieval. This flexibility enables
+teams to select the best tools for their specific requirements rather
+than being constrained by a one-size-fits-all approach.
+
+To manage the complexity of distributed services, microservices architectures
+often incorporate an API Gateway, which serves as a single entry point for
+client requests. The gateway handles shared concerns such as authentication,
+load balancing, and request routing, simplifying client interactions and
+improving security.
+
+One of the primary advantages of microservices is agility. Because services
+are developed and deployed independently, updates can be released
+faster, with experiments with new features or roll backs for changes that
+have caused issues earlier.
+This contrasts with traditional applications, where a single bug fix may
+require a full redeployment. Furthermore, microservices support fault
+isolation, meaning the failure of one service does not necessarily bring
+down the entire system. Techniques such as the Circuit Breaker pattern
+help maintain system stability by preventing cascading failures.
+
+However, adopting microservices introduces challenges. The distributed nature
+of the architecture increases operational complexity, requiring robust
+monitoring, logging, and debugging tools to track interactions between
+services. Data consistency becomes more difficult to enforce, as transactions
+may span multiple services, often necessitating eventual consistency rather
+than strict ACID compliance. Network latency and inter-service communication
+overhead can also impact performance, particularly in systems with
+deeply nested service dependencies.
+
+Adhering to best practices, such as domain-driven design, which aligns services
+with business capabilities, and decentralized data management, where each
+service owns its data store, helps mitigating these challenges. Avoiding
+tight coupling between services, whether through shared databases or rigid
+APIs, ensures long-term maintainability. Additionally, resilience patterns
+like retries, timeouts, and bulkheads help manage failures gracefully,
+while API versioning prevent compatibility issues during updates.
+Cloud platforms can provide essential tools for microservices adoption,
+including container orchestration and API Management. These services simplify
+deployment, scaling, and security, allowing people to focus on building
+business logic rather than infrastructure.
 
 \section{Saga interaction}
 
-When building applications with microservices, a key issue is maintaining data
+"When moving to microservices, one of the first things to
+realize is that individual services don’t exist in isolation." %https://www.infoq.com/articles/saga-orchestration-outbox/
+Like discussed above, this can cause many issues, but a key one
+is maintaining data
 consistency across services. The Database per Service pattern is a common
 approach where each microservice has its own database, enabling loose coupling,
 and independent development, and scalability. However, this introduces the
@@ -753,6 +814,16 @@ local database first and then publishing them to the message broker. This
 guarantees that messages are not lost even if a service fails.
 
 \section{Event driven architecture}
+%TODO glossary
+
+Event-Driven Architecture (EDA) and microservices are complementary patterns;
+while microservices decompose applications into small, independent services,
+EDA provides the communication backbone that enables these services to
+interact asynchronously through events, resulting in looser coupling and
+greater scalability compared to synchronous request-driven approaches.
+
+While EDA pairs well with microservices, it is a standalone, modern
+pattern that delivers vital benefits, even in monolithic or hybrid systems.
 
 kubernetes - playstation
 
