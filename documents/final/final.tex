@@ -1,38 +1,96 @@
 \documentclass[]{final}
+\usepackage{graphicx, caption, subcaption, float, wrapfig}
+\usepackage{cite, hyperref, xurl, xcolor, color}
+\hypersetup{colorlinks=true, urlcolor=blue, citecolor=blue, linkcolor=black}
+\usepackage{upgreek, amsmath, tipa , textcomp, amssymb}
+\usepackage{listings, chapterbib, enumerate}
+\usepackage[smartEllipses]{markdown}
 \bibliographystyle{apalike}
 \bibstyle{apalike}
-\usepackage{graphicx, wrapfig, listings, xcolor, caption}
-\usepackage{hyperref, cite}
-\usepackage[smartEllipses]{markdown}
-\usepackage{enumerate}
 
-\setcounter{tocdepth}{7}
+\setcounter{tocdepth}{4} %TODO set to 6 and see what to want to keep
+% screenshots sub headings
+%code implementations
 
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{245,244,243}
-
-\lstdefinestyle{mycodestyle}{
-    backgroundcolor=\color{backcolour},
-    commentstyle=\color{codegreen},
-    keywordstyle=\color{magenta},
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\tiny,
-    breakatwhitespace=false,
-    breaklines=true,
-    captionpos=b,
+% Gleam code style
+\definecolor{WhiteCodeBlock}{RGB}{255,255,255}% rgb(255,255,255)
+\definecolor{BlackText}{RGB}{110,107,94}% rgb(110,107,94)
+\definecolor{GreenString}{RGB}{164,241,166}% rgb(164, 241, 166)
+\definecolor{GreenTypename}{RGB}{98,228,168}% rgb(98,228,168)
+\definecolor{PurpleKeyword}{RGB}{222,44,253}% rgb(222, 44, 253)
+\definecolor{GrayComment}{RGB}{170,170,170}% rgb(170,170,170)
+\definecolor{GoldDocumentation}{RGB}{180,165,45}% rgb(180,165,45)
+\definecolor{OrangeVariable}{RGB}{255, 172, 32}% rgb(255, 172, 32)
+\definecolor{Math}{RGB}{112,116,254}% rgb(112, 116, 254)
+\definecolor{BlueFunction}{RGB}{122,209,255}% rgb(122, 209, 255)
+\lstdefinelanguage{gleam}
+{
+    alsoletter={:},
+    columns=fullflexible,
+    tabsize=2,
     keepspaces=true,
-    numbers=left,
-    numbersep=5pt,
-    showspaces=false,
+    captionpos=b,
     showstringspaces=false,
-    showtabs=false,
-    tabsize=2
+    frame=single,
+    framesep=0pt,
+    framerule=0pt,
+    framexleftmargin=4pt,
+    framexrightmargin=4pt,
+    framextopmargin=5pt,
+    framexbottommargin=3pt,
+    xleftmargin=4pt,
+    xrightmargin=4pt,
+    backgroundcolor=\color{WhiteCodeBlock},
+    basicstyle=\ttfamily\color{BlackText}\tiny,
+    keywords={
+        pub, fn, let, case, if, else, use, type,
+        struct, enum, import, as, external
+    },
+    keywordstyle=\color{PurpleKeyword},
+    stringstyle=\color{GreenString},
+    morestring=[s]{"}{"},
+    literate=
+    {=}{{{\color{Math}=}}}{1}%
+    {->}{{{\color{OrangeVariable}->}}}{2}%
+    {|>}{{{\color{OrangeVariable}|>}}}{2}%
+    {+}{{{\color{Math}+}}}{1}%
+    {*}{{{\color{Math}*}}}{1}%
+    {!}{{{\color{Math}!}}}{1}%
+    {(}{{{\color{Math}(}}}{1}%
+    {)}{{{\color{Math})}}}{1}%
+    {[}{{{\color{Math}[}}}{1}%
+    {]}{{{\color{Math}]}}}{1}%
+    {<}{{{\color{Math}<}}}{1}%
+    {0}{{{\color{Math}0}}}1%
+    {1}{{{\color{Math}1}}}1%
+    {2}{{{\color{Math}2}}}1%
+    {3}{{{\color{Math}3}}}1%
+    {4}{{{\color{Math}4}}}1%
+    {5}{{{\color{Math}5}}}1%
+    {6}{{{\color{Math}6}}}1%
+    {7}{{{\color{Math}7}}}1%
+    {8}{{{\color{Math}8}}}1%
+    {9}{{{\color{Math}9}}}1,
+    morekeywords=[2]{
+        Request, Connection, Subject, DirectorActorMessage, Info,
+        WebsocketActorState, Neither, None, Some, DequeueParticipant,
+        UserDisconnected, Nil
+    },
+    keywordstyle=[2]\color{GreenTypename},
+    morekeywords=[3]{
+        log, new_selector, new_subject, debug, send, new, websocket, selecting
+    },
+    keywordstyle=[3]\color{BlueFunction},
+    morekeywords=[4]{
+        request:, on_init:, on_close:, handler:, name:, game_code:,
+        player:, ws_subject:, game_subject:, director_subject:
+    },
+    keywordstyle=[4]\color{OrangeVariable},
+    comment=[l][\color{GrayComment}\slshape]{//},
+    morecomment=[l][\color{GoldDocumentation}\slshape]{///},
+    commentstyle=\color{GrayComment}\slshape
 }
 
-\lstset{style=mycodestyle}
 
 
 \newcommand{\bulletPoint}{\hspace{-3.1pt}$\bullet$ \hspace{5pt}}
@@ -687,7 +745,12 @@ failure management pattern that helps establish consistency in distributed
 applications, and coordinates transactions between multiple services to
 maintain data consistency. Helps with split-brain
 
+\section{Pool Architecture}
+%https://cubettech.com/resources/blog/microservice-v-s-pool-architecture-for-saa-s-applications/
+
 \section{Microservices}
+Compared to a monolith architecture
+
 %https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/microservices
 Using microservices for your architecture is a fairly modern and common software
 design pattern in which you structure an application as a collection of small,
@@ -825,15 +888,92 @@ greater scalability compared to synchronous request-driven approaches.
 While EDA pairs well with microservices, it is a standalone, modern
 pattern that delivers vital benefits, even in monolithic or hybrid systems.
 
+%https://aws.amazon.com/event-driven-architecture/
+
+In EDA, events trigger and facilitate communication between decoupled services.
+This approach is widely adopted in modern applications, whether they are built
+using microservices or a monolith, due to its ability to enhance scalability,
+flexibility, and resilience. An event represents a change in state, such
+as a customer placing an order in an e-commerce system, and can either
+carry a large data payload or serve as a notification prompting further
+action.
+
+An event-driven system consists of three fundamental elements; event producers,
+event routers, and event consumers. A producer generates an event when a
+state change occurs, such as an inventory update or a payment confirmation.
+The event router, often a message broker or event bus, receives these
+events, filters and transforms them, and delivers them to the appropriate
+consumers. The consumers then process the events, executing business logic
+such as updating a database or triggering a notification. Crucially,
+producers and consumers remain entirely decoupled, unaware of each other’s
+existence, which allows them to work independently.
+
+One of the primary benefits of EDA is the ability to scale and fail
+independently. Since services interact only through the event router, a failure
+in one component does not cascade to others. The router acts as an elastic
+buffer, absorbing workload spikes and ensuring reliable event delivery even
+during partial system outages.
+
+EDA also accelerates development agility by eliminating the need for custom
+polling or request-response logic. The event router handles event filtering,
+routing, and delivery automatically, reducing boilerplate code and minimizing
+cross-team coordination. This decoupling enables teams to deploy updates to
+producers or consumers without requiring synchronized releases.
+
+From an operational standpoint, event-driven systems simplify auditing and
+security management. The event router serves as a centralized control point
+where access policies, encryption standards, and compliance rules can be
+enforced uniformly. Events can be encrypted in transit and at rest, and
+fine-grained permissions ensure only authorized services publish or subscribe
+to specific event streams.
+
+Cost efficiency is another compelling advantage. Unlike polling-based systems,
+which continuously consume resources to check for updates, EDA operates on a
+push-based model, where processing occurs only when events are emitted. This
+reduces unnecessary network traffic, CPU overhead, and idle resource allocation,
+leading to lower operational expenses.
+
+Event-driven architectures excel in scenarios requiring cross-account or
+cross-region data replication. For instance, a global SaaS platform might use
+an event router to synchronize user data across geographically distributed
+databases while allowing each region to operate autonomously.
+
+They are equally effective for real-time monitoring and alerting. Instead of
+repeatedly querying resources like cloud storage or serverless functions,
+services can subscribe to event streams that notify them of anomalies,
+configuration changes, or performance thresholds being breached.
+
+EDA also enables efficient fanout and parallel processing. A single event,
+such as a file upload, can trigger multiple independent workflows (e.g.,
+thumbnail generation, metadata extraction, and virus scanning) without custom
+integration code. The event router disseminates the event to all relevant
+consumers, which process it concurrently.
+
+Finally, EDA is ideal for integrating heterogeneous systems. Organizations with
+legacy applications, third-party APIs, or polyglot microservices can use an
+event router as a universal interoperability layer, allowing disparate
+systems to exchange data without direct dependencies.
+
+While event-driven architectures offer significant advantages, their suitability
+depends on specific application requirements. Event durability is critical:
+if events must be processed exactly once, the event source must guarantee
+delivery and avoid duplicates. Performance control is another factor;
+applications must tolerate the asynchronous nature of event processing, which
+may introduce latency or out-of-order delivery. Event flow tracking can also
+pose challenges. While monitoring tools provide visibility into dynamic event
+streams, static code analysis becomes harder due to the indirection
+introduced by the router. Additionally, if the system needs to rebuild
+state (e.g., after a failure), the event source must support ordered,
+deduplicated replay to ensure consistency and prevent split-brain
+(where, ... explain).
+
 kubernetes - playstation
-
-https://aws.amazon.com/event-driven-architecture/
-
-https://www.appvia.io/blog/why-is-kubernetes-so-complicated
+%https://sonyinteractive.com/en/innovation/technology/research-academia/research/fully-automated-kubernetes-operations/
 scalability, flexibility, and cost-effectiveness - Kubernetes
-https://sonyinteractive.com/en/innovation/technology/research-academia/research/fully-automated-kubernetes-operations/
+
 
 event vs message - pub/sub
+%https://cloud.google.com/pubsub/docs/overview
 
 Delivery patterns for both events and messages include publish/subscribe
 (one-to-many) and point-to-point (one-to-one). While request/reply is
@@ -863,6 +1003,9 @@ production in massive amounts, like worldwide.
 
 erlang has global or pg module but too complicated. Simpler is messaging
 %https://www.erlang.org/doc/system/distributed_applications.html
+
+too complex, already learning a lot, not feasible
+%https://www.appvia.io/blog/why-is-kubernetes-so-complicated
 
 
 I will opt for the client-server model, using WebSockets, along with using a OSS Redis based database as a cluster,
@@ -1134,7 +1277,7 @@ denoted by the published message.
   \captionof{figure}{A sequence diagram used for designing how the player will connect to the game}\label{fig: 5}
   \vspace*{0.5cm}
   %\includegraphics[width=\textwidth]{new_websocket_actor}
-  \begin{lstlisting}
+  \begin{lstlisting}[language=gleam]
     ///See [here](https://hexdocs.pm/mist/mist.html#websocket)
     ///
     pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
@@ -1232,7 +1375,7 @@ the creator of the game is always player X, and the player who joins the game is
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}
+  \begin{lstlisting}[language=gleam]
 
     /// Creates the Actor
     pub fn start() -> Subject(DirectorActorMessage) {
@@ -1299,7 +1442,7 @@ the creator of the game is always player X, and the player who joins the game is
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}
+  \begin{lstlisting}[language=gleam]
     /// Creates the actor
     ///
     pub fn start(
@@ -1337,7 +1480,7 @@ the creator of the game is always player X, and the player who joins the game is
   \end{lstlisting}
   \captionof{figure}{The function that starts the game actor}\label{fig: 7}
   \vspace*{1.5cm}
-  \begin{lstlisting}
+  \begin{lstlisting}[language=gleam]
     /// Creates a unique code for the game
     ///
     fn generate_game_code(player: PlayerSocket) -> Int {
@@ -1373,7 +1516,7 @@ the creator of the game is always player X, and the player who joins the game is
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}
+  \begin{lstlisting}[language=gleam]
     /// After the game code has been inputted on the join page
     ///
     /// Sends the player to the `set_name_page`
@@ -1472,7 +1615,7 @@ allowing the opponent to take their turn.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}
+  \begin{lstlisting}[language=gleam]
     case message_for_actor {
       BoxClick(player, box_index) -> {
         // Update state for boxes
@@ -1535,7 +1678,7 @@ allowing the opponent to take their turn.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}
+  \begin{lstlisting}[language=gleam]
   /// Gets the winning player for a game
   ///
   /// Returns "X", "O", or "Draw" if a game has ended
