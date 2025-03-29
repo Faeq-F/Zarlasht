@@ -1,10 +1,10 @@
 import app/actors/actor_types.{
   type GameActorState, type PlayerSocket, type WebsocketActorState, AddedName,
-  Chat, GameActorState, GameStarted, GameState, GetParticipants, GetState,
-  GetStateWS, Message, Participants, Player, SendToClient, StateWS, UpdateState,
-  WebsocketActorState,
+  Chat, Dice, GameActorState, GameStarted, GameState, GetParticipants, GetState,
+  GetStateWS, Home, Map, Message, Participants, Player, SendToClient, StateWS,
+  UpdateState, WebsocketActorState,
 }
-import app/pages/chat.{chat_section}
+import app/pages/chat.{chat, chat_section}
 import app/pages/created_game.{info_error_player_count, info_error_setting_name}
 import birl
 import gleam/dict
@@ -67,10 +67,11 @@ pub fn start_game(player: PlayerSocket) {
 }
 
 pub fn send_message(
-  player_to_send_to: Int,
+  player_to_send_to: String,
   message: String,
   player: PlayerSocket,
 ) {
+  let assert Ok(player_to_send_to) = int.parse(player_to_send_to)
   let time = birl.now() |> birl.to_naive_time_string()
   let assert Ok(juno.Object(message_dict)) = juno.decode(message, [])
   let assert Ok(juno.String(message_text)) =
@@ -138,6 +139,7 @@ pub fn send_message(
       //update_chat_pages_in_view(player_to_send_to, new_game_state)
     }
   }
+  player.state
 }
 
 //TODO - check if handled allies correctly
@@ -170,4 +172,115 @@ fn update_chat_pages_in_view(player_to_send_to: Int, game_state: GameActorState)
       _ -> Nil
     }
   })
+}
+
+import gleam/int
+
+pub fn switch_chat(
+  player_to_chat_to: String,
+  state: WebsocketActorState,
+  conn: mist.WebsocketConnection,
+) {
+  let assert Ok(player_to_chat_to) = int.parse(player_to_chat_to)
+  let assert Some(game_subject) = state.game_subject
+  let assert GameState(game_state) =
+    process.call_forever(game_subject, GetState)
+
+  process.send(
+    game_subject,
+    UpdateState(
+      GameActorState(
+        ..game_state,
+        pages_in_view: game_state.pages_in_view
+          |> dict.insert(state.player.number, Chat(player_to_chat_to)),
+      ),
+    ),
+  )
+
+  let assert Ok(_) =
+    mist.send_text_frame(
+      conn,
+      chat_section(player_to_chat_to, state, game_state)
+        |> element.to_string,
+    )
+  state
+}
+
+import app/pages/game as game_page
+import app/pages/map.{map}
+import app/pages/roll_die.{roll_die}
+
+pub fn go_to_map(state: WebsocketActorState, conn: mist.WebsocketConnection) {
+  let assert Some(game_subject) = state.game_subject
+  let assert GameState(game_state) =
+    process.call_forever(game_subject, GetState)
+  process.send(
+    game_subject,
+    UpdateState(
+      GameActorState(
+        ..game_state,
+        pages_in_view: game_state.pages_in_view
+          |> dict.insert(state.player.number, Map),
+      ),
+    ),
+  )
+  let assert Ok(_) = mist.send_text_frame(conn, map(state, game_state))
+  state
+}
+
+pub fn go_to_home(state: WebsocketActorState, conn: mist.WebsocketConnection) {
+  let assert Some(game_subject) = state.game_subject
+  let assert GameState(game_state) =
+    process.call_forever(game_subject, GetState)
+  process.send(
+    game_subject,
+    UpdateState(
+      GameActorState(
+        ..game_state,
+        pages_in_view: game_state.pages_in_view
+          |> dict.insert(state.player.number, Home),
+      ),
+    ),
+  )
+  let assert Ok(_) = mist.send_text_frame(conn, game_page.game(state.player))
+  state
+}
+
+pub fn go_to_chats(state: WebsocketActorState, conn: mist.WebsocketConnection) {
+  let assert Some(game_subject) = state.game_subject
+  let assert GameState(game_state) =
+    process.call_forever(game_subject, GetState)
+  process.send(
+    game_subject,
+    UpdateState(
+      GameActorState(
+        ..game_state,
+        pages_in_view: game_state.pages_in_view
+          |> dict.insert(state.player.number, Chat(state.player.number)),
+      ),
+    ),
+  )
+  let assert Ok(_) = mist.send_text_frame(conn, chat(state))
+  state
+}
+
+pub fn go_to_dice_roll(
+  state: WebsocketActorState,
+  conn: mist.WebsocketConnection,
+) {
+  let assert Some(game_subject) = state.game_subject
+  let assert GameState(game_state) =
+    process.call_forever(game_subject, GetState)
+  process.send(
+    game_subject,
+    UpdateState(
+      GameActorState(
+        ..game_state,
+        pages_in_view: game_state.pages_in_view
+          |> dict.insert(state.player.number, Dice),
+      ),
+    ),
+  )
+  let assert Ok(_) = mist.send_text_frame(conn, roll_die(state.player))
+  state
 }

@@ -25,7 +25,7 @@ pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
     player.state.director_subject,
     EnqueueParticipant(
       game_code,
-      Player(1, "", "", 10, 1, #(1, 21), [#(1, 21)]),
+      Player(1, "", "", 10, 1, #(1, 21), []),
       player.state.ws_subject,
     ),
   )
@@ -33,7 +33,7 @@ pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
   //   mist.send_text_frame(player.socket, created_game_page(game_code, player))
   WebsocketActorState(
     ..player.state,
-    player: Player(1, "", "", 10, 1, #(1, 21), [#(1, 21)]),
+    player: Player(1, "", "", 10, 1, #(1, 21), []),
     game_code: game_code,
   )
 }

@@ -1,17 +1,22 @@
-import app/actors/actor_types.{type Player}
+import app/actors/actor_types.{
+  type GameActorState, type Player, type WebsocketActorState, GameState,
+  GetState,
+}
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{
   circle_user_round, circle_x, dices, messages_square, scan,
 }
 import app/pages/layout.{stats as info_stats}
+import gleam/erlang/process
 import gleam/list
+import gleam/option.{Some}
 import gleam/result
 import gleam/string.{join}
 import lustre/attribute.{attribute, class, id, style}
 import lustre/element.{type Element}
 import lustre/element/html.{button, div, h1, text}
 
-pub fn map(stats: Player) {
+pub fn map(player: WebsocketActorState, game_state: GameActorState) {
   div([id("page"), class("h-full w-full")], [
     div(
       [
@@ -23,9 +28,9 @@ pub fn map(stats: Player) {
       ],
       [
         div([class("!w-full z-30 absolute")], [
-          bottom_bar(info(stats), buttons()),
+          bottom_bar(info(player.player), buttons()),
         ]),
-        map_section(),
+        map_section(player, game_state),
       ],
     ),
   ])
@@ -36,7 +41,20 @@ fn header(chat: String) {
   div([], [h1([class("font-header !text-4xl text-center !mt-8")], [text(chat)])])
 }
 
-fn map_section() {
+fn map_section(player: WebsocketActorState, game_state: GameActorState) {
+  let current_positions =
+    game_state.participants
+    |> list.map(fn(player) {
+      #(
+        { player.0 }.name,
+        { player.0 }.position.0,
+        { player.0 }.position.1,
+        { player.0 }.color,
+      )
+    })
+  let covered_positions =
+    player.player.old_positions
+    |> list.append([player.player.position])
   div(
     [
       class(
@@ -59,13 +77,7 @@ fn map_section() {
           ]),
           class("grid gap-0 !border !border-neutral-500 rounded-xl"),
         ],
-        generate_grid([
-          #("John", 3, 5),
-          #("John", 38, 17),
-          #("Faeq", 54, 8),
-          #("John", 34, 20),
-          #("John", 7, 12),
-        ]),
+        generate_grid(covered_positions, current_positions),
       ),
       key(),
     ],
@@ -209,8 +221,146 @@ fn buttons() {
   ]
 }
 
-fn generate_grid(player_positions: List(#(String, Int, Int))) {
-  let grid = [
+fn generate_grid(
+  covered_positions: List(#(Int, Int)),
+  current_player_positions: List(#(String, Int, Int, String)),
+) {
+  let map_grid_to_show = map_grid_to_show(covered_positions)
+  list.flatten(
+    list.index_map(map_grid(), fn(x, i) {
+      list.index_map(x, fn(y, j) {
+        case map_grid_to_show |> list.contains(#(j, i)) {
+          True -> {
+            let player =
+              list.filter(current_player_positions, fn(z) {
+                z.1 == j && z.2 == i
+              })
+            let content = case list.length(player) {
+              num_players if num_players > 1 -> {
+                let user_names =
+                  player
+                  |> list.fold("", fn(old, player) { old <> "\n" <> player.0 })
+                element.fragment([
+                  circle_user_round([
+                    class("peer w-[3vh] h-[3vh] stroke-[neutral-500/50]"),
+                  ]),
+                  div(
+                    [
+                      attribute.role("tooltip"),
+                      attribute.class(
+                        "pointer-events-none w-fit relative bottom-0 mb-2 left-1/2 -translate-x-1/2 z-10 flex w-64 flex-col gap-1 rounded-sm bg-white p-2.5 text-xs font-text opacity-0 transition-all ease-out peer-hover:opacity-100 peer-focus:opacity-100",
+                      ),
+                    ],
+                    [text(user_names)],
+                  ),
+                ])
+              }
+              1 -> {
+                let user_color =
+                  result.unwrap(list.first(player), #("", 0, 0, "")).3
+                let user_name =
+                  result.unwrap(list.first(player), #("", 0, 0, "")).0
+                element.fragment([
+                  circle_user_round([
+                    class("peer w-[3vh] h-[3vh] stroke-[" <> user_color <> "]"),
+                  ]),
+                  div(
+                    [
+                      attribute.role("tooltip"),
+                      attribute.class(
+                        "pointer-events-none w-fit relative bottom-0 mb-2 left-1/2 -translate-x-1/2 z-10 flex w-64 flex-col gap-1 rounded-sm bg-white p-2.5 text-xs font-text opacity-0 transition-all ease-out peer-hover:opacity-100 peer-focus:opacity-100",
+                      ),
+                    ],
+                    [text(user_name)],
+                  ),
+                ])
+              }
+              _ -> text("")
+            }
+            case y {
+              1 -> div([class("w-[3vh] h-[3vh] bg-amber-500/50")], [content])
+              2 -> div([class("w-[3vh] h-[3vh] bg-emerald-500/50")], [content])
+              3 -> div([class("w-[3vh] h-[3vh] bg-pink-500/50")], [content])
+              4 -> div([class("w-[3vh] h-[3vh] bg-red-500/50")], [content])
+              5 -> div([class("w-[3vh] h-[3vh] bg-cyan-500/50")], [content])
+              6 -> div([class("w-[3vh] h-[3vh] bg-teal-500/50")], [content])
+              7 -> div([class("w-[3vh] h-[3vh] bg-violet-500/50")], [content])
+              8 -> div([class("w-[3vh] h-[3vh] bg-lime-500/50")], [content])
+              9 -> div([class("w-[3vh] h-[3vh] bg-sky-500/50")], [content])
+              _ -> div([class("w-[3vh] h-[3vh] bg-white/50")], [content])
+            }
+          }
+          _ -> {
+            //neutral color for unseen parts of the map
+            div([class("w-[3vh] h-[3vh] bg-neutral-500/50")], [text("")])
+          }
+        }
+      })
+    }),
+  )
+}
+
+fn map_grid_to_show(covered_positions: List(#(Int, Int))) {
+  covered_positions
+  |> list.map(fn(pos) {
+    //got this wrong - pos.1+1 goes down 1 - no need to change
+    let up_one = #(pos.0, pos.1 + 1)
+    let up_two = #(pos.0, pos.1 + 2)
+    let down_one = #(pos.0, pos.1 - 1)
+    let down_two = #(pos.0, pos.1 - 2)
+    let left_one = #(pos.0 - 1, pos.1)
+    let left_two = #(pos.0 - 2, pos.1)
+    let right_one = #(pos.0 + 1, pos.1)
+    let right_two = #(pos.0 + 2, pos.1)
+    let tl_diag_one = #(pos.0 - 1, pos.1 + 1)
+    let tl_diag_two = #(pos.0 - 2, pos.1 + 2)
+    let tr_diag_one = #(pos.0 + 1, pos.1 + 1)
+    let tr_diag_two = #(pos.0 + 2, pos.1 + 2)
+    let bl_diag_one = #(pos.0 - 1, pos.1 - 1)
+    let bl_diag_two = #(pos.0 - 2, pos.1 - 2)
+    let br_diag_one = #(pos.0 + 1, pos.1 - 1)
+    let br_diag_two = #(pos.0 + 2, pos.1 - 2)
+    let tl_diag_off_one = #(pos.0 - 1, pos.1 + 2)
+    let tl_diag_off_two = #(pos.0 - 2, pos.1 + 1)
+    let tr_diag_off_one = #(pos.0 + 1, pos.1 + 2)
+    let tr_diag_off_two = #(pos.0 + 2, pos.1 + 1)
+    let bl_diag_off_one = #(pos.0 - 1, pos.1 - 2)
+    let bl_diag_off_two = #(pos.0 - 2, pos.1 - 1)
+    let br_diag_off_one = #(pos.0 + 1, pos.1 - 2)
+    let br_diag_off_two = #(pos.0 + 2, pos.1 - 1)
+    [
+      pos,
+      up_one,
+      up_two,
+      down_one,
+      down_two,
+      left_one,
+      left_two,
+      right_one,
+      right_two,
+      tl_diag_one,
+      tl_diag_two,
+      tr_diag_one,
+      tr_diag_two,
+      bl_diag_one,
+      bl_diag_two,
+      br_diag_one,
+      br_diag_two,
+      tl_diag_off_one,
+      tl_diag_off_two,
+      tr_diag_off_one,
+      tr_diag_off_two,
+      bl_diag_off_one,
+      bl_diag_off_two,
+      br_diag_off_one,
+      br_diag_off_two,
+    ]
+  })
+  |> list.flatten
+}
+
+fn map_grid() {
+  [
     [
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -322,51 +472,4 @@ fn generate_grid(player_positions: List(#(String, Int, Int))) {
       4, 3, 3, 3, 3,
     ],
   ]
-  list.flatten(
-    list.index_map(grid, fn(x, i) {
-      list.index_map(x, fn(y, j) {
-        let player =
-          list.filter(player_positions, fn(z) { z.1 == j && z.2 == i })
-        let content = case list.length(player) == 1 {
-          True -> {
-            //would get color from game state
-            let user_color = case
-              result.unwrap(list.first(player), #("", 0, 0)).0
-            {
-              "John" -> "red"
-              _ -> "indigo"
-            }
-            element.fragment([
-              circle_user_round([
-                class("peer w-[3vh] h-[3vh] stroke-[" <> user_color <> "]"),
-              ]),
-              div(
-                [
-                  attribute.role("tooltip"),
-                  attribute.class(
-                    "pointer-events-none w-fit relative bottom-0 mb-2 left-1/2 -translate-x-1/2 z-10 flex w-64 flex-col gap-1 rounded-sm bg-white p-2.5 text-xs font-text opacity-0 transition-all ease-out peer-hover:opacity-100 peer-focus:opacity-100",
-                  ),
-                ],
-                [text(result.unwrap(list.first(player), #("", 0, 0)).0)],
-              ),
-            ])
-          }
-          _ -> text("")
-        }
-        //neutral color for unseen parts of the map
-        case y {
-          1 -> div([class("w-[3vh] h-[3vh] bg-amber-500/50")], [content])
-          2 -> div([class("w-[3vh] h-[3vh] bg-emerald-500/50")], [content])
-          3 -> div([class("w-[3vh] h-[3vh] bg-pink-500/50")], [content])
-          4 -> div([class("w-[3vh] h-[3vh] bg-red-500/50")], [content])
-          5 -> div([class("w-[3vh] h-[3vh] bg-cyan-500/50")], [content])
-          6 -> div([class("w-[3vh] h-[3vh] bg-teal-500/50")], [content])
-          7 -> div([class("w-[3vh] h-[3vh] bg-violet-500/50")], [content])
-          8 -> div([class("w-[3vh] h-[3vh] bg-lime-500/50")], [content])
-          9 -> div([class("w-[3vh] h-[3vh] bg-sky-500/50")], [content])
-          _ -> div([class("w-[3vh] h-[3vh] bg-white/50")], [content])
-        }
-      })
-    }),
-  )
 }

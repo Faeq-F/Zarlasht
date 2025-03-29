@@ -24,13 +24,13 @@ import lustre/element/html
 import mist.{type Connection, Custom}
 
 import app/lib/create_game.{on_create_game, update_colors}
-import app/lib/game.{start_game}
+import app/lib/game.{
+  go_to_chats, go_to_dice_roll, go_to_home, go_to_map, start_game, switch_chat,
+}
 import app/lib/join_game.{on_join_game, on_to_join_game}
 import app/lib/set_name.{set_name}
 import app/pages/chat.{chat, chat_section}
-import app/pages/game as game_page
-import app/pages/map.{map}
-import app/pages/roll_die.{roll_die}
+
 import app/pages/set_name as sn_pg
 
 //TODO
@@ -51,7 +51,7 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
       #(
         WebsocketActorState(
           game_code: 0,
-          player: Player(0, "", "", 10, 1, #(1, 21), [#(1, 21)]),
+          player: Player(0, "", "", 10, 1, #(1, 21), []),
           ws_subject: ws_subject,
           game_subject: None,
           director_subject: director,
@@ -110,143 +110,45 @@ fn handle_ws_message(state, conn, message) {
 
       case trigger {
         "create" -> on_create_game(PlayerSocket(conn, state)) |> actor.continue
+
         "set-name-form" ->
-          set_name(message, PlayerSocket(conn, state)) |> actor.continue
+          set_name(message, PlayerSocket(conn, state))
+          |> actor.continue
 
         "join" -> on_to_join_game(PlayerSocket(conn, state)) |> actor.continue
+
         "join-game-form" ->
           on_join_game(message, PlayerSocket(conn, state))
           |> actor.continue
 
         "colors" ->
-          update_colors(message, PlayerSocket(conn, state)) |> actor.continue
-        "start_game" ->
-          start_game(PlayerSocket(conn, state))
+          update_colors(message, PlayerSocket(conn, state))
           |> actor.continue
 
-        //TODO - refactor
-        "go_to_home" -> {
-          let assert Some(game_subject) = state.game_subject
-          let assert GameState(game_state) =
-            process.call_forever(game_subject, GetState)
-          process.send(
-            game_subject,
-            UpdateState(
-              GameActorState(
-                ..game_state,
-                pages_in_view: game_state.pages_in_view
-                  |> dict.insert(state.player.number, Home),
-              ),
-            ),
-          )
-          let assert Ok(_) =
-            mist.send_text_frame(conn, game_page.game(state.player))
-          state |> actor.continue
-        }
-        "go_to_chats" -> {
-          let assert Some(game_subject) = state.game_subject
-          let assert GameState(game_state) =
-            process.call_forever(game_subject, GetState)
-          process.send(
-            game_subject,
-            UpdateState(
-              GameActorState(
-                ..game_state,
-                pages_in_view: game_state.pages_in_view
-                  |> dict.insert(state.player.number, Chat(state.player.number)),
-              ),
-            ),
-          )
-          let assert Ok(_) = mist.send_text_frame(conn, chat(state))
-          state |> actor.continue
-        }
-        "go_to_map" -> {
-          let assert Some(game_subject) = state.game_subject
-          let assert GameState(game_state) =
-            process.call_forever(game_subject, GetState)
-          process.send(
-            game_subject,
-            UpdateState(
-              GameActorState(
-                ..game_state,
-                pages_in_view: game_state.pages_in_view
-                  |> dict.insert(state.player.number, Map),
-              ),
-            ),
-          )
-          let assert Ok(_) = mist.send_text_frame(conn, map(state.player))
-          state |> actor.continue
-        }
-        "go_to_dice_roll" -> {
-          let assert Some(game_subject) = state.game_subject
-          let assert GameState(game_state) =
-            process.call_forever(game_subject, GetState)
-          process.send(
-            game_subject,
-            UpdateState(
-              GameActorState(
-                ..game_state,
-                pages_in_view: game_state.pages_in_view
-                  |> dict.insert(state.player.number, Dice),
-              ),
-            ),
-          )
-          let assert Ok(_) = mist.send_text_frame(conn, roll_die(state.player))
-          state |> actor.continue
-        }
+        "start_game" -> start_game(PlayerSocket(conn, state)) |> actor.continue
 
-        trigger -> {
-          case trigger |> string.starts_with("switch_chat_") {
-            True -> {
-              let assert Ok(player_to_chat_to) =
-                int.parse(trigger |> string.drop_start(12))
+        "go_to_home" -> go_to_home(state, conn) |> actor.continue
 
-              let assert Some(game_subject) = state.game_subject
-              let assert GameState(game_state) =
-                process.call_forever(game_subject, GetState)
+        "go_to_chats" -> go_to_chats(state, conn) |> actor.continue
 
-              process.send(
-                game_subject,
-                UpdateState(
-                  GameActorState(
-                    ..game_state,
-                    pages_in_view: game_state.pages_in_view
-                      |> dict.insert(
-                        state.player.number,
-                        Chat(player_to_chat_to),
-                      ),
-                  ),
-                ),
-              )
+        "go_to_map" | "map" -> go_to_map(state, conn) |> actor.continue
 
-              let assert Ok(_) =
-                mist.send_text_frame(
-                  conn,
-                  chat_section(player_to_chat_to, state, game_state)
-                    |> element.to_string,
-                )
-              state |> actor.continue
-            }
-            _ -> {
-              //TODO - refactor
-              case trigger |> string.starts_with("send_message_") {
-                True -> {
-                  let assert Ok(player_to_send_to) =
-                    int.parse(trigger |> string.drop_start(13))
-                  game.send_message(
-                    player_to_send_to,
-                    message,
-                    PlayerSocket(conn, state),
-                  )
-                  actor.continue(state)
-                }
-                _ -> {
-                  logging.log(Alert, "Unknown Trigger")
-                  actor.continue(state)
-                }
-              }
-            }
-          }
+        "go_to_dice_roll" -> go_to_dice_roll(state, conn) |> actor.continue
+
+        "switch_chat_" <> player_to_chat_to ->
+          switch_chat(player_to_chat_to, state, conn) |> actor.continue
+
+        "send_message_" <> player_to_send_to ->
+          game.send_message(
+            player_to_send_to,
+            message,
+            PlayerSocket(conn, state),
+          )
+          |> actor.continue
+
+        _ -> {
+          logging.log(Alert, "Unknown Trigger")
+          actor.continue(state)
         }
       }
     }
