@@ -26,6 +26,7 @@ import mist.{type Connection, Custom}
 import app/lib/create_game.{on_create_game, update_colors}
 import app/lib/game.{
   go_to_chats, go_to_dice_roll, go_to_home, go_to_map, start_game, switch_chat,
+  update_chat_messages,
 }
 import app/lib/join_game.{on_join_game, on_to_join_game}
 import app/lib/set_name.{set_name}
@@ -130,6 +131,11 @@ fn handle_ws_message(state, conn, message) {
         "go_to_home" -> go_to_home(state, conn) |> actor.continue
 
         "go_to_chats" -> go_to_chats(state, conn) |> actor.continue
+
+        "chat_messages" -> {
+          update_chat_messages(state, conn)
+          state |> actor.continue
+        }
 
         "go_to_map" | "map" -> go_to_map(state, conn) |> actor.continue
 

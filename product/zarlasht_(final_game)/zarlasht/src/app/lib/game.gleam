@@ -4,7 +4,7 @@ import app/actors/actor_types.{
   GetStateWS, Home, Map, Message, Participants, Player, SendToClient, StateWS,
   UpdateState, WebsocketActorState,
 }
-import app/pages/chat.{chat, chat_section}
+import app/pages/chat.{chat, chat_messages, chat_section, send_message_section}
 import app/pages/created_game.{info_error_player_count, info_error_setting_name}
 import birl
 import gleam/dict
@@ -71,6 +71,16 @@ pub fn send_message(
   message: String,
   player: PlayerSocket,
 ) {
+  // -- clear field
+  let assert Ok(to_chat_to) = int.parse(player_to_send_to)
+  let assert Ok(_) =
+    mist.send_text_frame(
+      player.socket,
+      send_message_section(to_chat_to) |> element.to_string,
+    )
+
+  // -- send message
+
   let assert Ok(player_to_send_to) = int.parse(player_to_send_to)
   let time = birl.now() |> birl.to_naive_time_string()
   let assert Ok(juno.Object(message_dict)) = juno.decode(message, [])
@@ -135,43 +145,61 @@ pub fn send_message(
         )
 
       process.send(game_subject, UpdateState(new_game_state))
-      // update pages being viewed
+      // update pages being viewed (event-driven)
       //update_chat_pages_in_view(player_to_send_to, new_game_state)
     }
   }
   player.state
 }
 
+// update_chat_messages below is the polling equivalent of this (somewhat broken) event-driven update func
 //TODO - check if handled allies correctly
-fn update_chat_pages_in_view(player_to_send_to: Int, game_state: GameActorState) {
-  game_state.pages_in_view
-  |> dict.keys()
-  |> list.each(fn(key) {
-    let assert Ok(page) = game_state.pages_in_view |> dict.get(key)
-    case page == Chat(player_to_send_to) {
-      True -> {
-        let assert Ok(player_viewing) =
-          game_state.participants
-          |> list.find(fn(player) { { player.0 }.number == key })
+// fn update_chat_pages_in_view(player_to_send_to: Int, game_state: GameActorState) {
+//   game_state.pages_in_view
+//   |> dict.keys()
+//   |> list.each(fn(key) {
+//     let assert Ok(page) = game_state.pages_in_view |> dict.get(key)
+//     case page == Chat(player_to_send_to) {
+//       True -> {
+//         let assert Ok(player_viewing) =
+//           game_state.participants
+//           |> list.find(fn(player) { { player.0 }.number == key })
 
-        //issue - call forever not ending
-        let assert StateWS(player_viewing_state) =
-          process.call(player_viewing.1, GetStateWS, 5000)
+//         //issue - call forever not ending
+//         let assert StateWS(player_viewing_state) =
+//           process.call(player_viewing.1, GetStateWS, 5000)
 
-        echo player_viewing_state
+//         echo player_viewing_state
 
-        process.send(
-          player_viewing.1,
-          SendToClient(
-            chat_section(player_to_send_to, player_viewing_state, game_state)
-            |> element.to_string,
-          ),
-        )
-        Nil
-      }
-      _ -> Nil
-    }
-  })
+//         process.send(
+//           player_viewing.1,
+//           SendToClient(
+//             chat_section(player_to_send_to, player_viewing_state, game_state)
+//             |> element.to_string,
+//           ),
+//         )
+//         Nil
+//       }
+//       _ -> Nil
+//     }
+//   })
+// }
+
+pub fn update_chat_messages(
+  state: WebsocketActorState,
+  conn: mist.WebsocketConnection,
+) {
+  let assert Some(game_subject) = state.game_subject
+  let assert GameState(game_state) =
+    process.call_forever(game_subject, GetState)
+  let assert Ok(Chat(chatting_to)) =
+    game_state.pages_in_view |> dict.get(state.player.number)
+  let assert Ok(_) =
+    mist.send_text_frame(
+      conn,
+      chat_messages(chatting_to, state, game_state) |> element.to_string,
+    )
+  Nil
 }
 
 import gleam/int

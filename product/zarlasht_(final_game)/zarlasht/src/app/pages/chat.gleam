@@ -230,16 +230,27 @@ pub fn chat_section(
     ],
     [
       header(header_text),
-      div(
-        [
-          class(
-            "mx-12 py-1 px-2 overflow-y-scroll overflow-x-hidden max-h-[80vh] h-full mt-10 !border rounded-box !border-neutral-500  rounded-xl",
-          ),
-        ],
-        messages(to_chat_to, player, game_state),
-      ),
+      chat_messages(to_chat_to, player, game_state),
       send_message_section(to_chat_to),
     ],
+  )
+}
+
+pub fn chat_messages(
+  to_chat_to: Int,
+  player: WebsocketActorState,
+  game_state: GameActorState,
+) {
+  div(
+    [
+      id("chat_messages"),
+      attribute("ws-send", ""),
+      attribute("hx-trigger", "every 2s"),
+      class(
+        "mx-12 py-1 px-2 overflow-y-scroll overflow-x-hidden max-h-[80vh] h-full mt-10 !border rounded-box !border-neutral-500  rounded-xl",
+      ),
+    ],
+    messages(to_chat_to, player, game_state),
   )
 }
 
@@ -296,9 +307,10 @@ fn message_right(
   )
 }
 
-fn send_message_section(to_chat_to: Int) {
+pub fn send_message_section(to_chat_to: Int) {
   div(
     [
+      id("send_message_section"),
       class(
         "!mt-2 !h-[15%] flex w-full flex-col overflow-hidden border-neutral-300 bg-white/50 text-neutral-600 has-[p:focus]:outline-2 has-[p:focus]:outline-offset-2 has-[p:focus]:outline-black dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:has-[p:focus]:outline-white rounded-xl !border !border-neutral-500 ",
       ),
