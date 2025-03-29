@@ -3,8 +3,8 @@
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
   type Player, AddPlayer, AddedName, Disconnect, GameActorState, GameState,
-  GetState, Home, JoinGame, Player, PrepareGame, SendToClient, SwapColors,
-  UpdatePlayerState, UpdateState, UserDisconnected, Wait,
+  GetState, Home, JoinGame, Player, PlayerMoved, PrepareGame, SendToClient,
+  SwapColors, UpdatePlayerState, UpdateState, UserDisconnected, Wait,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
@@ -49,6 +49,17 @@ fn handle_message(
   logging.log(Info, "A Game Actor got the message")
   io.debug(message_for_actor)
   case message_for_actor {
+    PlayerMoved(player) -> {
+      let assert Ok(old_player) =
+        state.participants
+        |> list.find(fn(p) { { p.0 }.number == player.number })
+      let new_participants =
+        state.participants
+        |> list.filter(fn(p) { { p.0 }.number != player.number })
+        |> list.append([#(player, old_player.1)])
+      GameActorState(..state, participants: new_participants)
+      |> actor.continue
+    }
     AddPlayer(player, game_subject) -> {
       let new_player = #(
         Player(

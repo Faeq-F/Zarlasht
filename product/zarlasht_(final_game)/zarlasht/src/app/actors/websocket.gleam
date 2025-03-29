@@ -3,8 +3,9 @@
 import app/actors/actor_types.{
   type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Chat,
   DequeueParticipant, Dice, Disconnect, GameActorState, GameState, GetState,
-  GetStateWS, Home, JoinGame, Map, Player, PlayerSocket, SendToClient, StateWS,
-  UpdatePlayerState, UpdateState, UserDisconnected, Wait, WebsocketActorState,
+  GetStateWS, Home, JoinGame, Map, Move, Player, PlayerMoved, PlayerSocket,
+  SendToClient, StateWS, UpdatePlayerState, UpdateState, UserDisconnected, Wait,
+  WebsocketActorState,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
@@ -12,9 +13,11 @@ import gleam/function
 import gleam/http/request.{type Request, Request}
 import gleam/int
 import gleam/io
+import gleam/list
 import gleam/option.{None, Some}
 import gleam/otp/actor
 import gleam/otp/supervisor
+import gleam/otp/task
 import gleam/string
 import juno
 import logging.{Alert, Info}
@@ -31,7 +34,9 @@ import app/lib/game.{
 import app/lib/join_game.{on_join_game, on_to_join_game}
 import app/lib/set_name.{set_name}
 import app/pages/chat.{chat, chat_section}
-
+import app/pages/roll_die.{
+  already_rolled, anim_get_next_dice, dice_result, rolled_die,
+}
 import app/pages/set_name as sn_pg
 
 //TODO
@@ -52,7 +57,7 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
       #(
         WebsocketActorState(
           game_code: 0,
-          player: Player(0, "", "", 10, 1, #(1, 21), []),
+          player: Player(0, "", "", 10, 1, #(1, 21), [], Move(0)),
           ws_subject: ws_subject,
           game_subject: None,
           director_subject: director,
@@ -139,7 +144,82 @@ fn handle_ws_message(state, conn, message) {
 
         "go_to_map" | "map" -> go_to_map(state, conn) |> actor.continue
 
+        "clickable_position_" <> position -> {
+          //parse position
+          let assert Ok(x) = position |> string.split("_") |> list.first()
+          let assert Ok(y) = position |> string.split("_") |> list.last()
+          let assert Ok(x) = int.parse(x)
+          let assert Ok(y) = int.parse(y)
+          //update game state
+          let player =
+            Player(
+              ..state.player,
+              action: Move(0),
+              position: #(x, y),
+              old_positions: state.player.old_positions
+                |> list.append([state.player.position]),
+            )
+          let assert Some(game_subject) = state.game_subject
+          process.send(game_subject, PlayerMoved(player))
+          //update overall state, including move action
+          WebsocketActorState(..state, player: player)
+          |> actor.continue
+        }
+
         "go_to_dice_roll" -> go_to_dice_roll(state, conn) |> actor.continue
+
+        "roll" -> {
+          //TODO - handle spam?
+          case state.player.action {
+            Move(to_move_by) -> {
+              case to_move_by {
+                0 -> {
+                  let assert Ok(_) =
+                    mist.send_text_frame(conn, anim_get_next_dice())
+                  //after some time send normal die
+                  //task.await_forever(task.async(fn() { process.sleep(4000) }))
+                  let roll = case int.random(6) {
+                    //upper is exclusive, 0 is inclusive
+                    0 -> 6
+                    number -> number
+                  }
+                  let assert Ok(_) =
+                    mist.send_text_frame(
+                      conn,
+                      rolled_die(roll) |> element.to_string,
+                    )
+                  let action = Move(roll)
+                  //update to page info
+                  let assert Ok(_) =
+                    mist.send_text_frame(
+                      conn,
+                      dice_result(action) |> element.to_string,
+                    )
+                  //update state
+                  WebsocketActorState(
+                    ..state,
+                    player: Player(..state.player, action: action),
+                  )
+                  |> actor.continue
+                }
+                _ -> {
+                  let assert Ok(_) =
+                    mist.send_text_frame(conn, already_rolled())
+                  state |> actor.continue
+                }
+              }
+            }
+            _ -> {
+              // TODO - handle other actions
+              state |> actor.continue
+            }
+          }
+        }
+
+        "dice_anim" -> {
+          let assert Ok(_) = mist.send_text_frame(conn, anim_get_next_dice())
+          state |> actor.continue
+        }
 
         "switch_chat_" <> player_to_chat_to ->
           switch_chat(player_to_chat_to, state, conn) |> actor.continue

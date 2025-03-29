@@ -80,7 +80,19 @@ pub type Player {
     strength: Int,
     position: #(Int, Int),
     old_positions: List(#(Int, Int)),
+    action: Action,
   )
+}
+
+/// The action the player needs to complete
+///
+pub type Action {
+  /// The player is battling
+  ///
+  Battle(attack_type: Int, attack_damage: Int, defence_strategy: Int)
+  /// The player is moving through the map
+  ///
+  Move(amount_to_move: Int)
 }
 
 //----------------------------------------------------------------------
@@ -201,4 +213,7 @@ pub type GameActorMessage {
   /// Prepare the game as it is about to start
   ///
   PrepareGame
+  /// A player has moved on the map
+  ///
+  PlayerMoved(player: Player)
 }

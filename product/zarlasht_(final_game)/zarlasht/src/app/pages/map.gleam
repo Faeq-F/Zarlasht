@@ -1,6 +1,6 @@
 import app/actors/actor_types.{
-  type GameActorState, type Player, type WebsocketActorState, GameState,
-  GetState,
+  type Action, type GameActorState, type Player, type WebsocketActorState,
+  GameState, GetState, Move,
 }
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{
@@ -8,11 +8,12 @@ import app/pages/components/lucide_lustre.{
 }
 import app/pages/layout.{stats as info_stats}
 import gleam/erlang/process
+import gleam/int
 import gleam/list
 import gleam/option.{Some}
 import gleam/result
 import gleam/string.{join}
-import lustre/attribute.{attribute, class, id, style}
+import lustre/attribute.{type Attribute, attribute, class, id, style}
 import lustre/element.{type Element}
 import lustre/element/html.{button, div, h1, text}
 
@@ -77,7 +78,12 @@ fn map_section(player: WebsocketActorState, game_state: GameActorState) {
           ]),
           class("grid gap-0 !border !border-neutral-500 rounded-xl"),
         ],
-        generate_grid(covered_positions, current_positions),
+        generate_grid(
+          player.player.position,
+          covered_positions,
+          current_positions,
+          player.player.action,
+        ),
       ),
       key(),
     ],
@@ -222,15 +228,37 @@ fn buttons() {
 }
 
 fn generate_grid(
+  current_position: #(Int, Int),
   covered_positions: List(#(Int, Int)),
   current_player_positions: List(#(String, Int, Int, String)),
+  action: Action,
 ) {
+  let can_click_around = case action {
+    Move(around) -> {
+      around
+    }
+    _ -> 0
+  }
+  let can_click_on = can_click_on(current_position, can_click_around)
   let map_grid_to_show = map_grid_to_show(covered_positions)
   list.flatten(
     list.index_map(map_grid(), fn(x, i) {
       list.index_map(x, fn(y, j) {
         case map_grid_to_show |> list.contains(#(j, i)) {
           True -> {
+            let clickable = case can_click_on |> list.contains(#(j, i)) {
+              True -> [
+                id(
+                  "clickable_position_"
+                  <> int.to_string(j)
+                  <> "_"
+                  <> int.to_string(i),
+                ),
+                attribute("ws-send", ""),
+                style([#("cursor", "pointer")]),
+              ]
+              _ -> []
+            }
             let player =
               list.filter(current_player_positions, fn(z) {
                 z.1 == j && z.2 == i
@@ -277,18 +305,7 @@ fn generate_grid(
               }
               _ -> text("")
             }
-            case y {
-              1 -> div([class("w-[3vh] h-[3vh] bg-amber-500/50")], [content])
-              2 -> div([class("w-[3vh] h-[3vh] bg-emerald-500/50")], [content])
-              3 -> div([class("w-[3vh] h-[3vh] bg-pink-500/50")], [content])
-              4 -> div([class("w-[3vh] h-[3vh] bg-red-500/50")], [content])
-              5 -> div([class("w-[3vh] h-[3vh] bg-cyan-500/50")], [content])
-              6 -> div([class("w-[3vh] h-[3vh] bg-teal-500/50")], [content])
-              7 -> div([class("w-[3vh] h-[3vh] bg-violet-500/50")], [content])
-              8 -> div([class("w-[3vh] h-[3vh] bg-lime-500/50")], [content])
-              9 -> div([class("w-[3vh] h-[3vh] bg-sky-500/50")], [content])
-              _ -> div([class("w-[3vh] h-[3vh] bg-white/50")], [content])
-            }
+            cell(y, clickable, content)
           }
           _ -> {
             //neutral color for unseen parts of the map
@@ -298,6 +315,97 @@ fn generate_grid(
       })
     }),
   )
+}
+
+fn cell(y: Int, clickable: List(Attribute(a)), content: Element(a)) {
+  case y {
+    1 ->
+      div(
+        [clickable, [class("w-[3vh] h-[3vh] bg-amber-500/50")]]
+          |> list.flatten,
+        [content],
+      )
+    2 ->
+      div(
+        [clickable, [class("w-[3vh] h-[3vh] bg-emerald-500/50")]]
+          |> list.flatten,
+        [content],
+      )
+    3 ->
+      div(
+        [clickable, [class("w-[3vh] h-[3vh] bg-pink-500/50")]]
+          |> list.flatten,
+        [content],
+      )
+    4 ->
+      div(
+        [clickable, [class("w-[3vh] h-[3vh] bg-red-500/50")]]
+          |> list.flatten,
+        [content],
+      )
+    5 ->
+      div(
+        [clickable, [class("w-[3vh] h-[3vh] bg-cyan-500/50")]]
+          |> list.flatten,
+        [content],
+      )
+    6 ->
+      div(
+        [clickable, [class("w-[3vh] h-[3vh] bg-teal-500/50")]]
+          |> list.flatten,
+        [content],
+      )
+    7 ->
+      div(
+        [clickable, [class("w-[3vh] h-[3vh] bg-violet-500/50")]]
+          |> list.flatten,
+        [content],
+      )
+    8 ->
+      div(
+        [clickable, [class("w-[3vh] h-[3vh] bg-lime-500/50")]]
+          |> list.flatten,
+        [content],
+      )
+    9 ->
+      div(
+        [clickable, [class("w-[3vh] h-[3vh] bg-sky-500/50")]]
+          |> list.flatten,
+        [content],
+      )
+    //can't click on this
+    _ -> div([class("w-[3vh] h-[3vh] bg-white/50")], [content])
+  }
+}
+
+fn can_click_on(current_position: #(Int, Int), can_click_around: Int) {
+  let right =
+    list.range(0, can_click_around)
+    |> list.map(fn(i) { #(current_position.0 + i, current_position.1) })
+  let left =
+    list.range(0, can_click_around)
+    |> list.map(fn(i) { #(current_position.0 - i, current_position.1) })
+  let up =
+    list.range(0, can_click_around)
+    |> list.map(fn(i) { #(current_position.0, current_position.1 - i) })
+  let down =
+    list.range(0, can_click_around)
+    |> list.map(fn(i) { #(current_position.0 - i, current_position.1 + i) })
+
+  let tl =
+    list.range(0, can_click_around)
+    |> list.map(fn(i) { #(current_position.0 - i, current_position.1 + i) })
+  let tr =
+    list.range(0, can_click_around)
+    |> list.map(fn(i) { #(current_position.0 + i, current_position.1 + i) })
+  let bl =
+    list.range(0, can_click_around)
+    |> list.map(fn(i) { #(current_position.0 - i, current_position.1 - i) })
+  let br =
+    list.range(0, can_click_around)
+    |> list.map(fn(i) { #(current_position.0 + i, current_position.1 - i) })
+
+  [right, left, up, down, tl, tr, bl, br] |> list.flatten
 }
 
 fn map_grid_to_show(covered_positions: List(#(Int, Int))) {

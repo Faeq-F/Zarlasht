@@ -2,7 +2,7 @@
 
 import app/actors/actor_types.{
   type PlayerSocket, type WebsocketActorState, EnqueueParticipant,
-  GetParticipants, Participants, Player, WebsocketActorState,
+  GetParticipants, Move, Participants, Player, WebsocketActorState,
 }
 import app/pages/join_game.{incorrect_info, join_game_page}
 import carpenter/table
@@ -61,13 +61,22 @@ pub fn on_join_game(
             player.state.director_subject,
             EnqueueParticipant(
               code,
-              Player(num, "Setting name...", "", 10, 1, #(1, 21), []),
+              Player(num, "Setting name...", "", 10, 1, #(2, 21), [], Move(0)),
               player.state.ws_subject,
             ),
           )
           WebsocketActorState(
             ..player.state,
-            player: Player(num, "Setting name...", "", 10, 1, #(1, 21), []),
+            player: Player(
+              num,
+              "Setting name...",
+              "",
+              10,
+              1,
+              #(2, 21),
+              [],
+              Move(0),
+            ),
             game_code: code,
           )
         }
