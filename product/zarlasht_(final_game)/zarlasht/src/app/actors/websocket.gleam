@@ -1,11 +1,11 @@
 //// All Websocket related functions for the app
 
 import app/actors/actor_types.{
-  type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Battle,
-  Chat, DequeueParticipant, Dice, Disconnect, GameActorState, GameState,
-  GetState, GetStateWS, Home, JoinGame, Map, Move, Player, PlayerMoved,
-  PlayerSocket, SendToClient, StateWS, UpdatePlayerState, UpdateState,
-  UserDisconnected, Wait, WebsocketActorState,
+  type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Ambush,
+  Battle, Cemetary, Chat, Demon, DequeueParticipant, Dice, Disconnect,
+  EnemyTribe, GameActorState, GameState, GetState, GetStateWS, Home, JoinGame,
+  Map, Move, Player, PlayerMoved, PlayerSocket, Ravine, SendToClient, StateWS,
+  UpdatePlayerState, UpdateState, UserDisconnected, Wait, WebsocketActorState,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
@@ -160,26 +160,28 @@ fn handle_ws_message(state, conn, message) {
                   True -> {
                     //randomize battle based off cell type
                     Some(case cell {
+                      //TODO - randomy generate warrior types
                       // 4 = red = enemy tribe - always battle (warrior)
-                      4 -> Battle(0, 0, 0)
+                      4 -> Battle(EnemyTribe("Expert Swordsman"), 0, 0, 0)
                       // 5 = cyan = cemetary - 30% chance (undead)
                       5 ->
                         case int.random(10) {
-                          num if num < 3 -> Battle(0, 0, 0)
+                          num if num < 3 -> Battle(Cemetary, 0, 0, 0)
                           _ -> Move(0)
                         }
                       // 6 = teal = ritual - always battle (demon)
-                      6 -> Battle(0, 0, 0)
+                      6 -> Battle(Demon, 0, 0, 0)
                       // 7 = violet = ravine - 70%
                       7 ->
                         case int.random(10) {
-                          num if num < 7 -> Battle(0, 0, 0)
+                          num if num < 7 ->
+                            Battle(Ravine("Expert Swordsman"), 0, 0, 0)
                           _ -> Move(0)
                         }
                       // 8 = lime = fog - depends on who nearby - TODO
                       8 -> Move(0)
                       // 9 = sky = ambush - always battle
-                      9 -> Battle(0, 0, 0)
+                      9 -> Battle(Ambush("Expert Swordsman"), 0, 0, 0)
                       // 0 = white = mountain - no battle (can't be here)
                       // 1 = amber = path - no battle
                       // 2 = emerald = beginning - no battle
@@ -192,9 +194,7 @@ fn handle_ws_message(state, conn, message) {
               })
             })
             |> list.flatten
-            |> list.find(fn(el) {
-              el == Some(Move(0)) || el == Some(Battle(0, 0, 0))
-            })
+            |> list.find(option.is_some)
           //update game state
           let player =
             Player(
@@ -253,7 +253,7 @@ fn handle_ws_message(state, conn, message) {
                 }
               }
             }
-            Battle(a_type, damage, defence) -> {
+            Battle(btype, a_type, damage, defence) -> {
               // TODO - battle features
               // TODO - let game/battle know
               //check if all 3 filled, then already_rolled
@@ -274,9 +274,9 @@ fn handle_ws_message(state, conn, message) {
                     )
 
                   let action = case a_type, damage, defence {
-                    0, _, _ -> Battle(roll, damage, defence)
-                    _, 0, _ -> Battle(a_type, roll, defence)
-                    _, _, _ -> Battle(a_type, damage, roll)
+                    0, _, _ -> Battle(btype, roll, damage, defence)
+                    _, 0, _ -> Battle(btype, a_type, roll, defence)
+                    _, _, _ -> Battle(btype, a_type, damage, roll)
                   }
 
                   let assert Ok(_) =

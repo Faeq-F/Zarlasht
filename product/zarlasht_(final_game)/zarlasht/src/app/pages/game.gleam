@@ -131,7 +131,11 @@ fn area_panel() {
           class("!ml-8 font-subheader items-end inline-flex !text-6xl"),
           style([#("cursor", "default")]),
         ],
-        [radar([class("!w-18 !h-18 !mr-[10px]")]), text("Ambush!")],
+        [
+          radar([class("!w-18 !h-18 !mr-[10px]")]),
+          //TODO - dynamic
+          text("Ambush!"),
+        ],
       ),
     ]),
     div([class("flex justify-center items-center")], [
@@ -141,6 +145,7 @@ fn area_panel() {
           style([#("cursor", "default")]),
         ],
         [
+          //TODO - dynamic
           text(
             "You are on the border of the forest and a neighboring tribe spotted you. You are being ambushed and must fight your way out!",
           ),
@@ -177,6 +182,7 @@ fn area_panel() {
               [
                 p([class("font-subheader inline-flex text-4xl")], [
                   sword([class("self-center !mr-1 w-8 h-8")]),
+                  //TODO - dynamic
                   text("Expert Swordsman"),
                 ]),
                 ul(
@@ -188,39 +194,9 @@ fn area_panel() {
                     ]),
                     class("font-text"),
                   ],
-                  [
-                    li([], [
-                      text(
-                        "The Expert Swordsman is a skilled warrior who has been trained in the art of combat since he was a child. He is a formidable opponent and will not go down easily.",
-                      ),
-                    ]),
-                    li([], [
-                      text(
-                        "If he is not defeated quickly, he will call for reinforcements",
-                      ),
-                    ]),
-                    li([], [
-                      text(
-                        "If he is too strong, you can call for allies to help you",
-                      ),
-                    ]),
-                  ],
+                  expert_swordsman_points(),
                 ),
-                button(
-                  [
-                    class(join(
-                      [
-                        "btn !border font-text !text-xl !mt-4",
-                        "bg-black/15 hover:bg-black/30",
-                        "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
-                        "border-black/40 text-current",
-                        "transition-all duration-500",
-                      ],
-                      " ",
-                    )),
-                  ],
-                  [text("Call Allies to help")],
-                ),
+                call_allies_btn(),
               ],
             ),
           ]),
@@ -228,6 +204,37 @@ fn area_panel() {
       ),
     ]),
   ])
+}
+
+fn expert_swordsman_points() {
+  [
+    li([], [
+      text(
+        "The Expert Swordsman is a skilled warrior who has been trained in the art of combat since he was a child. He is a formidable opponent and will not go down easily.",
+      ),
+    ]),
+    li([], [
+      text("If he is not defeated quickly, he will call for reinforcements"),
+    ]),
+    li([], [text("If he is too strong, you can call for allies to help you")]),
+  ]
+}
+
+fn call_allies_btn() {
+  button(
+    [
+      class(join(
+        [
+          "btn !border font-text !text-xl !mt-4",
+          "bg-black/15 hover:bg-black/30",
+          "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+          "border-black/40 text-current", "transition-all duration-500",
+        ],
+        " ",
+      )),
+    ],
+    [text("Call Allies to help")],
+  )
 }
 
 fn info_panel() {
@@ -251,9 +258,9 @@ fn info_panel() {
           class("font-text"),
         ],
         [
-          li([], [text("Your Ally, John, has been injured badly and retreated")]),
-          li([], [text("You defeated 4 enemies within your party")]),
-          li([], [text("Something else")]),
+          // li([], [text("Your Ally, John, has been injured badly and retreated")]),
+        // li([], [text("You defeated 4 enemies within your party")]),
+        // li([], [text("Something else")]),
         ],
       ),
     ],

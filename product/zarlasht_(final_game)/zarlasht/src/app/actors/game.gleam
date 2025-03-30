@@ -61,10 +61,10 @@ fn handle_message(
     PlayerMoved(player, game) -> {
       //check if action is battle
       let new_battles = case player.action {
-        Battle(_, _, _) -> {
+        Battle(btype, _, _, _) -> {
           // create battle
           let game_subject = process.new_subject()
-          let battle_erl = fn() { battle.start(game_subject) }
+          let battle_erl = fn() { battle.start(btype, game_subject) }
           let assert Ok(battle_subject) = process.receive(game_subject, 1000)
           // get id
           let id = case list.last(state.battles) {

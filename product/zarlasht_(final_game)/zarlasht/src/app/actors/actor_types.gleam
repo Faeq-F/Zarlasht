@@ -89,10 +89,24 @@ pub type Player {
 pub type Action {
   /// The player is battling
   ///
-  Battle(attack_type: Int, attack_damage: Int, defence_strategy: Int)
+  Battle(
+    tyoe: BattleType,
+    attack_type: Int,
+    attack_damage: Int,
+    defence_strategy: Int,
+  )
   /// The player is moving through the map
   ///
   Move(amount_to_move: Int)
+}
+
+pub type BattleType {
+  EnemyTribe(warrior_type: String)
+  Cemetary
+  Demon
+  Ravine(warrior_type: String)
+  Fog(player_num: Int)
+  Ambush(warrior_type: String)
 }
 
 //----------------------------------------------------------------------
@@ -225,7 +239,11 @@ pub type GameActorMessage {
 //----------------------------------------------------------------------
 
 pub type BattleActorState {
-  BattleActorState(id: Int, game: Option(Subject(GameActorMessage)))
+  BattleActorState(
+    id: Int,
+    game: Option(Subject(GameActorMessage)),
+    battle_type: BattleType,
+  )
 }
 
 pub type BattleActorMessage {

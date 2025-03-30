@@ -1,11 +1,11 @@
 //// The battle actor - process to manage a battle occurring in a game
 
 import app/actors/actor_types.{
-  type BattleActorMessage, type BattleActorState, type DirectorActorMessage,
-  type DirectorActorState, type GameActorMessage, AddPlayer, BattleActorState,
-  DequeueParticipant, DirectorActorState, EnqueueParticipant, GameStarted,
-  GetParticipants, JoinGame, Participants, PrepareGame, SendToClient,
-  SetupBattle, UpdateParticipant,
+  type BattleActorMessage, type BattleActorState, type BattleType,
+  type DirectorActorMessage, type DirectorActorState, type GameActorMessage,
+  AddPlayer, BattleActorState, DequeueParticipant, DirectorActorState,
+  EnqueueParticipant, GameStarted, GetParticipants, JoinGame, Participants,
+  PrepareGame, SendToClient, SetupBattle, UpdateParticipant,
 }
 
 import app/pages/game as game_page
@@ -20,6 +20,7 @@ import gleam/otp/actor.{type Next}
 
 /// Creates the Actor
 pub fn start(
+  battle_type: BattleType,
   game_subject: Subject(Subject(BattleActorMessage)),
 ) -> Result(process.Pid, Dynamic) {
   actor.start_spec(actor.Spec(
@@ -31,7 +32,7 @@ pub fn start(
         process.new_selector()
         |> process.selecting(battle_subject, function.identity)
 
-      actor.Ready(BattleActorState(0, None), selector)
+      actor.Ready(BattleActorState(0, None, battle_type), selector)
     },
     init_timeout: 1000,
     loop: handle_message,
