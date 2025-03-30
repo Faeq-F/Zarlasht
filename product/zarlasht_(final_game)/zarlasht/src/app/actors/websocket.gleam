@@ -1,11 +1,11 @@
 //// All Websocket related functions for the app
 
 import app/actors/actor_types.{
-  type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Chat,
-  DequeueParticipant, Dice, Disconnect, GameActorState, GameState, GetState,
-  GetStateWS, Home, JoinGame, Map, Move, Player, PlayerMoved, PlayerSocket,
-  SendToClient, StateWS, UpdatePlayerState, UpdateState, UserDisconnected, Wait,
-  WebsocketActorState,
+  type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Battle,
+  Chat, DequeueParticipant, Dice, Disconnect, GameActorState, GameState,
+  GetState, GetStateWS, Home, JoinGame, Map, Move, Player, PlayerMoved,
+  PlayerSocket, SendToClient, StateWS, UpdatePlayerState, UpdateState,
+  UserDisconnected, Wait, WebsocketActorState,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
@@ -34,6 +34,7 @@ import app/lib/game.{
 import app/lib/join_game.{on_join_game, on_to_join_game}
 import app/lib/set_name.{set_name}
 import app/pages/chat.{chat, chat_section}
+import app/pages/map.{map_grid}
 import app/pages/roll_die.{
   already_rolled, anim_get_next_dice, dice_result, rolled_die,
 }
@@ -145,22 +146,65 @@ fn handle_ws_message(state, conn, message) {
         "go_to_map" | "map" -> go_to_map(state, conn) |> actor.continue
 
         "clickable_position_" <> position -> {
+          let assert Some(game_subject) = state.game_subject
           //parse position
           let assert Ok(x) = position |> string.split("_") |> list.first()
           let assert Ok(y) = position |> string.split("_") |> list.last()
           let assert Ok(x) = int.parse(x)
           let assert Ok(y) = int.parse(y)
+          //check if we should enter battle
+          let assert Ok(Some(action)) =
+            list.index_map(map_grid(), fn(z, row) {
+              list.index_map(z, fn(cell, column) {
+                case column == x && row == y {
+                  True -> {
+                    //randomize battle based off cell type
+                    Some(case cell {
+                      // 4 = red = enemy tribe - always battle (warrior)
+                      4 -> Battle(0, 0, 0)
+                      // 5 = cyan = cemetary - 30% chance (undead)
+                      5 ->
+                        case int.random(10) {
+                          num if num < 3 -> Battle(0, 0, 0)
+                          _ -> Move(0)
+                        }
+                      // 6 = teal = ritual - always battle (demon)
+                      6 -> Battle(0, 0, 0)
+                      // 7 = violet = ravine - 70%
+                      7 ->
+                        case int.random(10) {
+                          num if num < 7 -> Battle(0, 0, 0)
+                          _ -> Move(0)
+                        }
+                      // 8 = lime = fog - depends on who nearby - TODO
+                      8 -> Move(0)
+                      // 9 = sky = ambush - always battle
+                      9 -> Battle(0, 0, 0)
+                      // 0 = white = mountain - no battle (can't be here)
+                      // 1 = amber = path - no battle
+                      // 2 = emerald = beginning - no battle
+                      // 3 = pink = end - no battle
+                      _ -> Move(0)
+                    })
+                  }
+                  _ -> None
+                }
+              })
+            })
+            |> list.flatten
+            |> list.find(fn(el) {
+              el == Some(Move(0)) || el == Some(Battle(0, 0, 0))
+            })
           //update game state
           let player =
             Player(
               ..state.player,
-              action: Move(0),
+              action: action,
               position: #(x, y),
               old_positions: state.player.old_positions
                 |> list.append([state.player.position]),
             )
-          let assert Some(game_subject) = state.game_subject
-          process.send(game_subject, PlayerMoved(player))
+          process.send(game_subject, PlayerMoved(player, game_subject))
           //update overall state, including move action
           WebsocketActorState(..state, player: player)
           |> actor.continue
@@ -169,7 +213,7 @@ fn handle_ws_message(state, conn, message) {
         "go_to_dice_roll" -> go_to_dice_roll(state, conn) |> actor.continue
 
         "roll" -> {
-          //TODO - handle spam?
+          //TODO - refactor
           case state.player.action {
             Move(to_move_by) -> {
               case to_move_by {
@@ -209,9 +253,50 @@ fn handle_ws_message(state, conn, message) {
                 }
               }
             }
-            _ -> {
-              // TODO - handle other actions
-              state |> actor.continue
+            Battle(a_type, damage, defence) -> {
+              // TODO - battle features
+              // TODO - let game/battle know
+              //check if all 3 filled, then already_rolled
+              case a_type == 0 || damage == 0 || defence == 0 {
+                True -> {
+                  //else fill the on not set & update state & page info
+                  let assert Ok(_) =
+                    mist.send_text_frame(conn, anim_get_next_dice())
+                  let roll = case int.random(6) {
+                    //upper is exclusive, 0 is inclusive
+                    0 -> 6
+                    number -> number
+                  }
+                  let assert Ok(_) =
+                    mist.send_text_frame(
+                      conn,
+                      rolled_die(roll) |> element.to_string,
+                    )
+
+                  let action = case a_type, damage, defence {
+                    0, _, _ -> Battle(roll, damage, defence)
+                    _, 0, _ -> Battle(a_type, roll, defence)
+                    _, _, _ -> Battle(a_type, damage, roll)
+                  }
+
+                  let assert Ok(_) =
+                    mist.send_text_frame(
+                      conn,
+                      dice_result(action) |> element.to_string,
+                    )
+
+                  WebsocketActorState(
+                    ..state,
+                    player: Player(..state.player, action: action),
+                  )
+                  |> actor.continue
+                }
+                _ -> {
+                  let assert Ok(_) =
+                    mist.send_text_frame(conn, already_rolled())
+                  state |> actor.continue
+                }
+              }
             }
           }
         }

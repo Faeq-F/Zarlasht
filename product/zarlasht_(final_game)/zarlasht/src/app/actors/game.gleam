@@ -2,23 +2,31 @@
 
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddPlayer, AddedName, Disconnect, GameActorState, GameState,
-  GetState, Home, JoinGame, Player, PlayerMoved, PrepareGame, SendToClient,
-  SwapColors, UpdatePlayerState, UpdateState, UserDisconnected, Wait,
+  type Player, AddPlayer, AddedName, Battle, Disconnect, GameActorState,
+  GameState, GetState, Home, JoinGame, Move, Player, PlayerMoved, PrepareGame,
+  SendToClient, SetupBattle, SwapColors, UpdatePlayerState, UpdateState,
+  UserDisconnected, Wait,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
+import gleam/int
 import gleam/io
 import gleam/list
+import gleam/option.{None}
 import gleam/otp/actor.{type Next}
+import gleam/otp/static_supervisor as sup
 import logging.{Info}
 import lustre/element
 
+// TODO refactor into their own models
+
+import app/actors/battle
 import app/pages/created_game.{created_game_page, get_color, player_container}
 
 /// Creates the actor
 ///
 pub fn start(code: Int) -> Subject(GameActorMessage) {
+  // set initial state
   let state =
     GameActorState(
       code: code,
@@ -35,6 +43,7 @@ pub fn start(code: Int) -> Subject(GameActorMessage) {
       player_chats: dict.new(),
       ally_chats: dict.new(),
       pages_in_view: dict.new(),
+      battles: [],
     )
   let assert Ok(actor) = actor.start(state, handle_message)
   actor
@@ -49,7 +58,36 @@ fn handle_message(
   logging.log(Info, "A Game Actor got the message")
   io.debug(message_for_actor)
   case message_for_actor {
-    PlayerMoved(player) -> {
+    PlayerMoved(player, game) -> {
+      //check if action is battle
+      let new_battles = case player.action {
+        Battle(_, _, _) -> {
+          // create battle
+          let game_subject = process.new_subject()
+          let battle_erl = fn() { battle.start(game_subject) }
+          let assert Ok(battle_subject) = process.receive(game_subject, 1000)
+          // get id
+          let id = case list.last(state.battles) {
+            Ok(b) -> b.0 + 1
+            _ -> 0
+          }
+          // add to supervisor
+          let _ =
+            sup.new(sup.OneForOne)
+            |> sup.add(sup.supervisor_child(
+              "battle_is_" <> id |> int.to_string,
+              battle_erl,
+            ))
+            |> sup.start_link
+          let new_battle = #(id, battle_subject)
+          // setup battle
+          process.send(battle_subject, SetupBattle(id, game))
+          // add to state
+          state.battles |> list.append([new_battle])
+        }
+        Move(_) -> state.battles
+      }
+      //state update
       let assert Ok(old_player) =
         state.participants
         |> list.find(fn(p) { { p.0 }.number == player.number })
@@ -57,7 +95,11 @@ fn handle_message(
         state.participants
         |> list.filter(fn(p) { { p.0 }.number != player.number })
         |> list.append([#(player, old_player.1)])
-      GameActorState(..state, participants: new_participants)
+      GameActorState(
+        ..state,
+        battles: new_battles,
+        participants: new_participants,
+      )
       |> actor.continue
     }
     AddPlayer(player, game_subject) -> {

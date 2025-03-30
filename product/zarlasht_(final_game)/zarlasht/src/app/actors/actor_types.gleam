@@ -158,6 +158,7 @@ pub type GameActorState {
     player_chats: Dict(#(Int, Int), List(Message)),
     ally_chats: Dict(List(Int), List(Message)),
     pages_in_view: Dict(Int, Page),
+    battles: List(#(Int, Subject(BattleActorMessage))),
   )
 }
 
@@ -215,5 +216,18 @@ pub type GameActorMessage {
   PrepareGame
   /// A player has moved on the map
   ///
-  PlayerMoved(player: Player)
+  /// They will possibly battle in the position they moved to;
+  /// a battle actor will be started if so
+  ///
+  PlayerMoved(player: Player, game: Subject(GameActorMessage))
+}
+
+//----------------------------------------------------------------------
+
+pub type BattleActorState {
+  BattleActorState(id: Int, game: Option(Subject(GameActorMessage)))
+}
+
+pub type BattleActorMessage {
+  SetupBattle(id: Int, game: Subject(GameActorMessage))
 }

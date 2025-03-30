@@ -467,7 +467,7 @@ fn map_grid_to_show(covered_positions: List(#(Int, Int))) {
   |> list.flatten
 }
 
-fn map_grid() {
+pub fn map_grid() {
   [
     [
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
