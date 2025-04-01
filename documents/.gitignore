@@ -26,5 +26,7 @@ faeq_faisal_signature.png
 !sequence_playing.pdf
 !use_case.pdf
 
+!**/code_listing_creator/**
+
 # even if they are in subdirs
 !*/
