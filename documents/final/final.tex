@@ -5,96 +5,14 @@
 \usepackage{upgreek, amsmath, tipa , textcomp, amssymb}
 \usepackage{listings, chapterbib, enumerate}
 \usepackage[smartEllipses]{markdown}
-\bibliographystyle{apalike}
-\bibstyle{apalike}
+\bibliographystyle{alpha}
+\bibstyle{alpha}
 \usepackage{tocloft}
 \setlength\cftparskip{2pt}
 \setlength\cftbeforechapskip{0pt}
 \setlength\cftbeforesecskip{2pt}
 \setlength\cftaftertoctitleskip{10pt}
 \setlength{\cftbeforetoctitleskip}{-2em}
-
-% Gleam code style
-\definecolor{WhiteCodeBlock}{RGB}{255,255,255}% rgb(255,255,255)
-\definecolor{BlackText}{RGB}{110,107,94}% rgb(110,107,94)
-\definecolor{GreenString}{RGB}{164,241,166}% rgb(164, 241, 166)
-\definecolor{GreenTypename}{RGB}{98,228,168}% rgb(98,228,168)
-\definecolor{PurpleKeyword}{RGB}{222,44,253}% rgb(222, 44, 253)
-\definecolor{GrayComment}{RGB}{170,170,170}% rgb(170,170,170)
-\definecolor{GoldDocumentation}{RGB}{180,165,45}% rgb(180,165,45)
-\definecolor{OrangeVariable}{RGB}{255, 172, 32}% rgb(255, 172, 32)
-\definecolor{Math}{RGB}{112,116,254}% rgb(112, 116, 254)
-\definecolor{BlueFunction}{RGB}{122,209,255}% rgb(122, 209, 255)
-\lstdefinelanguage{gleam}
-{
-    alsoletter={:},
-    columns=fullflexible,
-    tabsize=2,
-    keepspaces=true,
-    captionpos=b,
-    showstringspaces=false,
-    frame=single,
-    framesep=0pt,
-    framerule=0pt,
-    framexleftmargin=4pt,
-    framexrightmargin=4pt,
-    framextopmargin=5pt,
-    framexbottommargin=3pt,
-    xleftmargin=4pt,
-    xrightmargin=4pt,
-    backgroundcolor=\color{WhiteCodeBlock},
-    basicstyle=\ttfamily\color{BlackText}\tiny,
-    keywords={
-        pub, fn, let, case, if, else, use, type,
-        struct, enum, import, as, external
-    },
-    keywordstyle=\color{PurpleKeyword},
-    stringstyle=\color{GreenString},
-    morestring=[s]{"}{"},
-    literate=
-    {=}{{{\color{Math}=}}}{1}%
-    {->}{{{\color{OrangeVariable}->}}}{2}%
-    {|>}{{{\color{OrangeVariable}|>}}}{2}%
-    {+}{{{\color{Math}+}}}{1}%
-    {*}{{{\color{Math}*}}}{1}%
-    {!}{{{\color{Math}!}}}{1}%
-    {(}{{{\color{Math}(}}}{1}%
-    {)}{{{\color{Math})}}}{1}%
-    {[}{{{\color{Math}[}}}{1}%
-    {]}{{{\color{Math}]}}}{1}%
-    {<}{{{\color{Math}<}}}{1}%
-    {0}{{{\color{Math}0}}}1%
-    {1}{{{\color{Math}1}}}1%
-    {2}{{{\color{Math}2}}}1%
-    {3}{{{\color{Math}3}}}1%
-    {4}{{{\color{Math}4}}}1%
-    {5}{{{\color{Math}5}}}1%
-    {6}{{{\color{Math}6}}}1%
-    {7}{{{\color{Math}7}}}1%
-    {8}{{{\color{Math}8}}}1%
-    {9}{{{\color{Math}9}}}1,
-    morekeywords=[2]{
-        Request, Connection, Subject, DirectorActorMessage, Info,
-        WebsocketActorState, Neither, None, Some, DequeueParticipant,
-        UserDisconnected, Nil
-    },
-    keywordstyle=[2]\color{GreenTypename},
-    morekeywords=[3]{
-        log, new_selector, new_subject, debug, send, new, websocket, selecting
-    },
-    keywordstyle=[3]\color{BlueFunction},
-    morekeywords=[4]{
-        request:, on_init:, on_close:, handler:, name:, game_code:,
-        player:, ws_subject:, game_subject:, director_subject:
-    },
-    keywordstyle=[4]\color{OrangeVariable},
-    comment=[l][\color{GrayComment}\slshape]{//},
-    morecomment=[l][\color{GoldDocumentation}\slshape]{///},
-    commentstyle=\color{GrayComment}\slshape
-}
-
-
-
 \newcommand{\bulletPoint}{\hspace{-3.1pt}$\bullet$ \hspace{5pt}}
 
 %--
@@ -354,6 +272,9 @@ there are further actions that I could have taken, given time.
 These will be outlined in greater detail later in the report.
 
 \section{Rationale}
+
+\phantomsection
+\label{rationale}
 
 As previously mentioned {\hypersetup{linkcolor=teal}(\pageref{rationale_importance}, \pageref{rationale_problem},
     and \pageref{rationale_abstract})},
@@ -807,8 +728,6 @@ a pool of servers within my architecture.
 
 \chapter{Architectural paradigms, distribution and design patterns}
 
-%TODO - CAP theorem
-
 Distribution is a critical consideration for highly concurrent game
 environments, ensuring scalability when individual servers become
 overloaded, such as during sudden traffic spikes like flash floods, as
@@ -888,6 +807,9 @@ tend to have an API Gateway, a singular entry point for client requests. The gat
 common concerns like authentication, load balancing, and request routing, making interactions simpler,
 with enhanced security.
 
+\phantomsection
+\label{microservice_issue}
+
 A major issue is the added operational complexity due to the decentralized
 design; strong monitoring, logging, and debugging capabilities are required in
 order to monitor communication between services.
@@ -905,185 +827,136 @@ and API versioning avoids compatibility issues on updates.
 \addcontentsline{toc}{section}{Saga interaction}
 \subsection{Saga interaction}
 
-"When moving to microservices, one of the first things to
-realize is that individual services don’t exist in isolation." %https://www.infoq.com/articles/saga-orchestration-outbox/
-Like discussed above, this can cause many issues, but a key one
-is maintaining data
-consistency across services. The Database per Service pattern is a common
-approach where each microservice has its own database, enabling loose coupling,
-and independent development, and scalability. However, this introduces the
-issue of handling transactions that span multiple services.
+%https://www.infoq.com/articles/saga-orchestration-outbox/
+”When moving to microservices, one of the first things to realize is that
+individual services don’t exist in isolation.” As discussed
+before {\hypersetup{linkcolor=teal}(\pageref{microservice_issue})}, this causes
+many issues, including the major issue of maintaining data consistency across
+services. One solution is the Database per Service pattern where each service
+has its own database, allowing for loose coupling, independent development,
+and scalability. But this adds the issue of handling transactions that span
+multiple services; the Saga interaction pattern solves this issue.
 %https://microservices.io/patterns/data/saga.html
 
 A Saga is a sequence of local transactions. %https://microservices.io/patterns/data/saga.html
-It allows long-running transactions to be distributed across multiple
-microservices while maintaining all-or-nothing semantics
-(either all the transactions in the sequence succeed, or the entire operation
-is rolled back to ensure data consistency).
-%https://www.infoq.com/articles/saga-orchestration-outbox/
+It makes it possible for long-running transactions to span across multiple
+microservices without violating all-or-nothing semantics (either all
+transactions in the sequence succeed, or the whole operation is rolled back
+so that data consistency is maintained).%https://www.infoq.com/articles/saga-orchestration-outbox/
 
-Saga interaction works by coordinating transactions between microservices using
-asynchronous messaging.
-Messaging can be done using message brokers; asynchronous communication is
-preferred because it decouples services, ensuring that the failure of one
-service doesn’t block others. %https://microservices.io/post/sagas/2019/08/04/developing-sagas-part-2.html
-Each microservice publishes an event after completing its local transaction,
-and the next transaction is triggered based on the outcome of the previous
-one. If the transactions complete successfully, the operation is finalized
-but if any transaction fails, compensating transactions are executed to
-undo the changes made by previous transactions. %https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
-Compensating transactions undo the effects of a previously committed local
-transaction. For example, in e-commerce, if a payment is processed but an
-order cannot be fulfilled, a compensating transaction would refund the
-payment. However, designing compensating transactions can be complex as each
-service must define how to reverse its changes. This complexity grows as
-the number of microservices increases, making debugging and maintenance
-challenging.
+\phantomsection
+\label{saga_events}
+The Saga interaction pattern works by coordinating the transactions among
+microservices using asynchronous messaging, likely through the use of message
+brokers. Asynchronous communication is preferred since it isolates services,
+i.e., failure in one service doesn't block others. %https://microservices.io/post/sagas/2019/08/04/developing-sagas-part-2.html
+The microservices
+broadcast an event after successfully completing a local transaction, and
+the next transaction is initiated by the success or failure of the
+previous one. If all transactions are successful, the operation is complete
+but if any of the transactions fail, then compensating transactions are
+invoked to reverse the alterations made by past transactions. %https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
+For example, in e-commerce, where a payment has been processed but the order
+cannot be fulfilled, a compensating transaction would refund the payment.
+However, designing compensating transactions can be complex as each service
+must define how to reverse its changes. This complexity grows as the number
+of microservices increases, making debugging and maintenance challenging.
 %https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
 
-There are two main ways to implement Saga interaction; choreography and
-orchestration. In choreography, each service communicates directly with the
-next service in the sequence. After completing its local transaction, a
-service publishes an event that triggers the next transaction. This
-decentralized approach is simple but can become difficult to manage as the
-number of services grows. The logic of the Saga is scattered across
-services, making it harder to understand and debug. %https://www.infoq.com/articles/saga-orchestration-outbox/
-In orchestration, a central 'orchestrator' coordinates the Sagas. The orchestrator
-invokes each service in sequence and handles the flow of events. This approach
-centralizes the logic, making it easier to manage and extend. For example,
-adding a new step to the Saga only requires updating the orchestrator,
-not every participating service. %https://www.infoq.com/articles/saga-orchestration-outbox/
-While the pattern is useful, ensuring all transactions are atomic, consistent and
-durable (changes are permanent), there is a lack of isolation, meaning that
-changes from local transactions are visible immediately, even if the Saga fails
-later.
+There are two main ways of implementing Saga interaction; choreography and
+orchestration. In choreography, every service talks directly to the next
+service in the chain. Upon completion of a local transaction, a service sends
+an event that initiates the next transaction; a decentralized design that is
+simple but can become difficult to work with when there are many services
+as Saga logic is distributed across services, making it more difficult
+to debug and comprehend.%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+In the alternative implementation, orchestration, a central ’orchestrator’
+coordinates the Sagas. The orchestrator calls each service one after another
+and controls the flow of messages, centralizing the logic, making it easier
+to extend and maintain. For e.g., to add a new step to a Saga, you only need
+to update the orchestrator, not every participating service.%https://www.infoq.com/articles/saga-orchestration-outbox/
+
+The lack of isolation is still a large issue though, since even with the
+pattern ensuring all transactions are atomic, consistent and durable
+(changes are permanent), the lack of isolation means that changes from local
+transactions are visible immediately, even if the Saga fails later.
 %https://www.infoq.com/articles/saga-orchestration-outbox/
 
-To avoid issues with dual-writes (writing to the database and sending a message
-simultaneously, causing multiple writes without an additional layer that
-ensures data consistency over both services), the outbox pattern is often used.
-This pattern ensures that messages are reliably sent by storing them in the
-local database first and then publishing them to the message broker. This
-guarantees that messages are not lost even if a service fails.
-
 \section{Event driven architecture}
-%TODO glossary
-
-Event-Driven Architecture (EDA) and microservices are complementary patterns;
-while microservices decompose applications into small, independent services,
-EDA provides the communication backbone that enables these services to
-interact asynchronously through events, resulting in looser coupling and
-greater scalability compared to synchronous request-driven approaches.
-While EDA pairs well with microservices, it is a standalone
-pattern that delivers vital benefits, even in monolithic or hybrid systems
-(This includes Pool Architectures).
 
 %https://aws.amazon.com/event-driven-architecture/
 
-In EDA, events trigger and facilitate communication between decoupled services.
-This approach is widely adopted in modern applications, whether they are built
-using microservices or a monolith, due to its ability to enhance scalability,
-flexibility, and resilience. An event represents a change in state, such
-as a customer placing an order in an e-commerce system, and can either
-carry a large data payload or serve as a notification prompting further
-action.
+As seen in Saga interactions {\hypersetup{linkcolor=teal}(\pageref{saga_events})},
+Event-Driven Architecture (EDA) and microservices are complementary. While
+microservices decompose applications into independent components, EDA offers
+the backbone; asynchronous communication that allows loose coupling. Although
+often paired with microservices, EDA is extremely useful even in monolithic or
+hybrid architectures, like Pool Architectures. EDA is widely adopted for its
+scalability, flexibility, and resilience.
 
-An event-driven system consists of three fundamental elements; event producers,
-event routers, and event consumers. A producer generates an event when a
-state change occurs, such as an inventory update or a payment confirmation.
-The event router, often a message broker or event bus, receives these
-events, filters and transforms them, and delivers them to the appropriate
-consumers. The consumers then process the events, executing business logic
-such as updating a database or triggering a notification. Crucially,
-producers and consumers remain entirely decoupled, unaware of each other’s
-existence, which allows them to work independently.
+In EDA, events representing state changes (e.g., an e-commerce order) initiate
+communication between decoupled services. Events may or may not have a data
+payload, but can be used as a notification to initiate further action. The
+architecture is based on three main components; event producers, routers, and
+consumers. Producers and consumers are entirely decoupled so that they are
+completely unaware of each other’s existence, allowing them to work
+independently.
 
-One of the primary benefits of EDA is the ability to scale and fail
-independently. Since services interact only through the event router, a failure
-in one component does not cascade to others. The router acts as an elastic
-buffer, absorbing workload spikes and ensuring reliable event delivery even
-during partial system outages.
+EDA's primary strengths include fault isolation (component failures don't
+cascade), development agility (scalability and the lack of request-response or
+polling logic), and centralized security (consistent encryption and access
+control via routers). It also saves financial costs; as a push-based system,
+as opposed to polling-based systems that continuously consume resources to
+look for updates, processing only happens when events get emitted, avoiding
+idle resource consumption and unnecessary network traffic. The router also
+serves as an elastic buffer, absorbing workload spikes and providing
+guaranteed event delivery, even during partial system outages.
 
-EDA also accelerates development agility by eliminating the need for custom
-polling or request-response logic. The event router handles event filtering,
-routing, and delivery automatically, reducing boilerplate code and minimizing
-cross-team coordination. This decoupling enables teams to deploy updates to
-producers or consumers without requiring synchronized releases.
+\newpage
 
-From an operational standpoint, event-driven systems simplify auditing and
-security management. The event router serves as a centralized control point
-where access policies, encryption standards, and compliance rules can be
-enforced uniformly. Events can be encrypted in transit and at rest, and
-fine-grained permissions ensure only authorized services publish or subscribe
-to specific event streams.
+The pattern shines in cross-account or cross-region situations, real-time
+alerting / monitoring, or concurrent processing. As an example, from one file
+upload, the event router can publish an event to multiple consumers, launching
+concurrent flows. It integrates heterogeneous systems seamlessly as a universal
+layer of interoperability for legacy systems or polyglot services.
 
-Cost efficiency is another compelling advantage. Unlike polling-based systems,
-which continuously consume resources to check for updates, EDA operates on a
-push-based model, where processing occurs only when events are emitted. This
-reduces unnecessary network traffic, CPU overhead, and idle resource allocation,
-leading to lower operational expenses.
+While EDAs offer significant advantages, their suitability depends on specific
+application requirements. An EDA requires careful attention to event
+permanence; if events should be processed exactly once, the source of the
+event must ensure delivery and eliminate duplicates). As well as this,
+tolerance of latency and out-of-order delivery, and transparency of event
+flow (helping debugging) should be considered. State recovery requires
+ordered, deduplicated replays of the events to avoid inconsistencies,
+handling any split-brain states.
 
-Event-driven architectures excel in scenarios requiring cross-account or
-cross-region data replication. For instance, a global SaaS platform might use
-an event router to synchronize user data across geographically distributed
-databases while allowing each region to operate autonomously.
+\addcontentsline{toc}{section}{Kubernetes}
+\subsection{Kubernetes}
 
-They are equally effective for real-time monitoring and alerting. Instead of
-repeatedly querying resources like cloud storage or serverless functions,
-services can subscribe to event streams that notify them of anomalies,
-configuration changes, or performance thresholds being breached.
-
-EDA also enables efficient fanout and parallel processing. A single event,
-such as a file upload, can trigger multiple independent workflows (e.g.,
-thumbnail generation, metadata extraction, and virus scanning) without custom
-integration code. The event router disseminates the event to all relevant
-consumers, which process it concurrently.
-
-Finally, EDA is ideal for integrating heterogeneous systems. Organizations with
-legacy applications, third-party APIs, or polyglot microservices can use an
-event router as a universal interoperability layer, allowing disparate
-systems to exchange data without direct dependencies.
-
-While event-driven architectures offer significant advantages, their suitability
-depends on specific application requirements. Event durability is critical:
-if events must be processed exactly once, the event source must guarantee
-delivery and avoid duplicates. Performance control is another factor;
-applications must tolerate the asynchronous nature of event processing, which
-may introduce latency or out-of-order delivery. Event flow tracking can also
-pose challenges. While monitoring tools provide visibility into dynamic event
-streams, static code analysis becomes harder due to the indirection
-introduced by the router. Additionally, if the system needs to rebuild
-state (e.g., after a failure), the event source must support ordered,
-deduplicated replay to ensure consistency and prevent split-brain
-(where, ... explain).
-
-\section{Kubernetes}
-
-kubernetes - playstation
-%https://sonyinteractive.com/en/innovation/technology/research-academia/research/fully-automated-kubernetes-operations/
-scalability, flexibility, and cost-effectiveness - Kubernetes
-%reference rationale as pre mention of this occurring and then talk about ps
-%with pre-existing architectures used by large companies being swapped out for ones that better suite the need (talked about later in my distributions section)
-
+%https://enterprisersproject.com/article/2017/10/how-explain-kubernetes-plain-english
 A key example of an EDA is Kubernetes.
-Kubernetes exemplifies EDA through its reactive control loops—components like
+Kubernetes is a platform that automates Linux containers. It removes most of
+the manual processes involved in deploying and scaling containerized applications.
+You can group (cluster) together hosts running Linux containers, and then
+Kubernetes makes it simpler for you to work with the cluster. The main issue with
+Kubernetes, something it's infamous for, is it's sheer complexity; "it’s a
+difficult environment requiring a steep learning curve to seize its
+real potential".%https://www.appvia.io/blog/why-is-kubernetes-so-complicated
+
+%https://www.thestack.technology/playstation-gameservers-kubernetes-agones-multiplayer-games/
+%https://sonyinteractive.com/en/innovation/technology/research-academia/research/fully-automated-kubernetes-operations/
+
+Kubernetes exemplifies EDA through its reactive control loops; components like
 the scheduler and controllers continuously monitor cluster state changes
-(events) and reconcile actual state with desired state. At PlayStation Network,
-this event-driven paradigm enables autonomous operations: scaling events
-trigger KEDA (Kubernetes Event-driven Autoscaling) to adjust pods, while
-ArgoCD watches Git repositories for declarative manifest changes,
-automatically deploying updates. Even failures become events—when CoreDNS
-or VPC-CNI add-ons failed, Kubernetes' self-healing mechanisms triggered
-recovery workflows. By treating everything as an event (node failures,
-traffic spikes, security patches), PlayStation transformed Kubernetes
-from a manually managed orchestrator into a self-regulating platform
-where the system itself becomes the first responder. This shift mirrors
-cloud-native principles—infrastructure that reacts instantaneously
-to events rather than waiting for human intervention, proving that
-modern systems thrive when designed as interconnected event processors.
+(events) and reconcile actual state with desired state. This can enable
+autonomous operations like scaling events and adjusting pods (the smallest
+deployable units of computing). Git repositories can be watched for declarative
+manifest changes, to automatically deploy updates. Even failures can become
+events, like when add-ons fail, Kubernetes' self-healing mechanisms
+can trigger recovery workflows.
 
 While Kubernetes abstracts away infrastructure complexity from applications,
-this comes at a steep operational price—the platform's notorious configuration
+this comes at a steep operational price, the platform's notorious configuration
 overhead. What was once application-level complexity (scaling logic, failover
 mechanisms) now manifests as YAML sprawl, requiring teams to master hundreds of
 parameters for networking, storage, and autoscaling just to achieve basic
@@ -1093,81 +966,92 @@ Kubernetes expertise. The very decoupling that simplifies applications
 paradoxically complicates the ecosystem, demanding constant tuning of the
 orchestration layer that now holds all the moving parts.
 
-Kubernetes' greatest strength—externalizing infrastructure concerns—becomes
+Kubernetes' greatest strength, externalizing infrastructure concerns, becomes
 its weakness when organizations underestimate the operational tax. By
 divorcing applications from their runtime environment, Kubernetes creates a
 meta-problem: now you're not just debugging your code, but debugging the
 platform that runs your code. The abstraction leaks when teams spend more time
-wrestling with Helm charts and CRDs than writing business logic, proving that
-complexity never disappears—it just relocates.
+wrestling with the environment, rather than writing business logic, proving that
+complexity never disappears, it just relocates.
 
-\section{The Publish–Subscribe pattern}
+%percentages are https://sonyinteractive.com/en/innovation/technology/research-academia/research/fully-automated-kubernetes-operations/
+As mentioned {\hypersetup{linkcolor=teal}(\pageref{rationale})}, companies have
+wanted to / have swapped out their architectures
+for ones that better suit their need. A prime example is PlayStation running
+their game servers on Kubernetes. By treating everything as an event (node failures, traffic spikes, security
+patches), they transformed Kubernetes from a manually managed orchestrator
+into a self-regulating platform where the system itself becomes the first
+responder. They managed to cut cluster creation time by
+90\%, reduce the Recovery Time Objective (RTO) (the maximum acceptable downtime
+based on business requirements) by 90\% and reduced deployment times by 70\%,
+a testament to the scalability, flexibility, and cost-effectiveness of Kubernetes.
 
-event vs message - pub/sub
+\addcontentsline{toc}{section}{The Publish–Subscribe pattern}
+\subsection{The Publish–Subscribe pattern}
+
 %https://cloud.google.com/pubsub/docs/overview
 
-Delivery patterns for both events and messages include publish/subscribe
-(one-to-many) and point-to-point (one-to-one). While request/reply is
-technically possible, it is more commonly associated with messaging patterns
-rather than pure event-driven systems. Events excel at state propagation
-and decoupled notifications, while messages are better suited for command
-execution, workflow orchestration, and explicit coordination. [22][23]
+Delivery patterns for events include publish/subscribe (one-to-many) and
+point-to-point (one-to-one). These patterns can also be used for messaging
+though messages are better suited for command execution, workflow
+orchestration, and explicit coordination. While request/reply is technically
+possible, it is more commonly associated with messaging patterns rather than
+pure event-driven systems.
 
-Kubernetes and pub/sub represent two complementary approaches to implementing
-event-driven architectures, each with distinct strengths and tradeoffs.
-While Kubernetes internalizes event-driven principles through its control
-loops, reacting to cluster state changes like pod failures or scaling
-demands, pub/sub provides a more direct messaging layer for cross-service
-communication. The key difference lies in their scope: Kubernetes
-orchestrates infrastructure-level events, managing containers and resources
-reactively, while pub/sub specializes in application-level event streaming,
-enabling asynchronous communication between services without tight coupling.
-Pub/sub excels at business event distribution, real-time data pipelines, and
-enterprise integration scenarios where loose coupling matters more than
-immediate consistency.
+While, Kubernetes and Pub/Sub are complementary in implementing event-driven
+architectures, Pub/Sub can be used standalone in EDAs, like in Pool
+architectures. While Kubernetes internalizes event-driven principles through
+its control loops, Pub/Sub provides a more direct messaging layer for
+cross-service communication, specializing in application-level control.
+Pub/sub excels in enterprise integration scenarios where loose coupling
+matters more than immediate consistency. However, this decoupling comes
+with tradeoffs, unlike Kubernetes' built-in reconciliation and self-healing
+capabilities, Pub/Sub implementations require explicit handling of message
+retries, dead-letter queues (stores of messages that the messaging system
+cannot or should not deliver), and duplicate processing.
 
-However, this decoupling comes with tradeoffs,
-unlike Kubernetes' built-in reconciliation and self-healing capabilities,
-pub/sub implementations require explicit handling of message retries,
-dead-letter queues, and duplicate processing. In practice, modern systems
-often combine both approaches: leveraging Kubernetes for infrastructure
-automation while using pub/sub for business event propagation, creating a
-layered event-driven architecture that separates operational concerns from
-domain workflows. This hybrid approach allows organizations to benefit
-from Kubernetes' orchestration power while maintaining the flexibility
-and scalability of asynchronous messaging for business processes.
+In some modern systems, a combination of both approaches is used, leveraging
+Kubernetes for infrastructure automation while using pub/sub for event
+propagation, creating a layered event-driven architecture that separates
+operational concerns from domain workflows. This hybrid approach allows
+organizations to benefit from Kubernetes' orchestration power while
+maintaining the flexibility and scalability of asynchronous messaging for
+processes.
 
-\section{Point-to-Point Messaging}
+\addcontentsline{toc}{section}{Point-to-Point Messaging}
+\subsection{Point-to-Point Messaging}
 %https://eda-visuals.boyney.io/visuals/point-to-point-messaging
-Point-to-point messaging offers a focused approach within event-driven
-architectures, providing a streamlined alternative to pub/sub's broadcast
-model. This pattern establishes direct channels between message producers
-and consumers, where messages are placed in a queue and processed by
-receivers at their own pace - a stark contrast to pub/sub's one-to-many
-distribution. The point-to-point approach shines in workload distribution
-scenarios, enabling horizontal scaling through competing consumers that
-simultaneously pull messages from the same queue. This design proves
-particularly valuable when dealing with variable processing loads or
-rate-limited systems, as consumers can throttle their message intake to
-match their capacity. Unlike pub/sub's event broadcasting which
-assumes all subscribers need all messages, point-to-point channels
-implement a more targeted delivery mechanism where each message is
-processed exactly once, making it ideal for task distribution and
+Point-to-point messaging implements a targeted methodology in EDAs, a
+lightweight alternative to Pub/Sub's broadcasting model. Its implementation
+establishes direct channels between message producers and consumers, where
+messages that enter are placed into queue and processed by consumers at
+their own pace. This approach is effective for workload distribution as it
+allows horizontal scaling through competing consumers that simultaneously
+pull messages from the same queue.
+
+When working with variable processing loads or rate-limited systems, it is
+especially useful, since consumers can throttle their message consumption to
+match their capacity. Unlike Pub/Sub's event broadcasting, where all
+subscribers are expected to require all messages, point-to-point channels
+make use of a more focused delivery mechanism, where each message is
+handled exactly once, making it well suited for task distribution and
 job queues.
 
-The queue acts as an elastic buffer, absorbing traffic
-spikes while allowing consumers to process messages at sustainable
-rates, preventing overload scenarios common in synchronous systems.
-When implementing event-driven architectures, this pattern serves as
-a crucial tool for scenarios requiring ordered processing, load
-balancing, or integration with systems that can't handle
-pub/sub's fire-and-forget semantics, complementing rather than
-replacing broader event distribution patterns.
+The channel queue serves as an elastic buffer, absorbing traffic spikes while
+enabling consumers to process messages at sustainable rates, preventing
+overloads common in synchronous systems. In EDAs, this pattern is an
+essential mechanism for situations where ordered processing, load balancing,
+or integration with systems that cannot handle Pub/Sub's fire-and-forget
+semantics is needed, augmenting instead of replacing more general event
+distribution patterns.
+
+\newpage
 
 \section{Communication Technologies}
 
 %TODO
-%TCP, websockets, polling, etc.
+
+\subsection{Traditional Communication Protocols}
 
 Traditional communication protocols like TCP, while reliable for general data
 transmission, fall short for real-time systems that demand instantaneous
@@ -1191,6 +1075,8 @@ distribution among connections. The protocol's stateless nature also
 complicates session management, requiring custom solutions for authentication
 and flow control that TCP handles natively.
 
+\subsection{Real-time Communication}
+
 For
 real-time communication, solutions include, polling, long polling and websockets. In polling,
 clients send requests to the server regularly, with the server responding with a new message, or
@@ -1206,7 +1092,7 @@ communication, however they are not perfect, for e.g., they are still susceptibl
 \cite{gupta_overview_2018}. This is just one of the many use-cases that require an in-depth consideration
 of suitable technologies.
 
-%provide the benefits of TCP without most of the overhead
+%provides the benefits of TCP without most of the overhead
 
 While WebSockets provide full-duplex real-time communication, they are
 fundamentally built atop TCP, inheriting its reliable ordered delivery but
@@ -1245,6 +1131,13 @@ WebRTC delivers the predictability required for scalable concurrency.
 
 While WebRTC applies concurrency-aware constraints to UDP's wild efficiency,
 WebSockets inherit TCP's concurrency limitations at the protocol level.
+
+\section{The CAP theorem}
+%TODO - CAP theorem
+%https://www.splunk.com/en_us/blog/learn/cap-theorem.html
+
+Organisations have to prioritize two, like those previously mentioned (survey
+report), most prioritize ..., for ...
 
 \section{My choice for distribution}
 
@@ -1562,7 +1455,7 @@ denoted by the published message.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}[language=gleam]
+  \begin{lstlisting}
     ///See [here](https://hexdocs.pm/mist/mist.html#websocket)
     ///
     pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
@@ -1661,7 +1554,7 @@ the creator of the game is always player X, and the player who joins the game is
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}[language=gleam]
+  \begin{lstlisting}
 
     /// Creates the Actor
     pub fn start() -> Subject(DirectorActorMessage) {
@@ -1728,7 +1621,7 @@ the creator of the game is always player X, and the player who joins the game is
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}[language=gleam]
+  \begin{lstlisting}
     /// Creates the actor
     ///
     pub fn start(
@@ -1766,7 +1659,7 @@ the creator of the game is always player X, and the player who joins the game is
   \end{lstlisting}
   \captionof{figure}{The function that starts the game actor}\label{fig: 7}
   \vspace*{1.5cm}
-  \begin{lstlisting}[language=gleam]
+  \begin{lstlisting}
     /// Creates a unique code for the game
     ///
     fn generate_game_code(player: PlayerSocket) -> Int {
@@ -1802,7 +1695,7 @@ the creator of the game is always player X, and the player who joins the game is
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}[language=gleam]
+  \begin{lstlisting}
     /// After the game code has been inputted on the join page
     ///
     /// Sends the player to the `set_name_page`
@@ -1901,7 +1794,7 @@ allowing the opponent to take their turn.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}[language=gleam]
+  \begin{lstlisting}
     case message_for_actor {
       BoxClick(player, box_index) -> {
         // Update state for boxes
@@ -1964,7 +1857,7 @@ allowing the opponent to take their turn.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  \begin{lstlisting}[language=gleam]
+  \begin{lstlisting}
   /// Gets the winning player for a game
   ///
   /// Returns "X", "O", or "Draw" if a game has ended
