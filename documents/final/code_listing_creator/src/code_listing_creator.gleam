@@ -1,6 +1,7 @@
 import conversion.{convert, home}
 import gleam/erlang/process
 import gleam/io
+import gleam/list
 import lustre/element
 import mist
 import wisp.{type Request}
@@ -19,7 +20,12 @@ pub fn main() {
             home()
             |> element.to_string_builder
             |> wisp.html_response(200)
-          ["source" <> source] -> convert(source) |> wisp.html_response(200)
+          ["source"] -> {
+            use form <- wisp.require_form(req)
+            let assert Ok(source) = form.values |> list.first()
+            convert(source.1)
+            |> wisp.html_response(200)
+          }
           // All the empty responses
           ["internal-server-error"] -> wisp.internal_server_error()
           ["unprocessable-entity"] -> wisp.unprocessable_entity()

@@ -1,8 +1,10 @@
 pre code .hl-comment  { color: #d4d4d4; font-style: italic }
-pre code .hl-function { color: #9ce7ff }
-pre code .hl-keyword  { color: #ffd596 }
-pre code .hl-module   { color: #ffddfa }
-pre code .hl-number   { color: #c8ffa7 }
-pre code .hl-operator { color: #ffaff3 }
-pre code .hl-string   { color: #c8ffa7 }
-pre code .hl-variant  { color: #ffddfa }
+pre code .hl-function { color: #66c8ff }
+pre code .hl-keyword  { color: #ed8bfe }
+pre code .hl-module   { color: #7d8091 }
+pre code .hl-number   { color: #6765ff }
+pre code .hl-operator { color: #ff9434 }
+pre code .hl-string   { color: #34db36 }
+pre code .hl-variant  { color: #44de97 }
+pre code .prefixedColon { color: #ffac20 }
+pre code .outer { color: #5d5d5d }
