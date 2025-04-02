@@ -26,6 +26,17 @@ faeq_faisal_signature.png
 !sequence_playing.pdf
 !use_case.pdf
 
+!box_click.pdf
+!director_actor.pdf
+!final_architecture.pdf
+!game_actor_start.pdf
+!game_code_gen.pdf
+!mist_websocket.pdf
+!on_join_game.pdf
+!supervision_tree.pdf
+!supervision_tree_deployment_eg.pdf
+!winning.pdf
+
 !**/code_listing_creator/**
 
 # even if they are in subdirs
