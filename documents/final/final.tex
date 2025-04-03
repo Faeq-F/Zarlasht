@@ -5,8 +5,8 @@
 \usepackage{upgreek, amsmath, tipa , textcomp, amssymb}
 \usepackage{listings, chapterbib, enumerate}
 \usepackage[smartEllipses]{markdown}
-\bibliographystyle{alpha}
-\bibstyle{alpha}
+
+
 \usepackage{tocloft}
 \setlength\cftparskip{2pt}
 \setlength\cftbeforechapskip{0pt}
@@ -329,6 +329,7 @@ versatile and capable software engineer.
 
 \newpage
 
+
 \addcontentsline{toc}{section}{Technology Choices}
 \subsection{Technology Choices}
 
@@ -338,7 +339,7 @@ versatile and capable software engineer.
 For the front-end, the client-side, I used web technologies so that the Project
 would be more accessible to all. For functionality, I mostly used HTMX,
 but also added minimal JavaScript and Alpine.js, a lightweight JavaScript
-framework for my final game. %TODO - CITE
+framework \cite{noauthor_alpine.js_nodate} for my final game.
 This was mostly to allow me to focus on the
 architecture of the environment and the implementation of the game
 servers, as HTMX allows me to dynamically update the client-side, while
@@ -359,10 +360,10 @@ For the game servers themselves, I used Gleam, a new, type-safe, modern
 language with comprehensive tooling built-in. I believe they described why I
 chose their language best; "The power of a type system, the expressiveness
 of functional programming, and the reliability of the highly concurrent,
-fault tolerant Erlang runtime, with a familiar and modern syntax".
+fault tolerant Erlang runtime, with a familiar and modern syntax" \cite{noauthor_gleam_nodate}.
 I had been wishing to learn function programming and use a reliable and friendly
 type-safe language for web development for a while.
-Since "Gleam is designed to make your job as fun and stress-free as possible",
+Since "Gleam is designed to make your job as fun and stress-free as possible" \cite{noauthor_gleam_nodate},
 I chose to produce this project as I saw it as a perfect opportunity to try the
 language, as well as the other technologies that are new to me and I had liked
 to try, like HTMX and a Redis OSS based database.
@@ -376,27 +377,22 @@ move to implementing a reliable and scalable environment on the
 "Thanks to a multi-core actor based concurrency system that can run millions
 of concurrent tasks, fast immutable data structures, and a concurrent garbage
 collector that never stops the world, your service can scale and stay lightning
-fast with ease".
-
-%TODO - CITE all quotes
-%TODO - cite rate - maybe gleam developer survey - there will be articles online for this
-%TODO - cite news for constant growing
+fast with ease" \cite{noauthor_gleam_nodate}.
 
 I verified Gleam's maturity, prior to adopting it for the project to ensure
 that it would be suitable. Once I had done this, I was not worried about
 any unexpected limitations I could come across as the language allowed
 me to write FFIs to use functions written in other languages, like JavaScript,
-Erlang and Elixir, directly. As well as this, Gleam is constantly growing,
-at an exceptionally large rate too, with a "rich ecosystem of thousands of
-open source libraries for Gleam users to make use of".
+Erlang and Elixir, directly. As well as this, Gleam is constantly growing \cite{noauthor_news_nodate},
+at an exceptionally large rate too \cite{shashtari_why_2024}, with a "rich ecosystem of thousands of
+open source libraries for Gleam users to make use of" \cite{noauthor_gleam_nodate}.
 As well as all this, Gleam helps me keep up-to-date with modern
 programming styles, design and practices, reflecting my commitment,
 part of the 'professional competence and integrity' section of the
 BCS Code of Conduct, to
 "develop your professional knowledge, skills and competence on a continuing
 basis, maintaining awareness of technological developments, procedures, and
-standards that are relevant to your field".
-% TODO CITE - https://www.bcs.org/membership-and-registrations/become-a-member/bcs-code-of-conduct
+standards that are relevant to your field" \cite{noauthor_bcs_nodate}.
 
 For my database, I chose to use Valkey, as it is Redis OSS based, as
 desired {\hypersetup{linkcolor=teal}(\pageref{REDISOSS})} and is
@@ -720,6 +716,12 @@ enhances this by using supervision trees that
 organize processes in a hierarchical structure, allowing higher-level processes
 to monitor and correct errors in lower-level processes \cite{armstrong_erlang_2010}.
 
+Erlang with OTP has helped produce a large number of commercially successful products.
+Some of the largest are major Ericsson products, having over a million lines
+of Erlang code. One of these, the AXD301, is thought to be one of the most
+reliable products ever made by Ericsson \cite{armstrong_making_2003},
+likely a direct result of using the OTP.
+
 \section{My choice of mechanism}
 While JavaScript’s event loop model has its limitations, concurrency
 models like goroutines, coroutines, and the actor model offer superior
@@ -777,10 +779,8 @@ disruption for clients", or by having auto-scaling so that servers "can spin up 
 based on usage" \cite{pandey_peer--peer_2022}.
 
 \section{Pool Architectures}
-%https://cubettech.com/resources/blog/microservice-v-s-pool-architecture-for-saa-s-applications/
-
 The Pool architecture design is where every client is given a dedicated instance
-of a service, executing independently inside their own separate resource pool.
+of a service, executing independently inside their own separate resource pool \cite{cubet_microservice_nodate}.
 This allows for individual scaling and exact resource allocation, meaning that
 individual performance demands for individuals are fulfilled without other
 users' interference.
@@ -791,44 +791,43 @@ Allocating resources on a per-client basis, minimizes waste and optimizes effici
 ensuring clients only consume what they need.
 Additionally, isolation of resources inherently enhances security, as each client’s
 data and services remain segregated, reducing the risk of cross-tenant
-vulnerabilities.
+vulnerabilities \cite{cubet_microservice_nodate}.
 
 However, having many dedicated instances introduces complexity, but there are automation
 tools for deployment and monitoring to simplify things. While dedicated resources makes the model more
-costly (in terms of expenses), strategic usage of resources, like dynamic provisioning, can control the costs. The
+costly (in terms of expenses), strategic usage of resources, like dynamic provisioning, can control the costs \cite{cubet_microservice_nodate}. The
 centralized nature of the resource pool also presents a single point of failure, however this may be
-avoided by using robust backup mechanisms and disaster recovery protocols.
+avoided by using robust backup mechanisms and disaster recovery protocols \cite{cubet_microservice_nodate}.
 
 Pool architecture is particularly well-suited for B2B applications with
 fluctuating traffic patterns,
-where fine-grained scaling per client is critical. It is also well-suited
+where fine-grained scaling per client is critical \cite{cubet_microservice_nodate}. It is also well-suited
 for enterprise environments where monolithic client programs need to have resources
 assigned to them specifically, so it is easier to manage while maintaining efficiency.
 
 While pool architecture requires careful resource allocation, it can minimize
 long-term costs by eliminating over-provisioning. Because scaling is client-specific,
 the financial cost of scaling a complete system is completely eliminated when just some
-clients require additional capacity.
+clients require additional capacity \cite{cubet_microservice_nodate}.
 
 \section{Microservices}
-%https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/microservices
 
 Using microservices is an alternative that is fairly modern and common.
 With microservices, an application is structured as a collection of small,
 autonomous services with each one responsible for a specific function. This encourages decentralization
 and loose coupling since each service can run separately, allowing more flexibility,
-scalability, and robustness, making it well-suited for complex, dynamic systems.
+scalability, and robustness, making it well-suited for complex, dynamic systems \cite{robbagby_microservice_nodate}.
 This segregation makes services loosely coupled, i.e., changes to a single service need not be reflected in others.
 Microservices should be independently deployable so that development teams can update,
 scale, or replace a single service without disrupting the whole system. This
 modularity accelerates development cycles and reduces the risk reduces the
 risk involved in largescale deployments. Part of this is fault isolation; a
 single service failure does not take the whole system down.
-Design patterns such as the Circuit Breaker avoid cascading failures, preventing system instability.
+Design patterns such as the Circuit Breaker avoid cascading failures, preventing system instability \cite{robbagby_microservice_nodate}.
 
 Microservices tend to communicate with each other through APIs, enabling
 services to use different programming languages, databases, and frameworks,
-a concept known as polyglot persistence. For e.g., a service may use
+a concept known as polyglot persistence \cite{robbagby_microservice_nodate}. For e.g., a service may use
 a relational database for transactional consistency while another uses a NoSQL
 database for fast read speeds. In this way,
 teams can choose the best tool for the job and not be restricted by
@@ -837,63 +836,60 @@ a one-size-fits-all solution.
 In order to be able to manage the complexity of distributed services, architectures using microservices
 tend to have an API Gateway, a singular entry point for client requests. The gateway addresses
 common concerns like authentication, load balancing, and request routing, making interactions simpler,
-with enhanced security.
+with enhanced security \cite{robbagby_microservice_nodate}.
 
 \phantomsection
 \label{microservice_issue}
 
 A major issue is the added operational complexity due to the decentralized
 design; strong monitoring, logging, and debugging capabilities are required in
-order to monitor communication between services.
+order to monitor communication between services \cite{robbagby_microservice_nodate}.
 Data consistency gets harder to manage as transactions can be distributed among
 several services and tend to need eventual consistency rather than strict ACID
 compliance. Network delay and inter-service communication overhead can impact
 performance, especially in systems where there are deeply nested dependencies
-between services.
+between services \cite{robbagby_microservice_nodate}.
 
 Avoiding tight coupling between services, shared databases or strict
-APIs, allows for long-term maintainability. Resilience patterns
+APIs, allows for long-term maintainability \cite{robbagby_microservice_nodate}. Resilience patterns
 such as retries and timeouts help manage failures gracefully,
 and API versioning avoids compatibility issues on updates.
 
 \addcontentsline{toc}{section}{Saga interaction}
 \subsection{Saga interaction}
 
-%https://www.infoq.com/articles/saga-orchestration-outbox/
 ”When moving to microservices, one of the first things to realize is that
-individual services don’t exist in isolation.” As discussed
+individual services don’t exist in isolation.”\cite{noauthor_saga_nodate} As discussed
 before {\hypersetup{linkcolor=teal}(\pageref{microservice_issue})}, this causes
 many issues, including the major issue of maintaining data consistency across
 services. One solution is the Database per Service pattern where each service
 has its own database, allowing for loose coupling, independent development,
 and scalability. But this adds the issue of handling transactions that span
-multiple services; the Saga interaction pattern solves this issue.
-%https://microservices.io/patterns/data/saga.html
+multiple services; the Saga interaction pattern solves this issue \cite{noauthor_microservices_nodate}.
 
-A Saga is a sequence of local transactions. %https://microservices.io/patterns/data/saga.html
+A Saga is a sequence of local transactions \cite{noauthor_microservices_nodate}.
 It makes it possible for long-running transactions to span across multiple
 microservices without violating all-or-nothing semantics (either all
 transactions in the sequence succeed, or the whole operation is rolled back
-so that data consistency is maintained).%https://www.infoq.com/articles/saga-orchestration-outbox/
+so that data consistency is maintained) \cite{noauthor_saga_nodate}.
 
 \phantomsection
 \label{saga_events}
 The Saga interaction pattern works by coordinating the transactions among
 microservices using asynchronous messaging, likely through the use of message
 brokers. Asynchronous communication is preferred since it isolates services,
-i.e., failure in one service doesn't block others. %https://microservices.io/post/sagas/2019/08/04/developing-sagas-part-2.html
+i.e., failure in one service doesn't block others \cite{noauthor_managing_nodate}.
 The microservices
 broadcast an event after successfully completing a local transaction, and
 the next transaction is initiated by the success or failure of the
 previous one. If all transactions are successful, the operation is complete
 but if any of the transactions fail, then compensating transactions are
-invoked to reverse the alterations made by past transactions. %https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
+invoked to reverse the alterations made by past transactions \cite{noauthor_saga_nodateaws}.
 For example, in e-commerce, where a payment has been processed but the order
 cannot be fulfilled, a compensating transaction would refund the payment.
 However, designing compensating transactions can be complex as each service
 must define how to reverse its changes. This complexity grows as the number
-of microservices increases, making debugging and maintenance challenging.
-%https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
+of microservices increases, making debugging and maintenance challenging \cite{noauthor_saga_nodateaws}.
 
 There are two main ways of implementing Saga interaction; choreography and
 orchestration. In choreography, every service talks directly to the next
@@ -901,23 +897,20 @@ service in the chain. Upon completion of a local transaction, a service sends
 an event that initiates the next transaction; a decentralized design that is
 simple but can become difficult to work with when there are many services
 as Saga logic is distributed across services, making it more difficult
-to debug and comprehend.%https://www.infoq.com/articles/saga-orchestration-outbox/
+to debug and comprehend \cite{noauthor_saga_nodate}.
 
 In the alternative implementation, orchestration, a central ’orchestrator’
 coordinates the Sagas. The orchestrator calls each service one after another
 and controls the flow of messages, centralizing the logic, making it easier
 to extend and maintain. For e.g., to add a new step to a Saga, you only need
-to update the orchestrator, not every participating service.%https://www.infoq.com/articles/saga-orchestration-outbox/
+to update the orchestrator, not every participating service \cite{noauthor_saga_nodate}.
 
 The lack of isolation is still a large issue though, since even with the
 pattern ensuring all transactions are atomic, consistent and durable
 (changes are permanent), the lack of isolation means that changes from local
-transactions are visible immediately, even if the Saga fails later.
-%https://www.infoq.com/articles/saga-orchestration-outbox/
+transactions are visible immediately, even if the Saga fails later \cite{noauthor_saga_nodate}.
 
 \section{Event driven architecture}
-
-%https://aws.amazon.com/event-driven-architecture/
 
 As seen in Saga interactions {\hypersetup{linkcolor=teal}(\pageref{saga_events})},
 Event-Driven Architecture (EDA) and microservices are complementary. While
@@ -925,7 +918,7 @@ microservices decompose applications into independent components, EDA offers
 the backbone; asynchronous communication that allows loose coupling. Although
 often paired with microservices, EDA is extremely useful even in monolithic or
 hybrid architectures, like Pool Architectures. EDA is widely adopted for its
-scalability, flexibility, and resilience.
+scalability, flexibility, and resilience \cite{noauthor_event-driven_nodate}.
 
 In EDA, events representing state changes (e.g., an e-commerce order) initiate
 communication between decoupled services. Events may or may not have a data
@@ -933,17 +926,17 @@ payload, but can be used as a notification to initiate further action. The
 architecture is based on three main components; event producers, routers, and
 consumers. Producers and consumers are entirely decoupled so that they are
 completely unaware of each other’s existence, allowing them to work
-independently.
+independently \cite{noauthor_event-driven_nodate}.
 
 EDA's primary strengths include fault isolation (component failures don't
 cascade), development agility (scalability and the lack of request-response or
 polling logic), and centralized security (consistent encryption and access
-control via routers). It also saves financial costs; as a push-based system,
+control via routers) \cite{noauthor_event-driven_nodate}. It also saves financial costs; as a push-based system,
 as opposed to polling-based systems that continuously consume resources to
 look for updates, processing only happens when events get emitted, avoiding
 idle resource consumption and unnecessary network traffic. The router also
 serves as an elastic buffer, absorbing workload spikes and providing
-guaranteed event delivery, even during partial system outages.
+guaranteed event delivery, even during partial system outages \cite{noauthor_event-driven_nodate}.
 
 \newpage
 
@@ -951,52 +944,48 @@ The pattern shines in cross-account or cross-region situations, real-time
 alerting / monitoring, or concurrent processing. As an example, from one file
 upload, the event router can publish an event to multiple consumers, launching
 concurrent flows. It integrates heterogeneous systems seamlessly as a universal
-layer of interoperability for legacy systems or polyglot services.
+layer of interoperability for legacy systems or polyglot services \cite{noauthor_event-driven_nodate}.
 
 While EDAs offer significant advantages, their suitability depends on specific
 application requirements. An EDA requires careful attention to event
 permanence; if events should be processed exactly once, the source of the
-event must ensure delivery and eliminate duplicates). As well as this,
+event must ensure delivery and eliminate duplicates \cite{noauthor_event-driven_nodate}. As well as this,
 tolerance of latency and out-of-order delivery, and transparency of event
 flow (helping debugging) should be considered. State recovery requires
 ordered, deduplicated replays of the events to avoid inconsistencies,
-handling any split-brain states.
+handling any split-brain states \cite{noauthor_event-driven_nodate}.
 
 \addcontentsline{toc}{section}{Kubernetes}
 \subsection{Kubernetes}
 
-%https://enterprisersproject.com/article/2017/10/how-explain-kubernetes-plain-english
 A key example of an EDA is Kubernetes.
 Kubernetes is a platform that automates Linux containers. It removes most of
 the manual processes involved in deploying and scaling containerized applications.
 You can group (cluster) together hosts running Linux containers, and then
-Kubernetes makes it simpler for you to work with the cluster. The main issue with
+Kubernetes makes it simpler for you to work with the cluster \cite{casey_how_nodate}. The main issue with
 Kubernetes, something it's infamous for, is it's sheer complexity; "it’s a
 difficult environment requiring a steep learning curve to seize its
-real potential".%https://www.appvia.io/blog/why-is-kubernetes-so-complicated
-
-%https://www.thestack.technology/playstation-gameservers-kubernetes-agones-multiplayer-games/
-%https://sonyinteractive.com/en/innovation/technology/research-academia/research/fully-automated-kubernetes-operations/
+real potential" \cite{noauthor_why_nodate}.
 
 Kubernetes exemplifies EDA through its reactive control loops; components like
 the scheduler and controllers continuously monitor cluster state changes
 (events) and reconcile actual state with desired state. This can enable
 autonomous operations like scaling events and adjusting pods (the smallest
-deployable units of computing). Git repositories can be watched for declarative
+deployable units of computing) \cite{noauthor_fully_nodate}. Git repositories can be watched for declarative
 manifest changes, to automatically deploy updates. Even failures can become
 events, like when add-ons fail, Kubernetes' self-healing mechanisms
-can trigger recovery workflows.
+can trigger recovery workflows \cite{noauthor_fully_nodate}.
 
 While Kubernetes abstracts away infrastructure complexity from applications,
 this comes at a steep operational price, the platform's notorious configuration
 overhead. What was once application-level complexity (scaling logic, failover
 mechanisms) now manifests as YAML sprawl, requiring teams to master hundreds of
 parameters for networking, storage, and autoscaling just to achieve basic
-functionality. This shifts the burden from developers to platform engineers,
+functionality \cite{noauthor_fully_nodate}. This shifts the burden from developers to platform engineers,
 creating a new form of vendor lock-in where simple changes require deep
 Kubernetes expertise. The very decoupling that simplifies applications
 paradoxically complicates the ecosystem, demanding constant tuning of the
-orchestration layer that now holds all the moving parts.
+orchestration layer that now holds all the moving parts \cite{noauthor_fully_nodate}.
 
 Kubernetes' greatest strength, externalizing infrastructure concerns, becomes
 its weakness when organizations underestimate the operational tax. By
@@ -1004,24 +993,22 @@ divorcing applications from their runtime environment, Kubernetes creates a
 meta-problem: now you're not just debugging your code, but debugging the
 platform that runs your code. The abstraction leaks when teams spend more time
 wrestling with the environment, rather than writing business logic, proving that
-complexity never disappears, it just relocates.
+complexity never disappears, it just relocates \cite{noauthor_fully_nodate}.
 
-%percentages are https://sonyinteractive.com/en/innovation/technology/research-academia/research/fully-automated-kubernetes-operations/
+%https://www.thestack.technology/playstation-gameservers-kubernetes-agones-multiplayer-games/
 As mentioned {\hypersetup{linkcolor=teal}(\pageref{rationale})}, companies have
 wanted to / have swapped out their architectures
 for ones that better suit their need. A prime example is PlayStation running
 their game servers on Kubernetes. By treating everything as an event (node failures, traffic spikes, security
 patches), they transformed Kubernetes from a manually managed orchestrator
 into a self-regulating platform where the system itself becomes the first
-responder. They managed to cut cluster creation time by
+responder \cite{noauthor_fully_nodate}. They managed to cut cluster creation time by
 90\%, reduce the Recovery Time Objective (RTO) (the maximum acceptable downtime
-based on business requirements) by 90\% and reduced deployment times by 70\%,
+based on business requirements) by 90\% and reduced deployment times by 70\% \cite{noauthor_fully_nodate},
 a testament to the scalability, flexibility, and cost-effectiveness of Kubernetes.
 
 \addcontentsline{toc}{section}{The Publish–Subscribe pattern}
 \subsection{The Publish–Subscribe pattern}
-
-%https://cloud.google.com/pubsub/docs/overview
 
 Delivery patterns for events include publish/subscribe (one-to-many) and
 point-to-point (one-to-one). These patterns can also be used for messaging
@@ -1036,30 +1023,30 @@ architectures. While Kubernetes internalizes event-driven principles through
 its control loops, Pub/Sub provides a more direct messaging layer for
 cross-service communication, specializing in application-level control.
 Pub/sub excels in enterprise integration scenarios where loose coupling
-matters more than immediate consistency. However, this decoupling comes
+matters more than immediate consistency \cite{noauthor_what_pubsub}. However, this decoupling comes
 with tradeoffs, unlike Kubernetes' built-in reconciliation and self-healing
 capabilities, Pub/Sub implementations require explicit handling of message
 retries, dead-letter queues (stores of messages that the messaging system
-cannot or should not deliver), and duplicate processing.
+cannot or should not deliver), and duplicate processing \cite{noauthor_what_pubsub}.
 
 In some modern systems, a combination of both approaches is used, leveraging
 Kubernetes for infrastructure automation while using Pub/Sub for event
 propagation, creating a layered event-driven architecture that separates
-operational concerns from domain workflows. This hybrid approach allows
+operational concerns from domain workflows \cite{noauthor_what_pubsub}. This hybrid approach allows
 organizations to benefit from Kubernetes' orchestration power while
 maintaining the flexibility and scalability of asynchronous messaging for
 processes.
 
 \addcontentsline{toc}{section}{Point-to-Point Messaging}
 \subsection{Point-to-Point Messaging}
-%https://eda-visuals.boyney.io/visuals/point-to-point-messaging
+
 Point-to-point messaging implements a targeted methodology in EDAs, a
 lightweight alternative to Pub/Sub's broadcasting model. Its implementation
 establishes direct channels between message producers and consumers, where
 messages that enter are placed into queue and processed by consumers at
 their own pace. This approach is effective for workload distribution as it
 allows horizontal scaling through competing consumers that simultaneously
-pull messages from the same queue.
+pull messages from the same queue \cite{noauthor_point--point_nodate}.
 
 When working with variable processing loads or rate-limited systems, it is
 especially useful, since consumers can throttle their message consumption to
@@ -1067,11 +1054,11 @@ match their capacity. Unlike Pub/Sub's event broadcasting, where all
 subscribers are expected to require all messages, point-to-point channels
 make use of a more focused delivery mechanism, where each message is
 handled exactly once, making it well suited for task distribution and
-job queues.
+job queues \cite{noauthor_point--point_nodate}.
 
 The channel queue serves as an elastic buffer, absorbing traffic spikes while
 enabling consumers to process messages at sustainable rates, preventing
-overloads common in synchronous systems. In EDAs, this pattern is an
+overloads common in synchronous systems \cite{noauthor_point--point_nodate}. In EDAs, this pattern is an
 essential mechanism for situations where ordered processing, load balancing,
 or integration with systems that cannot handle Pub/Sub's fire-and-forget
 semantics is needed, augmenting instead of replacing more general event
@@ -1083,37 +1070,35 @@ distribution patterns.
 
 \subsection{Traditional Communication Protocols}
 
-%https://www.ijcaonline.org/archives/volume46/number7/6920-9285/
 Traditional communication protocols like TCP, though appropriate for general
 data transmission, are not adequate for real-time systems that require immediate
 interactions. TCP's connection-oriented approach, three-way handshake, and
 guaranteed delivery mechanisms result in latencies that make TCP unsuitable
 for highly concurrent architectures that require responses within milliseconds.
 These protocols also preserve state for each connection, introducing
-scalability issues when there are thousands of concurrent real-time events.
+scalability issues when there are thousands of concurrent real-time events \cite{kumar_survey_2012}.
 
 Similarly, though UDP's lightweight, connectionless design provides ultra-low
 latency, appropriate for real-time applications, it poses significant issues in
 concurrent settings where state synchronization and reliability is required.
 Without built-in congestion control, ordering, or retransmission capabilities,
 UDP burdens developers with implementing them manually; a complex task when
-synchronizing thousands of concurrent connections. In highly concurrent
+synchronizing thousands of concurrent connections \cite{kumar_survey_2012}. In highly concurrent
 environments, unrestricted UDP traffic can lead to packet storms, dropped
 updates for critical states, and unfair bandwidth allocation across
 connections. The stateless nature of the protocol also complicates session
 management as it requires custom solutions for authentication and flow control,
-something TCP offers natively.
+something TCP offers natively \cite{kumar_survey_2012}.
 
 \subsection{Real-time Communication}
 
-%https://ieeexplore.ieee.org/document/7160422
 For real-time communication, solutions include, polling, long polling and WebSockets. In polling,
 clients send requests to the server regularly, with the server responding with a new message, or
 an empty response, if there isn't one. This has the obvious drawback of keeping load on the server,
 and consuming network bandwidth while there are no new messages. To prevent receiving client requests
 while there are no new messages, in long polling, the server does not send an empty response. Instead,
 it holds the current request until a new message is available or a timeout expires. An issue still remains,
-a connection still has to be kept alive and saved locally on the server.
+a connection still has to be kept alive and saved locally on the server \cite{gupta_overview_2018}.
 
 WebSockets are a solution to both issues. "With WebSockets, we can reduce the metadata (HTTP headers) that are sent in
 every request (a shortcoming of Polling) and we can also provide full–duplex communication through a
@@ -1123,7 +1108,7 @@ communication, however they are not perfect, for e.g., they are still susceptibl
 fundamentally built atop TCP, inheriting its reliable ordered delivery but
 also its connection overhead on the initial request. This is mitigated for
 future messaging as the connection is persistent after the initial
-handshake, providing the benefits of TCP without most of the overhead.
+handshake, providing the benefits of TCP without most of the overhead \cite{gupta_overview_2018}.
 The result of using WebSockets is near-real-time communication, ideal for
 applications like live chats, gaming, or financial tickers that need both
 reliability and sustained high-frequency messaging.
@@ -1132,7 +1117,7 @@ An alternative to the use of WebSockets is WebRTC. WebRTC utilizes UDP by
 layering protocols on top, introducing selective reliability through SCTP
 streams, allowing developers to choose between loss-tolerant media channels and
 guaranteed-delivery data channels within the same session, as well as
-in-order or out-of-order delivery. It is capable of
+in-order or out-of-order delivery \cite{sredojev_webrtc_2015}. It is capable of
 managing thousands of concurrent peers with dynamic congestion control to
 prevent connection starvation in crowded networks. By
 adding just enough structure to UDP without sacrificing its speed advantages,
@@ -1142,19 +1127,18 @@ WebSockets inherit TCP's concurrency limitations at the protocol level.
 
 \section{The CAP theorem}
 
-%https://www.splunk.com/en_us/blog/learn/cap-theorem.html
 The CAP theorem is a core concept in distributed system design. It states that
 in designing a distributed system, there needs to be a choice between three
 properties: consistency, availability, and partition tolerance. The theorem
 states that it is not possible for a system to provide all three at once,
-and that careful consideration of the trade-offs is required.
+and that careful consideration of the trade-offs is required \cite{noauthor_cap_nodate}.
 
 For Consistency, all of the nodes in a system must have the same information
 at all times. On a write occurring, all following reads must provide the latest
 value, regardless of which node handles the request. This makes the data
 accurate but usually adds latency and lowers availability, particularly
 during network issues. Ensuring strict consistency involves coordination
-amongst nodes, impacting system performance.
+amongst nodes, impacting system performance \cite{noauthor_cap_nodate}.
 
 As for Availability, it ensures that every request has a response, even when
 some nodes are unavailable. The system should continue to be operational and
@@ -1162,27 +1146,29 @@ responsive, but it may return slightly old results sometimes. This is
 essential in systems where reliability (uptime) is more important than
 accuracy of data. Methods such as data replication and load balancing
 ensure availability although they can produce eventual consistency instead
-of immediate consistency over all nodes.
+of immediate consistency over all nodes \cite{noauthor_cap_nodate}.
 
 Partition tolerance guarantees that the system keeps working when network or
 communication failures occur amongst nodes. Network partitions are unavoidable
 in distributed systems, so partition tolerance is generally accepted as a
 requirement for designing fault-tolerant systems. Without it, any network
 failure would render the entire system unavailable, which tends to be
-unacceptable for most real-world applications.
+unacceptable for most real-world applications \cite{noauthor_cap_nodate}.
 
-% venn diagram from https://www.splunk.com/en_us/blog/learn/cap-theorem.html
+\includegraphics[width=.3\linewidth]{CAPtheorem.png}
+
+Diagram from \cite{noauthor_cap_nodate}.
 
 Practically, system designers must compromise, choosing two properties to focus
 on, like the platforms that I had surveyed {\hypersetup{linkcolor=teal}(\pageref{survey})}.
 CP systems assure data correctness even in network partitions but
 can sacrifice availability. They are representative of financial systems
-where data consistency is of paramount importance. AP systems operate even
+where data consistency is of paramount importance \cite{noauthor_cap_nodate}. AP systems operate even
 during failures, but at the expense of returning slightly old data. They
 are best used in applications like social networking sites where
-responsiveness is what matters most. CA systems are not common in the
+responsiveness is what matters most \cite{noauthor_cap_nodate}. CA systems are not common in the
 real world, as they expect ideal networks which don't reflect
-real-world conditions.
+real-world conditions \cite{noauthor_cap_nodate}.
 
 Modern distributed systems often implement a flexible approach that can modify
 behavior based on current conditions. The majority of databases allow
@@ -1198,7 +1184,7 @@ I determined that a load-balanced server pool best fits my architectural
 needs. To start, I chose a client-server model for easier error handling,
 especially when handling peer disconnections.Between Microservice and Pool
 architecture, no tool is superior to the other
-since they both have varying use cases.%https://cubettech.com/resources/blog/microservice-v-s-pool-architecture-for-saa-s-applications/
+since they both have varying use cases \cite{cubet_microservice_nodate}.
 
 Since I chose to use the actor concurrency model implemented by the OTP
 framework, I would already have complete process isolation, fault tolerance,
@@ -1209,16 +1195,13 @@ Using actors can be seen to be like 'microservices within a single VM', while
 avoiding the network latency, deployment complexity, and interservice
 communication challenges.
 
-%https://www.appvia.io/blog/why-is-kubernetes-so-complicated
-As Kubernetes is infamously complex, although it makes the application easier
+As Kubernetes is infamously complex \cite{noauthor_why_nodate}, although it makes the application easier
 to write, it would be infeasible to use as I have already chosen to learn a
 lot of new technologies. As a result, I adopted a pool architecture which
 provides the necessary scalability without introducing unnecessary complexity.
 
 This approach is nice as it was a widely adopted solution for example
-services I found during my research (namely the ones here; %https://medium.com/@dragonblade9x/making-a-multiplayer-web-game-with-websocket-that-can-be-scalable-to-millions-of-users-923cc8bd4d3b
-)%https://jofranchetti.medium.com/coping-with-quarantine-by-coding-597372a17746
-, providing
+services I found during my research (namely the ones here; \cite{frost_making_2023, franchetti_coping_2020}), providing
 well-documented reference material, community support and troubleshooting
 resources.
 Given the BEAM's capabilities, a Kubernetes-based system could be excessive
@@ -1666,7 +1649,7 @@ allowing the opponent to take their turn.
 \hfill
 \begin{minipage}[t]{20em}
   \includegraphics[width=\textwidth]{box_click.pdf}
-  \captionof{figure}{The code to handle marking a box on the game board}\label{fig: 9}
+  \captionof{figure}{The code to handle marking a box on the game board}\label{fig: 12}
 \end{minipage}
 
 \newpage
@@ -1685,7 +1668,7 @@ allowing the opponent to take their turn.
 \hfill
 \begin{minipage}[t]{20em}
   \includegraphics[width=\textwidth]{winning.pdf}
-  \captionof{figure}{The functions to check if the game has ended and who won}\label{fig: 11}
+  \captionof{figure}{The functions to check if the game has ended and who won}\label{fig: 13}
 \end{minipage}
 
 \section{Challenges faced}
@@ -1696,7 +1679,7 @@ the libraries I was using, I was able to produce proof of concepts that work.
 Some libraries, like radish to connect to my Valkey database, did not have
 a complete set of capabilities yet, making me have to write extensions to those
 libraries within my source code - I contributed the code towards the
-library as a result.%https://github.com/massivefermion/radish/pull/7
+library as a result; \cite{noauthor_featfaeq:_nodate}.
 
 A major challenge was learning how to implement the actors as I was relying on
 the WebSocket actors to communicate with the clients. This was mainly due to the
@@ -1732,19 +1715,48 @@ I reused code from the prototypes, making the final game share a similar,
 modular implementation. As a result, I will only focus on the more advanced
 aspects of the final game within this section.
 
+%REDO pong bit of demo vid & include leaderboard in that & final game to show reuse
+%also explain alpine in it, like showing modals
+
 \begin{figure*}[ht!]
   \centering
   \includegraphics[width=\linewidth]{final_architecture}
   \vspace*{-1.5cm}
   \caption{A diagram representing the game environment architecture I chose to use.}
-  \label{fig: 3}
+  \label{fig: 14}
   The use of Alpine.js was explained above {\hypersetup{linkcolor=teal}(\pageref{alpine})}
 \end{figure*}
+
+\newpage
 
 \section{Code implementation}
 
 \addcontentsline{toc}{section}{Overriding actions in progress}
 \subsection{Overriding actions in progress}
+
+
+\begin{minipage}[t]{18em}
+
+  To start, I implemented overriding actions within the game. An example of this
+  is when the players are choosing colors on the \lstinline|join_game| page. When
+  a color is swapped by a player, a message is sent to the Game actor, which
+  updates its state and updates all players' pages. Alpine.js was useful here,
+  as while it was never used to trigger actions that can send a message to the
+  server, to ensure high performance, the server was able to send Alpine.js data
+  to the client-side. This meant that when the players' pages were updated,
+  if a player was in the process of swapping a color, the color they were dragging
+  would be ignored, overriding the action they were taking as a different player
+  completed the action first. To swap the color, the player would have to restart
+  the action, dragging the color to their desired position.
+
+\end{minipage}
+\hfill
+\begin{minipage}[t]{20em}
+  \includegraphics[width=\linewidth]{swap_colors.pdf}
+  \captionof{figure}{The handling code for the \lstinline|SwapColors| message to the Game actor}\label{fig: 15}
+\end{minipage}
+
+\newpage
 
 \addcontentsline{toc}{section}{Racing Actions}
 \subsection{Racing actions}
@@ -1758,8 +1770,31 @@ TO ADD
 \subsection{Compound actions}
 TO ADD
 
-\addcontentsline{toc}{section}{Realtime dynamic world updates}
-\subsection{Realtime dynamic world updates}
+\addcontentsline{toc}{section}{Real-time dynamic world updates}
+\subsection{Real-time dynamic world updates}
+
+This feature was achieved through event messages being passed between actors to
+update all relevant states, eventually triggering the clients that were viewing
+the map, to send a WebSocket message to re-render the page.
+
+\begin{minipage}[t]{18em}
+
+  As the map only displays places the player has gone through, the player state
+  holds all previous positions, including the current one, while the Game actor
+  state only holds the current positions of all players.Whenever one of these
+  positions is updated in the Game actor state, it triggers an event to re-render
+  the map pages, ensuring that the players are always viewing the correct
+  information, as it updates in real-time.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{20em}
+  \includegraphics[width=\linewidth]{go_to_map.pdf}
+  \captionof{figure}{Both triggers, clicking on the button to view the map page, and a change in player position, renders the entire map page again}\label{fig: 16}
+  \includegraphics[width=\linewidth]{update_state_move.pdf}
+  \captionof{figure}{The end of the handling code for a player moving position. Both the player's WebSocket actor's and Game actor's states are updated.}\label{fig: 17}
+\end{minipage}
+
+\newpage
 
 \addcontentsline{toc}{section}{Reliability and Error Handling}
 \subsection{Reliability and Error Handling}
@@ -1767,61 +1802,215 @@ TO ADD
 Aside from using the BEAM for it being a fault-tolerant VM, I implemented some
 advanced reliability and error handling features within my code. To start, there
 was comprehensive, consistent logging of all data, event, actions, etc. These
-logs had comprehensive information and were clear and succinct.
+logs had comprehensive information and were clear and succinct; I used the
+Erlang logger with different log levels.%waiting for join screenshot
 
 For example, if a UI element did not have use for communicating with the server,
 and triggered a message being sent anyway, the following logs would appear on the
-server;
+server (using the \lstinline|Info| and \lstinline|Alert| log levels);
+
 \includegraphics[width=\linewidth]{unknown_trigger_alert.png}
 
 As well as this, I embraced Erlang's 'let it crash' approach to error
 handling by letting failing processes crash while supervisors detect and
 fix their issues, as previously described {\hypersetup{linkcolor=teal}(\pageref{faultErlang})}.
-
-waiting for join screenshot
+I also linked all processes, propagating error signals between them.
+Using the supervision tree pattern allowed me to create a highly resiliant \cite{noauthor_gleam-otp-design-principals/gleam-otp-design-principals.org_nodate}
+server application.
 
 \noindent
 \begin{minipage}[t]{18em}
-  The supervision tree I used for the actors within the final game.
-  %\vskip{1em}
   \includegraphics[width=\linewidth]{supervision_tree.pdf}
+  \captionof{figure}{The supervision tree I used for the actors within the final game.}\label{fig: 18}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{20em}
-  I.e., the tree could look like the following in deployment (with 2 games being
-  played, 5 players in each, and 2 battles occurring in each);
-  %\vskip(1em)
   \includegraphics[width=\linewidth]{supervision_tree_deployment_eg.pdf}
+  \captionof{figure}{I.e., the tree could look like this in deployment (with 2 games being
+    played, 5 players in each, and 2 battles occurring in each)}\label{fig: 19}
 \end{minipage}
 
-failed assertion causes panic - image
+Supervisors are responsible for starting, stopping, and monitoring their child
+processes; it must keep its child processes alive by restarting them when
+necessary \cite{noauthor_gleam-otp-design-principals/gleam-otp-design-principals.org_nodate, noauthor_supervisor_nodate}.
 
-without a supervisor this would cause the server to stop running completely - image
+\newpage
 
-with supervisors, the director is rescued, and the websocket that triggered
-the faulty action can reconnect - add image
+The child processes of a supervisor could be workers or other supervisors.
+A supervisor can monitor the behavior of workers and restart a worker if something
+goes wrong.
+Workers are processes that perform computations, like actors and they can
+notify a supervisor if something goes wrong.
+
+A supervisor has different modes of dealing with worker failure; three main
+restart strategies \cite{noauthor_supervisor_nodate};
+\lstinline|one_for_one|, where if a child process terminates, only that process
+is restarted, \lstinline|one_for_all|, where
+if a child process terminates, all remaining child processes are terminated and
+subsequently, all child processes, including the terminated one, are restarted,
+and \lstinline|rest_for_one|, where
+if a child process terminates, the child processes after the terminated process
+in start order are terminated and subsequently, the terminated child
+process and the remaining child processes are restarted.
+
+\noindent
+\begin{minipage}[t]{18em}
+  Within my code, I used many \lstinline|assert| statements. These cause
+  a \lstinline|panic| if the assertion is not \lstinline|True|, crashing the
+  process.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{20em}
+  \includegraphics[width=\linewidth]{assert_panic}
+  \captionof{figure}{An example of a crash due to an \lstinline|assert|}\label{fig: 20}
+\end{minipage}
+
+Without a supervisor, for e.g., monitoring the director actor, the main process would
+also crash, closing the game server, making it unavailable. With supervisors, the director is rescued, and the WebSocket that triggered
+the faulty action can reconnect. When a process restarts,
+they would reobtain state information from other servers and the database,
+ensuring any split-brain state is resolved.
 
 Here errors were caused by me purposefuly adding a \lstinline|todo| statement
 into a function, causing a \lstinline|panic| and process crash. This was done
 for demonstration purposes.
 
-note the large arrays of numbers in the messages will be talked about later in
-the report.
+\phantomsection
+\label{ascii}
 
-error handling, supervisors, tasks, etc.
-Split-brain (nodes as cluster, recovery of servers, etc.) - supervisors, let
-it fail philosophy
+\noindent
+\begin{minipage}[t]{18em}
+  \includegraphics[width=\linewidth]{panic_without_supervisor.png}
+  \captionof{figure}{The result of a \lstinline|panic| without a supervisor}\label{fig: 21}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{20em}
+  \includegraphics[width=\linewidth]{panic_with_supervisor.png}
+  \captionof{figure}{The result of a \lstinline|panic| with a supervisor}\label{fig: 22}
 
-mix concurrency model, barely doing any asny awaiut on js - just client-specific
-interactions like oif the user wants to see the leaderboard - game actions all
-done on the server
+  (note; the large arrays of numbers in the messages will be mentioned later in
+  the report)
+\end{minipage}
+
+The functionality of a supervisor is managed by the OTP. To use a supervisor,
+I picked between the Gleam supervisor and static supervisor (Erlang's),
+and created the children, passing a subject that the worker can respond to
+so that I can obtain the worker's subject. I can then start the supervisor,
+declaring it's children, and then receive the child subjects.
+
+\begin{minipage}[t]{18em}
+  \includegraphics[width=\linewidth]{director_start.pdf}
+  \captionof{figure}{The function that creates the director actor}\label{fig: 18}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{20em}
+  \includegraphics[width=\linewidth]{main_supervisor.pdf}
+  \captionof{figure}{The code that creates and sets up the main supervisor (a Gleam supervisor)}\label{fig: 19}
+\end{minipage}
+
+The battle supervisors were made to be \lstinline|one_for_one| static
+supervisors, and were children to the game actor. Each battle had it's own
+supervisor as you can not add workers to a supervisor after the supervisor
+has started running. These were made in a similar way to the main supervisor.
+
+\begin{minipage}[t]{18em}
+  \includegraphics[width=\linewidth]{battle_supervisor_start.pdf}
+  \captionof{figure}{The function that creates the battle actor}\label{fig: 20}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{20em}
+  \includegraphics[width=\linewidth]{battle_supervisor.pdf}
+  \captionof{figure}{A part of the handler for player movement that can
+    trigger a battle, creating the battle \lstinline|child_supervisor| (a Erlang supervisor)}\label{fig: 20}
+\end{minipage}
 
 \section{Challenges faced}
-hello%TODO
-\section{Potential future enhancements}
-hi%TODO
 
-ascii encoded messages - 3 screenshots - wisp
+The main challenge for the final game was that I was working in a much larger
+codebase. This introduced issues like in code quality, ensuring I do not fall
+into bad practices, refactoring where necessary. % add
+
+Another challenge was getting used to more advanced OTP and functional
+programming concepts; these were unexpectedly non-trivial.
+Thankfully Gleam's modern interface made this easier, though it did not take
+away from the time it took to understand, for e.g., function captures.
+
+\begin{minipage}[t]{18em}
+  Another functional programming concept that was difficult to understand was Monads.
+  I realized that this was a common issue, especially amongst newer functional programmers,
+  so much so that it has become an Internet meme. The joke resembles the following;
+  "A monad is a monoid in the category of endofunctors, what don't you get about that?"
+\end{minipage}
+\hfill
+\begin{minipage}[t]{20em}
+  \includegraphics[width=\linewidth]{monads.png}
+  \captionof{figure}{From \cite{patel_what_2019}
+  }\label{fig: 20}
+\end{minipage}
+
+While I managed to learn how to use OTP in gleam for my prototypes, it was
+difficult for me to understand and learn how to use supervisors. Gleam's OTP
+library offers two types of supervisors; A supervisor that can pass state from
+older children to younger ones (the Gleam supervisor) \cite{noauthor_gleam/otp/supervisor_nodate},
+and a static supervisor (bindings to Erlang/OTP’s \lstinline|supervisor| module) \cite{noauthor_gleam/otp/static_supervisor_nodate}.
+A tool I found especially useful for this was a repository by Benjamin Peinhardt called 'learn OTP with Gleam' \cite{peinhardt_bcpeinhardt/learn_otp_with_gleam_2025}.
+While I found the repository after learning about supervisors, actors, etc.,
+it still helped me learn how to implement these concepts, supervisors
+specifically, in Gleam.
+
+\section{Potential future enhancements}
+
+While the final game was well implemented, there are improvements that can be
+made. To start, the codebase could use more refactoring, helping avoid code
+smells that I am unaware of as a newer functional programmer. For e.g., I could have
+used OTP tasks more often; these are processes that do some computation in
+the background, and their return value can be awaited by the creator process.
+As well as this the game itself could have had more niceties like better
+animations for UI components or even a different direction, like it being 3D,
+like popular AAA games.
+
+Security for the game could also be better implemented.
+For e.g., while some of my dependencies do use it, I could actively use the
+Houdini library to escape any string to be safely used inside an HTML document \cite{noauthor_houdini_nodate}.
+As well as this,
+there tends to be
+some language support to ease the burden of checking results. In
+Gleam this is the \lstinline|use <-| expression \cite{olano_gleam_2025}.
+I could have used it more often, instead I mostly used a \lstinline|let assert|
+for ensuring results are as expected, causing the supervisor to correct any
+issues at runtime.
+
+Another enhancement that can be made is adapting some of the automated logs
+from the web server. This is because some of them are logged out as ASCII
+encoded messages, which is not very readable; they appear as arrays of
+numbers, like what was seen before {\hypersetup{linkcolor=teal}(\pageref{ascii})}.
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{todo_ascii_err.png}
+  \caption{An example of an error caused by a \lstinline|todo| statement (which causes a \lstinline|panic|)}
+\end{figure}
+
+I noticed that when I was using the Wisp library for the web servers in the
+\lstinline|screen_designs| project for the final game and the
+\lstinline|code_listing_creator| project for this report, it did not have
+this issue with its server logs. This was possibly due
+to it's use of the mist (the library I used for the games) handler and not the
+mist server itself, though I have tried to see where this could be
+implemented (in the Wisp codebase) and have not obtained a complete
+understanding yet.
+
+\begin{minipage}[t]{18em}
+  \includegraphics[width=\linewidth]{ascii_err.png}
+  \captionof{figure}{The warning message from an implementation issue I had, where
+    a message going to the WebSocket actor was sent to a incorrect subject.
+  }\label{fig: 20}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{20em}
+  \includegraphics[width=\linewidth]{ascii_err_converted.png}
+  \captionof{figure}{I had to use a online converter to understand the message
+  }\label{fig: 20}
+\end{minipage}
 
 \chapter{Planning and Time-scale}
 
@@ -1887,9 +2076,9 @@ aligning with the BCS Code of Conduct, particularly the section on
 Professional competence and integrity, which emphasizes the need to
 "develop your professional knowledge, skills and competence on a continuing
 basis, maintaining awareness of technological developments, procedures,
-and standards that are relevant to your field".
+and standards that are relevant to your field" \cite{noauthor_bcs_nodate}.
 
-%TODO cite https://www.bcs.org/membership-and-registrations/become-a-member/bcs-code-of-conduct/
+%TODO check - readded?
 
 One of my concerns was the licensing of the different products I was using.
 While all of it was open source, they, for e.g., Gleam, NGINX, and Valkey,
@@ -1909,16 +2098,19 @@ also added comments in my code, wherever I took inspiration from, or directly
 used something I found online, in an attempt to avoid unintentional plagiarism.
 
 %TODO link?
-%TODO information modal image
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.3\linewidth]{info_modal.png}
+  \caption{The information modal}
+\end{figure}
 
 The issue of licensing is a broad one, with many issues that may arise.
 For example, Redis Labs infamously faced backlash when it applied
 the Commons Clause to a set of modules, and extensions to the core Redis database.
 This overrode the existing open source license "to render the
 software effectively proprietary and source available while still leveraging
-the brand of the original open source license"
-
-%TODO cite https://redmonk.com/sogrady/2024/07/16/post-valkey-world/
+the brand of the original open source license" \cite{ogrady_post-valkey_2024}.
 
 This decision raised questions about the sustainability of open-source projects
 and the balance between community contributions and commercial interests.
@@ -1927,11 +2119,9 @@ and respecting licensing terms, as well as considering the long-term
 implications of relying on open-source technologies. Thankfully, in the example's
 case, Valkey, the database I chose for this project, had a meaningful role.
 The Valkey project came together unusually quickly, recieving a suprising amount
-of attention, ending up as the leading alternative to Redis. Since it is a fork
+of attention, ending up as the leading alternative to Redis \cite{ogrady_post-valkey_2024}. Since it is a fork
 of Redis OSS, developers could use the same drivers as those with Redis, meaning
 that no changes to apps were required to switch to Valkey.
-
-%TODO cite https://redmonk.com/sogrady/2024/07/16/post-valkey-world/
 
 Another quick note to make is that, while I was using Gleam, which is open source,
 if I was using proprietary, new technologies, this project would have been a lot
@@ -1953,16 +2143,14 @@ alienate potential players and lead to criticism or worse, health effects, as
 seen in the backlash against games like Cyberpunk 2077, which not only lacked
 sufficient accessibility options but also lacked warnings that the game
 may cause seizures. The developers had to roll out updates which later added
-these warnings.%TODO cite https://www.polygon.com/2020/12/8/22163153/cyberpunk-2077-accessibility-epilepsy-seizure-warning
+these warnings \cite{carpenter_cyberpunk_2020}.
 The game was also criticized for being poorly optimized,
-resulting in a subpar experience for many players.
-%https://steamcommunity.com/app/1091500/discussions/7/4428814589383884489/
-%https://expertbeacon.com/why-does-my-cyberpunk-run-so-bad/
+resulting in a subpar experience for many players \cite{noauthor_cyberpunk_nodate, James_cyber_perm}.
 
 In my project, I focused primarily on server architecture and concurrency,
 which meant that optimization for client-side performance was not a
 priority. As a result, I used libraries like TailwindCSS directly from
-their CDN, which gives me a warning in my console.%TODO image
+their CDN, which gives me a warning in my console.%TODO image & gailglind
 However, this decision could have practical implications,
 as poorly optimized games can lead to negative user experiences and
 damage the reputation of the developers. This serves as a reminder
@@ -1996,9 +2184,10 @@ practice as a whole.
 
 As previously mentioned {\hypersetup{linkcolor=teal}(\pageref{valkeyMessageBroker})}, and as can be seen within my project diary below,
 I have completed all of my goals for the project.
-The project was highly successful; I implementing a concurrent game environment
+The project was highly successful; I implemented a highly concurrent game environment
 using OTP and Gleam, developed functional prototypes (online chat, Tic-Tac-Toe,
-Pong), and creating a final game with advanced concurrency features.
+Pong), created a final game with advanced concurrency features, all scaling
+seamlessly across multiple nodes on a load-balanced server pool architecture.
 Despite challenges, like learning new technologies and managing time
 constraints, the produced architecture and software design ensured
 scalability and fault tolerance.
@@ -2015,7 +2204,7 @@ meant that I could not use the time I had initially planned on allocating toward
 creating my games and their environments. I had also experienced some hardware
 issues and unexpected challenges when moving between frameworks / the compilation
 targets, which should have been identified and planned for. I had also not planned to
-produce an interim report, which has taken a significant amount of time.
+produce an interim report, which took a significant amount of time.
 The result of all of this can be seen within the
 code for the project, specifically the game of pong, and tests. While I tried to make tests comprehensive,
 and ensured that all code is working through play-testing, the tests leave out
@@ -2039,7 +2228,115 @@ break from a feature.
 
 \newpage
 \addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{alpha}
 \bibliography{refs}
+
+
+%Apparently extra curly bracket
+% @misc{frost_making_2023,
+%   title    = {Making a multiplayer web game with websocket that can be scalable to millions of users},
+%   url      = {https://medium.com/@dragonblade9x/making-a-multiplayer-web-game-with-websocket-that-can-be-scalable-to-millions-of-users-923cc8bd4d3b},
+%   abstract = {Authors: Emil Bui},
+%   language = {en},
+%   urldate  = {2025-04-03},
+%   journal  = {Medium},
+%   author   = {Frost, Sapphy},
+%   month    = mar,
+%   year     = {2023}
+% }
+
+% @misc{patel_what_2019,
+%   title    = {What does the phrase {Monadic} {Bind} mean?},
+%   url      = {https://medium.com/@nitinpatel_20236/what-does-the-phrase-monadic-bind-mean-a2184f34b2e3},
+%   abstract = {An Intuitive Guide to Monads},
+%   language = {en},
+%   urldate  = {2025-04-03},
+%   journal  = {Medium},
+%   author   = {Patel, Nitin},
+%   month    = jun,
+%   year     = {2019}
+% }
+
+
+% @misc{woolsey_how_2024,
+%   title    = {How {Hotpatching} on {Windows} {Server} is changing the game for {Xbox}},
+%   url      = {https://www.microsoft.com/en-us/windows-server/blog/2024/01/23/how-hotpatching-on-windows-server-is-changing-the-game-for-xbox/},
+%   abstract = {Hotpatch with Windows Server 2022 Azure Edition reduces downtime for SQL Server databases running on Windows Server Azure virtual machines. Learn more.},
+%   language = {en-US},
+%   urldate  = {2024-12-10},
+%   journal  = {Microsoft Windows Server Blog},
+%   author   = {Woolsey, Jeff, Orin Thomas},
+%   month    = jan,
+%   year     = {2024}
+% }
+
+% @misc{noauthor_event_2024,
+%   title    = {The event loop - {JavaScript} {\textbar} {MDN}},
+%   url      = {https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop},
+%   abstract = {JavaScript has a runtime model based on an event loop, which is responsible for executing the code, collecting and processing events, and executing queued sub-tasks. This model is quite different from models in other languages like C and Java.},
+%   language = {en-US},
+%   month    = oct,
+%   year     = {2024},
+%   note     = {Available at \url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop}}
+% }
+
+
+% @misc{noauthor_hitchhikers_nodate,
+%   title    = {The {Hitchhiker}'s {Guide} to {Concurrency} {\textbar} {Learn} {You} {Some} {Erlang} for {Great} {Good}!},
+%   url      = {https://learnyousomeerlang.com/the-hitchhikers-guide-to-concurrency},
+%   abstract = {The basic concepts behind Erlang's message passing architecture for writing fault-tolerant systems. How to spawn new processes, send and receive messages and a few examples.}
+% }
+
+
+
+
+% @misc{noauthor_steamworks_nodate,
+%   title = {Steamworks {API} {Overview} ({Steamworks} {Documentation})},
+%   url   = {https://partner.steamgames.com/doc/sdk/api},
+%   note  = {Available at \url{https://partner.steamgames.com/doc/sdk/api}}
+% }
+
+
+% @misc{noauthor_steam_nodate,
+%   title = {Steam {DRM} ({Steamworks} {Documentation})},
+%   url   = {https://partner.steamgames.com/doc/features/drm},
+%   note  = {Available at \url{https://partner.steamgames.com/doc/features/drm}}
+% }
+
+
+% @misc{noauthor_steam_nodate1,
+%   title    = {Steam {Labs}},
+%   url      = {https://store.steampowered.com/labs/},
+%   abstract = {A peek at some of the many experiments we put together around discoverability, video, machine learning, and more.},
+%   language = {en},
+%   note     = {Available at \url{https://store.steampowered.com/labs/}}
+% }
+
+
+
+% @article{armstrong_erlang_2010,
+%   title    = {Erlang},
+%   volume   = {53},
+%   issn     = {0001-0782, 1557-7317},
+%   url      = {https://dl.acm.org/doi/10.1145/1810891.1810910},
+%   doi      = {10.1145/1810891.1810910},
+%   abstract = {The same component isolation that made it effective for large distributed telecom systems makes it effective for multicore CPUs and networked applications.},
+%   language = {en},
+%   number   = {9},
+%   journal  = {Communications of the ACM},
+%   author   = {Armstrong, Joe},
+%   month    = sep,
+%   year     = {2010},
+%   pages    = {68--75}
+% }
+
+
+% @misc{noauthor_introconcurrency_nodate,
+%   title = {Introduction to Concurrency},
+%   url   = {https://cs.lmu.edu/~ray/notes/introconcurrency/},
+%   note  = {Available at \url{https://cs.lmu.edu/~ray/notes/introconcurrency/}}
+% }
+
 
 \chapter{Appendix}
 \section{Diary}
