@@ -218,10 +218,13 @@ fn handle_ws_message(state, conn, message) {
             Move(to_move_by) -> {
               case to_move_by {
                 0 -> {
-                  let assert Ok(_) =
-                    mist.send_text_frame(conn, anim_get_next_dice())
-                  //after some time send normal die
-                  //task.await_forever(task.async(fn() { process.sleep(4000) }))
+                  //animate dice by sending it multiple times
+                  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                  |> list.each(fn(_x) {
+                    let assert Ok(_) =
+                      mist.send_text_frame(conn, anim_get_next_dice())
+                    process.sleep(100)
+                  })
                   let roll = case int.random(6) {
                     //upper is exclusive, 0 is inclusive
                     0 -> 6

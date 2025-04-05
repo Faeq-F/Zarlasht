@@ -58,22 +58,19 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
           attribute("hx-ext", "ws"),
           id("app"),
         ],
-        [
-          script([], "window.onbeforeunload = function() {return true;};"),
-          div(
-            [id("page"), class("h-full w-full")],
-            list.flatten([
-              elements,
-              fog_styles(),
-              [
-                div(
-                  [id("fogWrap"), class("fogWrap")],
-                  list.repeat(img([src("/static/cloud.png")]), 100),
-                ),
-              ],
-            ]),
-          ),
-        ],
+        list.flatten([
+          [
+            script([], "window.onbeforeunload = function() {return true;};"),
+            div([id("page"), class("h-full w-full")], elements),
+          ],
+          fog_styles(),
+          [
+            div(
+              [id("fogWrap"), class("fogWrap")],
+              list.repeat(img([src("/static/cloud.png")]), 100),
+            ),
+          ],
+        ]),
       ),
     ]),
   ])

@@ -123,49 +123,29 @@ fn die_section(action: Action) {
   ])
 }
 
+fn dice() {
+  [
+    dice_1([class("w-56 h-56"), id("dice_anim")]),
+    dice_2([class("w-56 h-56"), id("dice_anim")]),
+    dice_3([class("w-56 h-56"), id("dice_anim")]),
+    dice_4([class("w-56 h-56"), id("dice_anim")]),
+    dice_5([class("w-56 h-56"), id("dice_anim")]),
+    dice_6([class("w-56 h-56"), id("dice_anim")]),
+  ]
+  |> list.index_map(fn(svg, i) { #(i + 1, svg) })
+}
+
 pub fn anim_get_next_dice() {
   let assert Ok(die_to_show) =
-    [
-      dice_6([
-        class("w-56 h-56"),
-        id("dice_anim"),
-        attribute("ws-send", ""),
-        attribute("hx-trigger", "every 0.2s"),
-      ]),
-      dice_5([
-        class("w-56 h-56"),
-        id("dice_anim"),
-        attribute("ws-send", ""),
-        attribute("hx-trigger", "every 0.2s"),
-      ]),
-      dice_4([
-        class("w-56 h-56"),
-        id("dice_anim"),
-        attribute("ws-send", ""),
-        attribute("hx-trigger", "every 0.2s"),
-      ]),
-      dice_3([
-        class("w-56 h-56"),
-        id("dice_anim"),
-        attribute("ws-send", ""),
-        attribute("hx-trigger", "every 0.2s"),
-      ]),
-      dice_2([
-        class("w-56 h-56"),
-        id("dice_anim"),
-        attribute("ws-send", ""),
-        attribute("hx-trigger", "every 0.2s"),
-      ]),
-      dice_1([
-        class("w-56 h-56"),
-        id("dice_anim"),
-        attribute("ws-send", ""),
-        attribute("hx-trigger", "every 0.2s"),
-      ]),
-    ]
+    dice()
     |> list.shuffle()
     |> list.first()
-  die_to_show |> element.to_string
+  die_to_show.1 |> element.to_string
+}
+
+pub fn rolled_die(rolled: Int) {
+  let assert Ok(die) = dice() |> list.find(fn(i_svg) { i_svg.0 == rolled })
+  die.1
 }
 
 fn roll_section(action: Action) {
@@ -259,17 +239,6 @@ pub fn already_rolled() {
     [text("You have already rolled!")],
   )
   |> element.to_string
-}
-
-pub fn rolled_die(rolled: Int) {
-  case rolled {
-    1 -> dice_1([id("dice_anim"), class("w-56 h-56")])
-    2 -> dice_2([id("dice_anim"), class("w-56 h-56")])
-    3 -> dice_3([id("dice_anim"), class("w-56 h-56")])
-    4 -> dice_4([id("dice_anim"), class("w-56 h-56")])
-    5 -> dice_5([id("dice_anim"), class("w-56 h-56")])
-    _ -> dice_6([id("dice_anim"), class("w-56 h-56")])
-  }
 }
 
 fn info_panel(action: Action) {

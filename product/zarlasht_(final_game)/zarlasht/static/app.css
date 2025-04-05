@@ -52,6 +52,7 @@ body {
 #app {
   padding: 1rem;
   background: white;
+  clip-path: xywh(1rem 1rem calc(100% - 2rem) calc(100% - 2rem) round 1.5rem 1.5rem);
 }
 
 html.dark #app {
@@ -61,7 +62,7 @@ html.dark #app {
 #page {
   overflow: hidden;
   text-align: left;
-  clip-path: xywh(0 0 100% 100% round 1.5rem 1.5rem)
+  /* clip-path: xywh(0 0 100% 100% round 1.5rem 1.5rem) */
 }
 
 #page:before {
