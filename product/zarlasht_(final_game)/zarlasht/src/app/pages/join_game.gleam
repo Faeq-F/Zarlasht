@@ -12,6 +12,10 @@ pub fn join_game_page() {
         style([
           #("width", "calc(100% - 2rem)"),
           #("height", "calc(100% - 2rem)"),
+          #("background-image", "url(/static/home.png)"),
+          #("background-size", "cover"),
+          #("background-repeat", "no-repeat"),
+          #("background-position", "right"),
         ]),
       ],
       [

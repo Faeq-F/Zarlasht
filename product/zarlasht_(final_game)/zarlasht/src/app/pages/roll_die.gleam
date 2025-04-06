@@ -2,7 +2,7 @@ import app/actors/actor_types.{type Action, type Player, Battle, Move}
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{
   circle_x, dice_1, dice_2, dice_3, dice_4, dice_5, dice_6, footprints,
-  info as info_icon, map, messages_square, shield,
+  info as info_icon, map, messages_square, shield, swords,
 }
 import app/pages/layout.{stats as info_stats}
 import gleam/int
@@ -151,10 +151,14 @@ pub fn rolled_die(rolled: Int) {
 fn roll_section(action: Action) {
   let icon = case action {
     Move(_) -> footprints([class("!mr-[10px]")])
+    Battle(_, 0, _, _) | Battle(_, _, 0, _) -> swords([class("!mr-[10px]")])
     _ -> shield([class("!mr-[10px]")])
   }
   let rolling_for = case action {
     Move(_) -> "movement"
+    Battle(_, 0, _, _) -> "attack type"
+    Battle(_, _, 0, _) -> "attack damage"
+    Battle(_, x, y, _) if x < 4 && y < 4 -> "attack damage"
     _ -> "defence strategy"
   }
   div([class("")], [
@@ -202,11 +206,43 @@ pub fn dice_result(action: Action) {
           ])
       },
     ]
-    _ -> [
-      //get numbers from Battle() values
-    // p([class("font-text")], [text("Attack type: 6 (Critical hit)")]),
-    // p([class("font-text")], [text("Attack Damage: 4")]),
-    ]
+    Battle(_, a_type, damage, defence) -> {
+      let attack_type = case a_type {
+        0 -> []
+        6 -> [p([class("font-text")], [text("Attack type: 6 (Critical hit)")])]
+        x if x < 4 -> [
+          p([class("font-text")], [
+            text(
+              "Attack type: "
+              <> int.to_string(x)
+              <> " (Light hits - chance to go twice!)",
+            ),
+          ]),
+        ]
+        x -> [
+          p([class("font-text")], [text("Attack type: " <> int.to_string(x))]),
+        ]
+      }
+      let a_damage = case damage {
+        0 -> []
+        x -> [
+          p([class("font-text")], [text("Attack damage: " <> int.to_string(x))]),
+        ]
+      }
+      let ds = case defence {
+        0 -> []
+        x -> [
+          p([class("font-text")], [
+            text("Defence strategy: " <> int.to_string(x)),
+          ]),
+        ]
+      }
+      let content = list.flatten([attack_type, a_damage, ds])
+      case content |> list.length() {
+        0 -> [p([class("font-text")], [text("You have not rolled yet")])]
+        _ -> content
+      }
+    }
   }
   div([id("dice_result"), class("flex justify-center items-center")], [
     div(

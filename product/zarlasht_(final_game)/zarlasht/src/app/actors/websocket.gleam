@@ -26,19 +26,26 @@ import lustre/element
 import lustre/element/html
 import mist.{type Connection, Custom}
 
-import app/lib/create_game.{on_create_game, update_colors}
-import app/lib/game.{
-  go_to_chats, go_to_dice_roll, go_to_home, go_to_map, start_game, switch_chat,
-  update_chat_messages,
+import app/models/websocket/create_game.{on_create_game, update_colors}
+import app/models/websocket/join_game.{on_join_game, on_to_join_game}
+import app/models/websocket/messaging.{
+  send_message, switch_chat, update_chat_messages,
 }
-import app/lib/join_game.{on_join_game, on_to_join_game}
-import app/lib/set_name.{set_name}
+import app/models/websocket/set_name.{set_name}
+import app/models/websocket/start_game.{start_game}
+import app/models/websocket/switch_pages.{
+  go_to_chats, go_to_dice_roll, go_to_home, go_to_map,
+}
 import app/pages/chat.{chat, chat_section}
 import app/pages/map.{map_grid}
 import app/pages/roll_die.{
   already_rolled, anim_get_next_dice, dice_result, rolled_die,
 }
 import app/pages/set_name as sn_pg
+
+import app/models/websocket/clicked_position.{clicked_position}
+import app/models/websocket/roll_battle.{roll_battle}
+import app/models/websocket/roll_move.{roll_move}
 
 //TODO
 //swap out io.debug with logs
@@ -145,162 +152,20 @@ fn handle_ws_message(state, conn, message) {
 
         "go_to_map" | "map" -> go_to_map(state, conn) |> actor.continue
 
-        "clickable_position_" <> position -> {
-          let assert Some(game_subject) = state.game_subject
-          //parse position
-          let assert Ok(x) = position |> string.split("_") |> list.first()
-          let assert Ok(y) = position |> string.split("_") |> list.last()
-          let assert Ok(x) = int.parse(x)
-          let assert Ok(y) = int.parse(y)
-          //check if we should enter battle
-          let assert Ok(Some(action)) =
-            list.index_map(map_grid(), fn(z, row) {
-              list.index_map(z, fn(cell, column) {
-                case column == x && row == y {
-                  True -> {
-                    //randomize battle based off cell type
-                    Some(case cell {
-                      //TODO - randomy generate warrior types
-                      // 4 = red = enemy tribe - always battle (warrior)
-                      4 -> Battle(EnemyTribe("Expert Swordsman"), 0, 0, 0)
-                      // 5 = cyan = cemetary - 30% chance (undead)
-                      5 ->
-                        case int.random(10) {
-                          num if num < 3 -> Battle(Cemetary, 0, 0, 0)
-                          _ -> Move(0)
-                        }
-                      // 6 = teal = ritual - always battle (demon)
-                      6 -> Battle(Demon, 0, 0, 0)
-                      // 7 = violet = ravine - 70%
-                      7 ->
-                        case int.random(10) {
-                          num if num < 7 ->
-                            Battle(Ravine("Expert Swordsman"), 0, 0, 0)
-                          _ -> Move(0)
-                        }
-                      // 8 = lime = fog - depends on who nearby - TODO
-                      8 -> Move(0)
-                      // 9 = sky = ambush - always battle
-                      9 -> Battle(Ambush("Expert Swordsman"), 0, 0, 0)
-                      // 0 = white = mountain - no battle (can't be here)
-                      // 1 = amber = path - no battle
-                      // 2 = emerald = beginning - no battle
-                      // 3 = pink = end - no battle
-                      _ -> Move(0)
-                    })
-                  }
-                  _ -> None
-                }
-              })
-            })
-            |> list.flatten
-            |> list.find(option.is_some)
-          //update game state
-          let player =
-            Player(
-              ..state.player,
-              action: action,
-              position: #(x, y),
-              old_positions: state.player.old_positions
-                |> list.append([state.player.position]),
-            )
-          process.send(game_subject, PlayerMoved(player, game_subject))
-          //update overall state, including move action
-          WebsocketActorState(..state, player: player)
+        "clickable_position_" <> position ->
+          clicked_position(position, state)
           |> actor.continue
-        }
 
         "go_to_dice_roll" -> go_to_dice_roll(state, conn) |> actor.continue
 
         "roll" -> {
-          //TODO - refactor
           case state.player.action {
-            Move(to_move_by) -> {
-              case to_move_by {
-                0 -> {
-                  //animate dice by sending it multiple times
-                  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-                  |> list.each(fn(_x) {
-                    let assert Ok(_) =
-                      mist.send_text_frame(conn, anim_get_next_dice())
-                    process.sleep(100)
-                  })
-                  let roll = case int.random(6) {
-                    //upper is exclusive, 0 is inclusive
-                    0 -> 6
-                    number -> number
-                  }
-                  let assert Ok(_) =
-                    mist.send_text_frame(
-                      conn,
-                      rolled_die(roll) |> element.to_string,
-                    )
-                  let action = Move(roll)
-                  //update to page info
-                  let assert Ok(_) =
-                    mist.send_text_frame(
-                      conn,
-                      dice_result(action) |> element.to_string,
-                    )
-                  //update state
-                  WebsocketActorState(
-                    ..state,
-                    player: Player(..state.player, action: action),
-                  )
-                  |> actor.continue
-                }
-                _ -> {
-                  let assert Ok(_) =
-                    mist.send_text_frame(conn, already_rolled())
-                  state |> actor.continue
-                }
-              }
-            }
-            Battle(btype, a_type, damage, defence) -> {
-              // TODO - battle features
-              // TODO - let game/battle know
-              //check if all 3 filled, then already_rolled
-              case a_type == 0 || damage == 0 || defence == 0 {
-                True -> {
-                  //else fill the on not set & update state & page info
-                  let assert Ok(_) =
-                    mist.send_text_frame(conn, anim_get_next_dice())
-                  let roll = case int.random(6) {
-                    //upper is exclusive, 0 is inclusive
-                    0 -> 6
-                    number -> number
-                  }
-                  let assert Ok(_) =
-                    mist.send_text_frame(
-                      conn,
-                      rolled_die(roll) |> element.to_string,
-                    )
+            Move(to_move_by) ->
+              roll_move(to_move_by, state, conn) |> actor.continue
 
-                  let action = case a_type, damage, defence {
-                    0, _, _ -> Battle(btype, roll, damage, defence)
-                    _, 0, _ -> Battle(btype, a_type, roll, defence)
-                    _, _, _ -> Battle(btype, a_type, damage, roll)
-                  }
-
-                  let assert Ok(_) =
-                    mist.send_text_frame(
-                      conn,
-                      dice_result(action) |> element.to_string,
-                    )
-
-                  WebsocketActorState(
-                    ..state,
-                    player: Player(..state.player, action: action),
-                  )
-                  |> actor.continue
-                }
-                _ -> {
-                  let assert Ok(_) =
-                    mist.send_text_frame(conn, already_rolled())
-                  state |> actor.continue
-                }
-              }
-            }
+            Battle(btype, a_type, damage, defence) ->
+              roll_battle(btype, a_type, damage, defence, state, conn)
+              |> actor.continue
           }
         }
 
@@ -313,11 +178,7 @@ fn handle_ws_message(state, conn, message) {
           switch_chat(player_to_chat_to, state, conn) |> actor.continue
 
         "send_message_" <> player_to_send_to ->
-          game.send_message(
-            player_to_send_to,
-            message,
-            PlayerSocket(conn, state),
-          )
+          send_message(player_to_send_to, message, PlayerSocket(conn, state))
           |> actor.continue
 
         _ -> {

@@ -8,7 +8,14 @@ pub fn home() -> Element(t) {
   div(
     [
       class("!text-left !absolute !z-[999]"),
-      style([#("width", "calc(100% - 2rem)"), #("height", "calc(100% - 2rem)")]),
+      style([
+        #("width", "calc(100% - 2rem)"),
+        #("height", "calc(100% - 2rem)"),
+        #("background-image", "url(/static/home.png)"),
+        #("background-size", "cover"),
+        #("background-repeat", "no-repeat"),
+        #("background-position", "right"),
+      ]),
     ],
     [
       div([class("!w-full")], [

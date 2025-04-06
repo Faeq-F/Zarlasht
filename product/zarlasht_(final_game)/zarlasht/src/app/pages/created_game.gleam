@@ -65,11 +65,32 @@ pub fn player_container(
   ])
 }
 
+fn random_player_image() {
+  case int.random(3) {
+    0 -> "3"
+    x -> int.to_string(x)
+  }
+}
+
 fn generate_players(state: GameActorState) {
   let items =
     state.participants
+    |> list.index_map(fn(x, i) { #(i, x) })
     |> list.map(fn(player) {
-      li([class("item text-center font-subheader")], [text({ player.0 }.name)])
+      li(
+        [
+          class("item text-center font-subheader"),
+          style([
+            #(
+              "background-image",
+              "url(/static/player" <> int.to_string(player.0 + 1) <> ".png)",
+            ),
+            #("background-position", "bottom"),
+            #("background-size", "cover"),
+          ]),
+        ],
+        [text({ player.1.0 }.name)],
+      )
     })
 
   case items |> list.length() >= 5 {
@@ -77,9 +98,20 @@ fn generate_players(state: GameActorState) {
     _ -> {
       items
       |> list.append(list.repeat(
-        li([class("item text-center font-subheader")], [
-          text("Waiting for player to join..."),
-        ]),
+        li(
+          [
+            class("item text-center font-subheader"),
+            style([
+              #(
+                "background-image",
+                "url(/static/player" <> random_player_image() <> ".png)",
+              ),
+              #("background-position", "bottom"),
+              #("background-size", "cover"),
+            ]),
+          ],
+          [text("Waiting for player to join...")],
+        ),
         5 - { items |> list.length() },
       ))
     }

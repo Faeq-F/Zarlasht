@@ -90,7 +90,7 @@ pub type Action {
   /// The player is battling
   ///
   Battle(
-    tyoe: BattleType,
+    battle_type: BattleType,
     attack_type: Int,
     attack_damage: Int,
     defence_strategy: Int,
@@ -248,4 +248,19 @@ pub type BattleActorState {
 
 pub type BattleActorMessage {
   SetupBattle(id: Int, game: Subject(GameActorMessage))
+}
+
+//----------------------------------------------------------------------
+
+pub type EnemyActorState {
+  EnemyActorState(me: EnemyType)
+}
+
+pub type EnemyActorMessage
+
+pub type EnemyType {
+  ExpertSwordsman
+  DemonicSpirit
+  Ghost
+  Zombie
 }

@@ -1,9 +1,11 @@
 import lustre/element.{type Element}
 
-import app/actors/actor_types.{type Player}
+import app/actors/actor_types.{
+  type Action, type Player, Battle, EnemyTribe, Move,
+}
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{
-  dices, info as info_icon, map, messages_square, radar, sword,
+  dices, footprints, info as info_icon, map, messages_square, radar, sword,
 }
 
 import app/pages/layout.{stats as info_stats}
@@ -26,7 +28,7 @@ pub fn game(stats: Player) {
         div([class("!w-full z-30 absolute")], [
           bottom_bar(info(stats), buttons()),
         ]),
-        info_section(),
+        info_section(stats.action),
       ],
     ),
   ])
@@ -96,7 +98,7 @@ fn buttons() {
   ]
 }
 
-fn info_section() {
+fn info_section(action: Action) {
   div([class("flex")], [
     div(
       [
@@ -107,7 +109,7 @@ fn info_section() {
           #("align-content", "center"),
         ]),
       ],
-      [area_panel()],
+      [area_panel(action)],
     ),
     div(
       [
@@ -123,7 +125,29 @@ fn info_section() {
   ])
 }
 
-fn area_panel() {
+fn area_panel(action) {
+  //TODO - rest of battle types
+  let title = case action {
+    Move(_) -> "Traversal"
+    Battle(EnemyTribe(_), _, _, _) -> "Enemy Tribe!"
+    _ -> "Ambush!"
+  }
+  let description = case action {
+    Move(_) ->
+      "You are trying to make your way around the mountain peak. Earlier, you heard of all sorts of nightmares that could be on the trail; you must choose your path wisely!"
+    Battle(EnemyTribe(_), _, _, _) ->
+      "You are on the border of the forest and a neighboring tribe spotted you. You are being ambushed and must fight your way out!"
+    _ ->
+      "You're carrying precious resources to get through the ritual. Food, water, weapons, ammunition. Enough for a neighboring tribe to try and plunder!"
+  }
+  let status = case action {
+    Move(_) -> "The trail"
+    _ -> "Battle"
+  }
+  let status_content = case action {
+    Move(_) -> traversal_section()
+    _ -> expert_swordsman_section()
+  }
   div([class("")], [
     div([class("flex  items-center")], [
       div(
@@ -131,11 +155,7 @@ fn area_panel() {
           class("!ml-8 font-subheader items-end inline-flex !text-6xl"),
           style([#("cursor", "default")]),
         ],
-        [
-          radar([class("!w-18 !h-18 !mr-[10px]")]),
-          //TODO - dynamic
-          text("Ambush!"),
-        ],
+        [radar([class("!w-18 !h-18 !mr-[10px]")]), text(title)],
       ),
     ]),
     div([class("flex justify-center items-center")], [
@@ -144,12 +164,7 @@ fn area_panel() {
           class("!ml-8 font-text !text-lg !text-left !my-6"),
           style([#("cursor", "default")]),
         ],
-        [
-          //TODO - dynamic
-          text(
-            "You are on the border of the forest and a neighboring tribe spotted you. You are being ambushed and must fight your way out!",
-          ),
-        ],
+        [text(description)],
       ),
     ]),
     div([class("flex justify-center items-center")], [
@@ -161,63 +176,132 @@ fn area_panel() {
           style([#("cursor", "default"), #("height", "60vh"), #("width", "90%")]),
         ],
         [
-          p([class("text-center !my-4 text-3xl")], [text("Battle")]),
-          div([class("flex")], [
-            div(
-              [
-                class("!inline"),
-                style([
-                  #("width", "40%"),
-                  #("height", "50vh"),
-                  #("align-content", "center"),
-                ]),
-              ],
-              [text("enemy image")],
-            ),
-            div(
-              [
-                class("!inline content-center"),
-                style([#("width", "60%"), #("height", "50vh")]),
-              ],
-              [
-                p([class("font-subheader inline-flex text-4xl")], [
-                  sword([class("self-center !mr-1 w-8 h-8")]),
-                  //TODO - dynamic
-                  text("Expert Swordsman"),
-                ]),
-                ul(
-                  [
-                    style([
-                      #("list-style", "circle"),
-                      #("width", "90%"),
-                      #("margin", "0 auto"),
-                    ]),
-                    class("font-text"),
-                  ],
-                  expert_swordsman_points(),
-                ),
-                call_allies_btn(),
-              ],
-            ),
-          ]),
+          p([class("text-center !my-4 text-3xl")], [text(status)]),
+          status_content,
         ],
       ),
     ]),
   ])
 }
 
-fn expert_swordsman_points() {
-  [
-    li([], [
-      text(
-        "The Expert Swordsman is a skilled warrior who has been trained in the art of combat since he was a child. He is a formidable opponent and will not go down easily.",
-      ),
-    ]),
-    li([], [
-      text("If he is not defeated quickly, he will call for reinforcements"),
-    ]),
-    li([], [text("If he is too strong, you can call for allies to help you")]),
-  ]
+fn traversal_section() {
+  div([class("flex")], [
+    div(
+      [
+        class("!inline"),
+        style([
+          #("width", "40%"),
+          #("height", "50vh"),
+          #("align-content", "center"),
+          #("background-image", "url(/static/mountain.png)"),
+          #("background-position", "center"),
+          #("background-size", "contain"),
+          #("background-repeat", "no-repeat"),
+        ]),
+      ],
+      [],
+    ),
+    div(
+      [
+        class("!inline content-center"),
+        style([#("width", "60%"), #("height", "50vh")]),
+      ],
+      [
+        p([class("font-subheader inline-flex text-4xl")], [
+          footprints([class("self-center !mr-1 w-8 h-8")]),
+          text("Footprints"),
+        ]),
+        ul(
+          [
+            style([
+              #("list-style", "circle"),
+              #("width", "90%"),
+              #("margin", "0 auto"),
+            ]),
+            class("font-text"),
+          ],
+          [
+            li([], [
+              text("Beware of falling rocks, avalanches, and slippery ice."),
+            ]),
+            li([], [
+              text(
+                "Stay alert to changing weather that affects your visibility and movement.",
+              ),
+            ]),
+            li([], [
+              text(
+                "Discover hidden paths, caves, and treasure on your way round.",
+              ),
+            ]),
+            li([], [
+              text(
+                "Be selective of who you fight, build and save your strength for the final ritual.",
+              ),
+            ]),
+          ],
+        ),
+      ],
+    ),
+  ])
+}
+
+fn expert_swordsman_section() {
+  div([class("flex")], [
+    div(
+      [
+        class("!inline"),
+        style([
+          #("width", "40%"),
+          #("height", "50vh"),
+          #("align-content", "center"),
+          #("background-image", "url(/static/expertSwordsman.png)"),
+          #("background-position", "center"),
+          #("background-size", "contain"),
+          #("background-repeat", "no-repeat"),
+        ]),
+      ],
+      [],
+    ),
+    div(
+      [
+        class("!inline content-center"),
+        style([#("width", "60%"), #("height", "50vh")]),
+      ],
+      [
+        p([class("font-subheader inline-flex text-4xl")], [
+          sword([class("self-center !mr-1 w-8 h-8")]),
+          text("Expert Swordsman"),
+        ]),
+        ul(
+          [
+            style([
+              #("list-style", "circle"),
+              #("width", "90%"),
+              #("margin", "0 auto"),
+            ]),
+            class("font-text"),
+          ],
+          [
+            li([], [
+              text(
+                "The Expert Swordsman is a skilled warrior who has been trained in the art of combat since he was a child. He is a formidable opponent and will not go down easily.",
+              ),
+            ]),
+            li([], [
+              text(
+                "If he is not defeated quickly, he will call for reinforcements",
+              ),
+            ]),
+            li([], [
+              text("If he is too strong, you can call for allies to help you"),
+            ]),
+          ],
+        ),
+        call_allies_btn(),
+      ],
+    ),
+  ])
 }
 
 fn call_allies_btn() {
