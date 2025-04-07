@@ -234,6 +234,9 @@ pub type GameActorMessage {
   /// a battle actor will be started if so
   ///
   PlayerMoved(player: Player, game: Subject(GameActorMessage))
+  /// Battle has ended
+  ///
+  BattleEnded(id: Int, player_died: Bool)
 }
 
 //----------------------------------------------------------------------
@@ -243,20 +246,43 @@ pub type BattleActorState {
     id: Int,
     game: Option(Subject(GameActorMessage)),
     battle_type: BattleType,
+    myself: Subject(BattleActorMessage),
+    enemy: Option(Subject(EnemyActorMessage)),
   )
 }
 
 pub type BattleActorMessage {
   SetupBattle(id: Int, game: Subject(GameActorMessage))
+  /// Action tuple represents attack_type, attack_damage, defence_strategy
+  ///
+  EnemyHit(action: #(Int, Int, Int), strength: Int)
+  /// Action tuple represents attack_type, attack_damage, defence_strategy
+  ///
+  PlayerHit(action: #(Int, Int, Int), strength: Int)
+  EnemyDied
 }
 
 //----------------------------------------------------------------------
 
+/// Action tuple represents attack_type, attack_damage, defence_strategy
+///
 pub type EnemyActorState {
-  EnemyActorState(me: EnemyType)
+  EnemyActorState(
+    battle: Subject(BattleActorMessage),
+    myself: Option(Subject(EnemyActorMessage)),
+    me: EnemyType,
+    health: Int,
+    strength: Int,
+    action: #(Int, Int, Int),
+  )
 }
 
-pub type EnemyActorMessage
+pub type EnemyActorMessage {
+  SetupEnemy(myself: Subject(EnemyActorMessage))
+  MakeActions
+  ShutdownEnemy
+  EnemyGotHit(remove_health: Int)
+}
 
 pub type EnemyType {
   ExpertSwordsman

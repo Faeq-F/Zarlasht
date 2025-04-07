@@ -1,25 +1,15 @@
 //// The game actor - process to manage a single game being played between two players
 
 import app/actors/actor_types.{
-  type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddPlayer, AddedName, Battle, Disconnect, GameActorState,
-  GameState, GetState, Home, JoinGame, Move, Player, PlayerMoved, PrepareGame,
-  SendToClient, SetupBattle, SwapColors, UpdatePlayerState, UpdateState,
-  UserDisconnected, Wait,
+  type GameActorMessage, type GameActorState, AddPlayer, AddedName,
+  GameActorState, GameState, GetState, PlayerMoved, PrepareGame, SwapColors,
+  UpdateState, UserDisconnected,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
-import gleam/int
 import gleam/io
-import gleam/list
-import gleam/option.{None}
 import gleam/otp/actor.{type Next}
-import gleam/otp/static_supervisor as sup
 import logging.{Info}
-import lustre/element
-
-import app/actors/battle
-import app/pages/created_game.{created_game_page, get_color, player_container}
 
 /// Creates the actor
 ///

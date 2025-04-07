@@ -35,7 +35,7 @@ import app/models/websocket/switch_pages.{
 import app/pages/chat.{chat, chat_section}
 import app/pages/map.{map_grid}
 import app/pages/roll_die.{
-  already_rolled, anim_get_next_dice, dice_result, rolled_die,
+  already_rolled, anim_get_next_dice, dice_result, roll_section, rolled_die,
 }
 import app/pages/set_name as sn_pg
 
@@ -73,8 +73,9 @@ pub fn roll_battle(
       }
 
       let assert Ok(_) =
+        mist.send_text_frame(conn, roll_section(action) |> element.to_string)
+      let assert Ok(_) =
         mist.send_text_frame(conn, dice_result(action) |> element.to_string)
-
       WebsocketActorState(
         ..state,
         player: Player(..state.player, action: action),

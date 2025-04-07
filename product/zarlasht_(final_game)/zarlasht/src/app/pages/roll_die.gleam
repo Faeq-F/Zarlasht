@@ -148,7 +148,7 @@ pub fn rolled_die(rolled: Int) {
   die.1
 }
 
-fn roll_section(action: Action) {
+pub fn roll_section(action: Action) {
   let icon = case action {
     Move(_) -> footprints([class("!mr-[10px]")])
     Battle(_, 0, _, _) | Battle(_, _, 0, _) -> swords([class("!mr-[10px]")])
@@ -160,6 +160,18 @@ fn roll_section(action: Action) {
     Battle(_, _, 0, _) -> "attack damage"
     Battle(_, x, y, _) if x < 4 && y < 4 -> "attack damage"
     _ -> "defence strategy"
+  }
+  let button_text = case action {
+    Battle(_, _, _, 0) | Move(_) -> "Roll"
+    _ -> "Hit!"
+  }
+  let rolled_value = case action {
+    Move(0) -> 6
+    Move(rolled) -> rolled
+    Battle(_, notrolled, _, _) if notrolled == 0 -> 6
+    Battle(_, rolled, 0, _) -> rolled
+    Battle(_, _, rolled, 0) -> rolled
+    Battle(_, _, _, rolled) -> rolled
   }
   div([class("")], [
     div([class("flex justify-center items-center")], [
@@ -173,7 +185,7 @@ fn roll_section(action: Action) {
         [icon, text("You are currently rolling for " <> rolling_for)],
       ),
     ]),
-    div([class("flex justify-center items-center")], [rolled_die(6)]),
+    div([class("flex justify-center items-center")], [rolled_die(rolled_value)]),
     div([class("flex justify-center items-center")], [
       button(
         [
@@ -188,7 +200,7 @@ fn roll_section(action: Action) {
             " ",
           )),
         ],
-        [text("Roll")],
+        [text(button_text)],
       ),
     ]),
     dice_result(action),

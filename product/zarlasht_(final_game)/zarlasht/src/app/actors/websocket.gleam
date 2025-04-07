@@ -1,23 +1,18 @@
 //// All Websocket related functions for the app
 
 import app/actors/actor_types.{
-  type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Ambush,
-  Battle, Cemetary, Chat, Demon, DequeueParticipant, Dice, Disconnect,
-  EnemyTribe, GameActorState, GameState, GetState, GetStateWS, Home, JoinGame,
-  Map, Move, Player, PlayerMoved, PlayerSocket, Ravine, SendToClient, StateWS,
-  UpdatePlayerState, UpdateState, UserDisconnected, Wait, WebsocketActorState,
+  type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Battle,
+  DequeueParticipant, Disconnect, GetStateWS, JoinGame, Move, Player,
+  PlayerSocket, SendToClient, StateWS, UpdatePlayerState, UserDisconnected,
+  WebsocketActorState,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
 import gleam/function
 import gleam/http/request.{type Request, Request}
-import gleam/int
 import gleam/io
-import gleam/list
 import gleam/option.{None, Some}
 import gleam/otp/actor
-import gleam/otp/supervisor
-import gleam/otp/task
 import gleam/string
 import juno
 import logging.{Alert, Info}
@@ -36,11 +31,7 @@ import app/models/websocket/start_game.{start_game}
 import app/models/websocket/switch_pages.{
   go_to_chats, go_to_dice_roll, go_to_home, go_to_map,
 }
-import app/pages/chat.{chat, chat_section}
-import app/pages/map.{map_grid}
-import app/pages/roll_die.{
-  already_rolled, anim_get_next_dice, dice_result, rolled_die,
-}
+import app/pages/roll_die.{anim_get_next_dice}
 import app/pages/set_name as sn_pg
 
 import app/models/websocket/clicked_position.{clicked_position}
@@ -236,7 +227,7 @@ fn disconnect() {
   html.div([attribute.id("page")], [
     html.script(
       [],
-      "alert('Your opponent disconnected!'); window.onbeforeunload = null; location.reload();",
+      "alert('You lost all of your health!'); window.onbeforeunload = null; location.reload();",
     ),
   ])
   |> element.to_string

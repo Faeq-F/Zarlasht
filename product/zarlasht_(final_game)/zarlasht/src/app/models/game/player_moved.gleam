@@ -38,10 +38,11 @@ pub fn player_moved(
       // add to supervisor
       let _ =
         sup.new(sup.OneForOne)
-        |> sup.add(sup.supervisor_child(
-          "battle_is_" <> id |> int.to_string,
-          battle_erl,
-        ))
+        |> sup.add(
+          sup.supervisor_child("battle_is_" <> id |> int.to_string, battle_erl)
+          |> sup.significant(True),
+        )
+        |> sup.auto_shutdown(sup.AnySignificant)
         |> sup.start_link
       let assert Ok(battle_subject) = process.receive(game_subject, 1000)
       let new_battle = #(id, battle_subject)

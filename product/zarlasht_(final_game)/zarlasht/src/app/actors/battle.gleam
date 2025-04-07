@@ -3,10 +3,11 @@
 import app/actors/actor_types.{
   type BattleActorMessage, type BattleActorState, type BattleType,
   type DirectorActorMessage, type DirectorActorState, type GameActorMessage,
-  AddPlayer, Ambush, BattleActorState, Cemetary, Demon, DequeueParticipant,
-  DirectorActorState, EnemyTribe, EnqueueParticipant, GameStarted,
-  GetParticipants, JoinGame, Participants, PrepareGame, Ravine, SendToClient,
-  SetupBattle, UpdateParticipant,
+  AddPlayer, Ambush, BattleActorState, BattleEnded, Cemetary, Demon,
+  DequeueParticipant, DirectorActorState, EnemyDied, EnemyHit, EnemyTribe,
+  EnqueueParticipant, GameStarted, GetParticipants, JoinGame, MakeActions,
+  Participants, PlayerHit, PrepareGame, Ravine, SendToClient, SetupBattle,
+  SetupEnemy, ShutdownEnemy, UpdateParticipant,
 }
 
 import app/pages/game as game_page
@@ -38,7 +39,10 @@ pub fn start(
         process.new_selector()
         |> process.selecting(battle_subject, function.identity)
 
-      actor.Ready(BattleActorState(0, None, battle_type), selector)
+      actor.Ready(
+        BattleActorState(0, None, battle_type, battle_subject, None),
+        selector,
+      )
     },
     init_timeout: 1000,
     loop: handle_message,
@@ -59,24 +63,48 @@ fn handle_message(
   io.debug(message_for_actor)
   case message_for_actor {
     SetupBattle(id, game) -> {
-      case state.battle_type {
+      let enemy_subject = case state.battle_type {
         Ravine(w_type) | EnemyTribe(w_type) | Ambush(w_type) -> {
-          enemy.start(w_type)
-          Nil
+          let enemy_subject = enemy.start(w_type, state.myself)
+          process.send(enemy_subject, SetupEnemy(enemy_subject))
+          //start the enemy making actions (rolling dice, hitting, etc.)
+          process.send(enemy_subject, MakeActions)
+          Some(enemy_subject)
         }
         Demon | Cemetary -> {
           //predefined warrior types
           //should be DemonicSpirit and Ghost / Zombie (randomize between the two)
           //TODO - for now - swordsman
-          enemy.start("")
-          Nil
+          let enemy_subject = enemy.start("", state.myself)
+          process.send(enemy_subject, SetupEnemy(enemy_subject))
+          //start the enemy making actions (rolling dice, hitting, etc.)
+          process.send(enemy_subject, MakeActions)
+          Some(enemy_subject)
         }
         _ -> {
           //its fog - TODO - battle other player
-          Nil
+          None
         }
       }
-      BattleActorState(..state, id: id, game: Some(game)) |> actor.continue
+      BattleActorState(..state, id: id, game: Some(game), enemy: enemy_subject)
+      |> actor.continue
+    }
+    EnemyHit(action, strength) -> {
+      //update states
+      //if one gets to 0 health, shutdown & tell enemy to shutdown
+      let assert Some(enemy_subject) = state.enemy
+      process.send(enemy_subject, ShutdownEnemy)
+      actor.Stop(process.Normal)
+      todo
+    }
+    PlayerHit(action, strength) -> {
+      todo
+      //racing action - decide who got hit first
+    }
+    EnemyDied -> {
+      let assert Some(game) = state.game
+      process.send(game, BattleEnded(state.id, False))
+      actor.Stop(process.Normal)
     }
   }
 }
