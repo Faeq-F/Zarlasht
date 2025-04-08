@@ -2,19 +2,23 @@
 
 import app/actors/actor_types.{
   type BattleActorMessage, type BattleActorState, type BattleType,
-  type DirectorActorMessage, type DirectorActorState, type GameActorMessage,
-  AddPlayer, Ambush, BattleActorState, BattleEnded, Cemetary, Demon,
-  DequeueParticipant, DirectorActorState, EnemyDied, EnemyHit, EnemyTribe,
+  type CustomWebsocketMessage, type DirectorActorMessage,
+  type DirectorActorState, type GameActorMessage, AddPlayer, Ambush,
+  BattleActorState, BattleEnded, Cemetary, Demon, DequeueParticipant,
+  DirectorActorState, EnemyDied, EnemyGotHit, EnemyHit, EnemyTribe,
   EnqueueParticipant, GameStarted, GetParticipants, JoinGame, MakeActions,
-  Participants, PlayerHit, PrepareGame, Ravine, SendToClient, SetupBattle,
-  SetupEnemy, ShutdownEnemy, UpdateParticipant,
+  Participants, PlayerDied, PlayerGotHit, PlayerHit, PrepareGame, Ravine,
+  SendToClient, SetupBattle, SetupEnemy, ShutdownEnemy, UpdateParticipant,
+  YourEnemyDied,
 }
+import gleam/string
 
 import app/pages/game as game_page
 import carpenter/table
 import gleam/dict.{drop, get, insert}
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang/process.{type Subject}
+import gleam/float
 import gleam/function
 import gleam/int
 import gleam/io
@@ -29,6 +33,7 @@ import app/actors/enemy
 pub fn start(
   battle_type: BattleType,
   game_subject: Subject(Subject(BattleActorMessage)),
+  player_subject: Subject(CustomWebsocketMessage),
 ) -> Result(process.Pid, Dynamic) {
   actor.start_spec(actor.Spec(
     init: fn() {
@@ -40,7 +45,14 @@ pub fn start(
         |> process.selecting(battle_subject, function.identity)
 
       actor.Ready(
-        BattleActorState(0, None, battle_type, battle_subject, None),
+        BattleActorState(
+          0,
+          None,
+          battle_type,
+          battle_subject,
+          player_subject,
+          None,
+        ),
         selector,
       )
     },
@@ -56,10 +68,7 @@ fn handle_message(
   message_for_actor: BattleActorMessage,
   state: BattleActorState,
 ) -> Next(BattleActorMessage, BattleActorState) {
-  logging.log(
-    Info,
-    "Battle Actor" <> int.to_string(state.id) <> " got the message",
-  )
+  io.debug("Battle Actor" <> int.to_string(state.id) <> " got the message")
   io.debug(message_for_actor)
   case message_for_actor {
     SetupBattle(id, game) -> {
@@ -90,21 +99,55 @@ fn handle_message(
       |> actor.continue
     }
     EnemyHit(action, strength) -> {
-      //update states
-      //if one gets to 0 health, shutdown & tell enemy to shutdown
-      let assert Some(enemy_subject) = state.enemy
-      process.send(enemy_subject, ShutdownEnemy)
-      actor.Stop(process.Normal)
-      todo
+      let remove_health = calculate_remove_health(action, strength)
+      process.send(state.player_subject, PlayerGotHit(remove_health))
+      //todo
+      //racing action - decide who got hit first
+      state |> actor.continue
     }
     PlayerHit(action, strength) -> {
-      todo
-      //racing action - decide who got hit first
+      let assert Some(enemy_subject) = state.enemy
+      let remove_health = calculate_remove_health(action, strength)
+      process.send(enemy_subject, EnemyGotHit(remove_health))
+      state |> actor.continue
     }
     EnemyDied -> {
       let assert Some(game) = state.game
-      process.send(game, BattleEnded(state.id, False))
+      process.send(state.player_subject, YourEnemyDied)
+      process.send(game, BattleEnded(state.id))
       actor.Stop(process.Normal)
     }
+    PlayerDied -> {
+      let assert Some(enemy_subject) = state.enemy
+      let assert Some(game) = state.game
+      process.send(enemy_subject, ShutdownEnemy)
+      process.send(game, BattleEnded(state.id))
+      actor.Stop(process.Normal)
+    }
+  }
+}
+
+fn calculate_remove_health(action: #(Int, Int, Int), strength: Int) {
+  let multiplier_1 = multipliers(action.0)
+  let multiplier_2 = multipliers(action.1)
+  let multiplier_3 = multipliers(action.2)
+  let multiplier_4 = multipliers(strength)
+  let assert Ok(remove_health) =
+    1.0 *. multiplier_1 *. multiplier_2 *. multiplier_3 *. multiplier_4
+    |> float.floor
+    |> float.to_string
+    |> string.drop_end(2)
+    |> int.parse
+  remove_health
+}
+
+fn multipliers(num: Int) {
+  case num {
+    6 -> 1.5
+    5 -> 1.4
+    4 -> 1.3
+    3 -> 1.2
+    2 -> 1.1
+    _ -> 1.0
   }
 }

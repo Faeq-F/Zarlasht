@@ -1,8 +1,8 @@
 import app/actors/actor_types.{
   type BattleType, type DirectorActorMessage, type PlayerSocket,
   type WebsocketActorState, Ambush, Battle, Cemetary, Chat, Demon,
-  DequeueParticipant, Dice, Disconnect, EnemyTribe, GameActorState, GameState,
-  GetState, GetStateWS, Home, JoinGame, Map, Move, Player, PlayerMoved,
+  DequeueParticipant, Dice, EnemyGotHit, EnemyTribe, GameActorState, GameState,
+  GetState, GetStateWS, HitEnemy, Home, JoinGame, Map, Move, Player, PlayerMoved,
   PlayerSocket, Ravine, SendToClient, StateWS, UpdatePlayerState, UpdateState,
   UserDisconnected, Wait, WebsocketActorState,
 }
@@ -82,8 +82,21 @@ pub fn roll_battle(
       )
     }
     _ -> {
-      let assert Ok(_) = mist.send_text_frame(conn, already_rolled())
-      state
+      //Hit
+      let assert Some(game) = state.game_subject
+      let assert Battle(b_type, a_type, a_damage, ds) = state.player.action
+      process.send(
+        game,
+        HitEnemy(
+          state.player.number,
+          #(a_type, a_damage, ds),
+          state.player.strength,
+        ),
+      )
+      WebsocketActorState(
+        ..state,
+        player: Player(..state.player, action: Battle(b_type, 0, 0, 0)),
+      )
     }
   }
 }

@@ -1,6 +1,6 @@
 import app/actors/actor_types.{
   type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Ambush,
-  Battle, Cemetary, Chat, Demon, DequeueParticipant, Dice, Disconnect,
+  Battle, Cemetary, Chat, Demon, DequeueParticipant, Dice,
   EnemyTribe, GameActorState, GameState, GetState, GetStateWS, Home, JoinGame,
   Map, Move, Player, PlayerMoved, PlayerSocket, Ravine, SendToClient, StateWS,
   UpdatePlayerState, UpdateState, UserDisconnected, Wait, WebsocketActorState,

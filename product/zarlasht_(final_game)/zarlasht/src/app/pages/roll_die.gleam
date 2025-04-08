@@ -6,6 +6,7 @@ import app/pages/components/lucide_lustre.{
 }
 import app/pages/layout.{stats as info_stats}
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/string.{join}
 import lustre/attribute.{attribute, class, id, style}

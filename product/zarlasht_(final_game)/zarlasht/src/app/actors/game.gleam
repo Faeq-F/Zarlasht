@@ -1,13 +1,14 @@
 //// The game actor - process to manage a single game being played between two players
 
 import app/actors/actor_types.{
-  type GameActorMessage, type GameActorState, AddPlayer, AddedName,
-  GameActorState, GameState, GetState, PlayerMoved, PrepareGame, SwapColors,
-  UpdateState, UserDisconnected,
+  type GameActorMessage, type GameActorState, AddPlayer, AddedName, BattleEnded,
+  EnemyHit, GameActorState, GameState, GetState, HitEnemy, IDied, PlayerDied,
+  PlayerHit, PlayerMoved, PrepareGame, SwapColors, UpdateState, UserDisconnected,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
 import gleam/io
+import gleam/list
 import gleam/otp/actor.{type Next}
 import logging.{Info}
 
@@ -62,12 +63,38 @@ fn handle_message(
     AddedName(player, game_subject, name) ->
       added_name(player, game_subject, name, state) |> actor.continue
 
-    UserDisconnected(player) -> {
+    UserDisconnected(player) ->
       user_disconnected(player, state)
       |> actor.continue
-    }
+
     SwapColors(colors, game_subject) ->
       swap_colors(colors, game_subject, state) |> actor.continue
+
+    HitEnemy(player, battle, strength) -> {
+      let assert Ok(battle_subject) =
+        state.battles
+        |> list.find(fn(battle) { battle.2 == player })
+      process.send(battle_subject.1, PlayerHit(battle, strength))
+      state |> actor.continue
+    }
+
+    BattleEnded(id) -> {
+      let new_battles =
+        state.battles |> list.filter(fn(battle) { battle.0 != id })
+      GameActorState(..state, battles: new_battles)
+      |> actor.continue
+    }
+
+    IDied(player_num) -> {
+      let assert Ok(battle) =
+        state.battles
+        |> list.find(fn(battle) { battle.2 == player_num })
+      process.send(battle.1, PlayerDied)
+      let new_participants =
+        state.participants
+        |> list.filter(fn(p) { { p.0 }.number != player_num })
+      GameActorState(..state, participants: new_participants) |> actor.continue
+    }
 
     PrepareGame ->
       prepare_game(state)

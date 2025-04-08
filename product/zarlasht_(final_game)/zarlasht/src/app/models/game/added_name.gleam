@@ -1,9 +1,9 @@
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddPlayer, AddedName, Battle, Disconnect, GameActorState,
-  GameState, GetState, Home, JoinGame, Move, Player, PlayerMoved, PrepareGame,
-  SendToClient, SetupBattle, SwapColors, UpdatePlayerState, UpdateState,
-  UserDisconnected, Wait,
+  type Player, AddPlayer, AddedName, Battle, GameActorState, GameState, GetState,
+  Home, JoinGame, Move, Player, PlayerMoved, PrepareGame, SendToClient,
+  SetupBattle, SwapColors, UpdatePlayerState, UpdateState, UserDisconnected,
+  Wait,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}

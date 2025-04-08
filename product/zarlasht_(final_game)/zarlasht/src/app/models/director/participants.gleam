@@ -48,27 +48,32 @@ pub fn dequeue_participant(
   game_code: Int,
   state: DirectorActorState,
 ) {
-  let assert Ok(game) = state.games_waiting |> get(game_code)
-  case game.1 |> list.length() == 1 {
-    True -> {
-      //remove from ETS table
-      let assert Ok(waiting_games) = table.ref("waiting_games")
-      waiting_games |> table.delete(game_code)
-      //remove from director state
-      DirectorActorState(state.games_waiting |> drop([game_code]))
+  //They may have been in a game that has already started
+  case state.games_waiting |> get(game_code) {
+    Ok(game) -> {
+      case game.1 |> list.length() == 1 {
+        True -> {
+          //remove from ETS table
+          let assert Ok(waiting_games) = table.ref("waiting_games")
+          waiting_games |> table.delete(game_code)
+          //remove from director state
+          DirectorActorState(state.games_waiting |> drop([game_code]))
+        }
+        _ -> {
+          //remove from director state
+          state.games_waiting
+          |> insert(game_code, #(
+            game.0,
+            game.1
+              |> list.filter(fn(participant) {
+                { participant.0 }.number != player.number
+              }),
+          ))
+          |> DirectorActorState
+        }
+      }
     }
-    _ -> {
-      //remove from director state
-      state.games_waiting
-      |> insert(game_code, #(
-        game.0,
-        game.1
-          |> list.filter(fn(participant) {
-            { participant.0 }.number != player.number
-          }),
-      ))
-      |> DirectorActorState
-    }
+    _ -> state
   }
 }
 

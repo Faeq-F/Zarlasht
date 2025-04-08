@@ -2,9 +2,9 @@
 
 import app/actors/actor_types.{
   type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Battle,
-  DequeueParticipant, Disconnect, GetStateWS, JoinGame, Move, Player,
+  DequeueParticipant, GetStateWS, IDied, JoinGame, Move, Player, PlayerGotHit,
   PlayerSocket, SendToClient, StateWS, UpdatePlayerState, UserDisconnected,
-  WebsocketActorState,
+  WebsocketActorState, YourEnemyDied,
 }
 import gleam/dict
 import gleam/erlang/process.{type Subject}
@@ -186,6 +186,33 @@ fn handle_ws_message(state, conn, message) {
       new_state |> actor.continue
     }
 
+    mist.Custom(PlayerGotHit(health_to_remove)) -> {
+      let new_health = state.player.health - health_to_remove
+      case new_health {
+        x if x < 1 -> {
+          let assert Some(game_subject) = state.game_subject
+          process.send(game_subject, IDied(state.player.number))
+          // The forced reload will disconnect the socket
+          let assert Ok(_) = mist.send_text_frame(conn, disconnect())
+          state |> actor.continue
+        }
+        _ ->
+          WebsocketActorState(
+            ..state,
+            player: Player(..state.player, health: new_health),
+          )
+          |> actor.continue
+      }
+    }
+
+    mist.Custom(YourEnemyDied) -> {
+      WebsocketActorState(
+        ..state,
+        player: Player(..state.player, action: Move(0)),
+      )
+      |> actor.continue
+    }
+
     mist.Custom(UpdatePlayerState(player_state)) -> {
       actor.continue(WebsocketActorState(..state, player: player_state))
     }
@@ -198,12 +225,6 @@ fn handle_ws_message(state, conn, message) {
     mist.Custom(SendToClient(text)) -> {
       let assert Ok(_) = mist.send_text_frame(conn, text)
       actor.continue(state)
-    }
-
-    mist.Custom(Disconnect) -> {
-      // The forced reload will disconnect the socket
-      let assert Ok(_) = mist.send_text_frame(conn, disconnect())
-      state |> actor.continue
     }
 
     mist.Binary(binary) -> {

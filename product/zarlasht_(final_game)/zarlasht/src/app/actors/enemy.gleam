@@ -5,6 +5,7 @@ import app/actors/actor_types.{
 }
 import gleam/erlang/process.{type Subject}
 import gleam/int
+import gleam/io
 import gleam/option.{None, Some}
 import gleam/otp/actor.{type Next}
 
@@ -39,6 +40,8 @@ fn handle_message(
   message: EnemyActorMessage,
   state: EnemyActorState,
 ) -> Next(EnemyActorMessage, EnemyActorState) {
+  io.debug("An Enemy Actor got the message")
+  io.debug(message)
   case message {
     MakeActions -> {
       //randomize sleep - emulate player reading info or some other task
@@ -65,18 +68,12 @@ fn handle_message(
             state.action.1,
             roll,
           ))
-        _ ->
-          //all filled - hit!
-          EnemyActorState(..state, action: #(0, 0, 0))
-      }
-      //check if need to hit
-      case new_state.action {
-        #(0, 0, 0) -> {
+        values -> {
           //randomize sleep - emulate player reading info or some other task
           process.sleep(int.random(3000))
-          process.send(state.battle, EnemyHit(new_state.action, state.strength))
+          process.send(state.battle, EnemyHit(values, state.strength))
+          EnemyActorState(..state, action: #(0, 0, 0))
         }
-        _ -> Nil
       }
       //loop
       let assert Some(myself) = state.myself
@@ -85,9 +82,10 @@ fn handle_message(
     }
     EnemyGotHit(remove_health) -> {
       let new_health = state.health - remove_health
+      io.debug("Enemy health is now at" <> int.to_string(new_health))
       //check if dead
       case new_health {
-        0 -> {
+        x if x < 1 -> {
           process.send(state.battle, EnemyDied)
           actor.Stop(process.Normal)
         }

@@ -37,11 +37,6 @@ pub type CustomWebsocketMessage {
   /// Sends the player a message to indicate this
   ///
   Wait
-  /// The other player has disconnected
-  ///
-  /// Send this player an alert and then disconnect them too
-  ///
-  Disconnect
   /// Response to GetParticipants
   ///
   Participants(participants: List(#(Player, Subject(CustomWebsocketMessage))))
@@ -57,6 +52,12 @@ pub type CustomWebsocketMessage {
   /// response to GetStateWS
   ///
   StateWS(state: WebsocketActorState)
+  /// The player was hit by the enemy they are in battle with
+  ///
+  PlayerGotHit(remove_health: Int)
+  /// The battle has ended, their enemy has died and the player can continue moving on the trail
+  ///
+  YourEnemyDied
 }
 
 /// A wrapper for a player's WebSocket Actor state and their connection
@@ -172,7 +173,9 @@ pub type GameActorState {
     player_chats: Dict(#(Int, Int), List(Message)),
     ally_chats: Dict(List(Int), List(Message)),
     pages_in_view: Dict(Int, Page),
-    battles: List(#(Int, Subject(BattleActorMessage))),
+    ///id, battle_actor, player_number, optional second player number
+    ///
+    battles: List(#(Int, Subject(BattleActorMessage), Int, Option(Int))),
   )
 }
 
@@ -236,7 +239,13 @@ pub type GameActorMessage {
   PlayerMoved(player: Player, game: Subject(GameActorMessage))
   /// Battle has ended
   ///
-  BattleEnded(id: Int, player_died: Bool)
+  BattleEnded(id: Int)
+  /// A player hit their enemy in battle
+  ///
+  HitEnemy(player: Int, action: #(Int, Int, Int), strength: Int)
+  /// A player has died in battle
+  ///
+  IDied(player: Int)
 }
 
 //----------------------------------------------------------------------
@@ -247,6 +256,7 @@ pub type BattleActorState {
     game: Option(Subject(GameActorMessage)),
     battle_type: BattleType,
     myself: Subject(BattleActorMessage),
+    player_subject: Subject(CustomWebsocketMessage),
     enemy: Option(Subject(EnemyActorMessage)),
   )
 }
@@ -260,6 +270,7 @@ pub type BattleActorMessage {
   ///
   PlayerHit(action: #(Int, Int, Int), strength: Int)
   EnemyDied
+  PlayerDied
 }
 
 //----------------------------------------------------------------------
