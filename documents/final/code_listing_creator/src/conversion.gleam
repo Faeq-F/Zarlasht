@@ -1,17 +1,13 @@
-//// The page & conversion logic
+//// The page & the conversion logic
 
-import birl
 import contour
-import file_streams/file_stream
 import gleam/list.{fold, map}
 import gleam/string.{split}
 import gleam/string_tree
-import lustre/attribute.{attribute, href, id, name, rel, src}
+import lustre/attribute.{attribute, href, id, name, rel, src, style}
 import lustre/element/html.{
-  body, button, div, form, head, html, link, script, text, textarea,
+  body, button, div, form, head, html, li, link, p, script, text, textarea, ul,
 }
-
-// ensure backgraound graphics is enabled & fit to printable area
 
 /// The home page
 ///
@@ -19,6 +15,7 @@ pub fn home() {
   html([], [
     head([], [
       link([rel("stylesheet"), href("/static/style.css")]),
+      // HTMX for dynamic changes
       script(
         [
           attribute("crossorigin", "anonymous"),
@@ -31,26 +28,21 @@ pub fn home() {
         "",
       ),
     ]),
-    // script(
-    //   [
-    //     src(
-    //       "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.1/jspdf.umd.min.js",
-    //     ),
-    //   ],
-    //   "",
-    // ),
-    // script(
-    //   [
-    //     src(
-    //       "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
-    //     ),
-    //   ],
-    //   "",
-    // ),
     body([], [
       div([id("bodyDiv")], [
+        //tips
+        p([], [text("Use gecko-based browser for text selectability")]),
+        text("Printing options;"),
+        ul([], [
+          li([], [text("Background Graphics")]),
+          li([], [text("Fit to page width")]),
+        ]),
+        //input
         form([], [
-          textarea([name("source")], ""),
+          textarea(
+            [name("source"), style([#("width", " 90vw"), #("height", "80vh")])],
+            "",
+          ),
           button(
             [
               attribute("hx-target", "#bodyDiv"),
@@ -60,13 +52,18 @@ pub fn home() {
           ),
         ]),
       ]),
-      trigger_pdf(),
+      //trigger print to pdf after code is swapped into the DOM
+      script(
+        [],
+        "document.body.addEventListener('htmx:afterSwap', function(evt) {window.print()});",
+      ),
     ]),
   ])
 }
 
+/// Convert to HTML with CSS classes for colours
+///
 pub fn convert(source: String) {
-  // Convert to HTML with CSS classes for colours
   let html =
     "<body><pre>"
     <> contour.to_html(source)
@@ -76,16 +73,11 @@ pub fn convert(source: String) {
     <> "</pre>"
     <> js()
     <> "</body>"
-  //use chrobot to convert to pdf & save that to disk
-  //save to disk
-  // let assert Ok(stream) =
-  //   file_stream.open_write(birl.now() |> birl.to_iso8601() <> ".pdf")
-  // let assert Ok(Nil) = file_stream.write_bytes(stream, <<"Hello!\n":utf8>>)
-  // let assert Ok(Nil) = file_stream.close(stream)
-  //return val
   string_tree.from_string(html)
 }
 
+/// Further highlighting using the prefixedColon class
+///
 fn js() {
   "
   <script>
@@ -105,30 +97,4 @@ fn js() {
   }
   </script>
   "
-}
-
-fn trigger_pdf() {
-  script(
-    [],
-    "
-  // const font = new FontFace(\"CaskaydiaCove-Regular\", \"url(https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/otf/CaskaydiaCove-Regular.otf)\");
-  // font.load()
-
-  // const { jsPDF } = window.jspdf;
-  // const { html2canvas } = window.html2canvas;
-
-  document.body.addEventListener('htmx:afterSwap', function(evt) {
-    // var doc = new jsPDF();
-    // doc.html(evt.detail.elt, {
-    //   callback: (pdf) => {pdf.save('code.pdf')},
-    //   x: 0,
-    //   y: 0,
-    //   width: 200,
-    //   windowWidth: 800,
-    //   fontFaces: [font]
-    // });
-    window.print()
-  });
-  ",
-  )
 }
