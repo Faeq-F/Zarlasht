@@ -3,13 +3,15 @@
 import birl
 import contour
 import file_streams/file_stream
+import gleam/list.{fold, map}
+import gleam/string.{split}
 import gleam/string_tree
 import lustre/attribute.{attribute, href, id, name, rel, src}
 import lustre/element/html.{
   body, button, div, form, head, html, link, script, text, textarea,
 }
 
-// ensure backgraound graphics is enabled
+// ensure backgraound graphics is enabled & fit to printable area
 
 /// The home page
 ///
@@ -29,6 +31,22 @@ pub fn home() {
         "",
       ),
     ]),
+    // script(
+    //   [
+    //     src(
+    //       "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.1/jspdf.umd.min.js",
+    //     ),
+    //   ],
+    //   "",
+    // ),
+    // script(
+    //   [
+    //     src(
+    //       "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+    //     ),
+    //   ],
+    //   "",
+    // ),
     body([], [
       div([id("bodyDiv")], [
         form([], [
@@ -42,6 +60,7 @@ pub fn home() {
           ),
         ]),
       ]),
+      trigger_pdf(),
     ]),
   ])
 }
@@ -49,9 +68,12 @@ pub fn home() {
 pub fn convert(source: String) {
   // Convert to HTML with CSS classes for colours
   let html =
-    "<body><pre><code>"
+    "<body><pre>"
     <> contour.to_html(source)
-    <> "</code></pre>"
+    |> split("\n")
+    |> map(fn(line) { "<code>" <> line <> "</code>" })
+    |> fold("", fn(old_lines, next_line) { old_lines <> "\n" <> next_line })
+    <> "</pre>"
     <> js()
     <> "</body>"
   //use chrobot to convert to pdf & save that to disk
@@ -68,11 +90,8 @@ fn js() {
   "
   <script>
   const regex = /(?:[^^.+\\b](\\w+): )/gm;
-
   const str = document.getElementsByTagName(\"code\")[0].innerHTML
-
   let m;
-
   while ((m = regex.exec(str)) !== null) {
       if (m.index === regex.lastIndex) {
           regex.lastIndex++;
@@ -84,18 +103,32 @@ fn js() {
               document.body.innerHTML = document.body.innerHTML.replaceAll(`${match}:`, `<span class=\"prefixedColon\">${match}:</span>`)
       });
   }
-
-  let code = document.getElementsByTagName(\"code\")[0].innerHTML
-  code = code.replaceAll(\"(\",\"<span class=\\\"outer\\\">(</span>\")
-  code = code.replaceAll(\")\",\"<span class=\\\"outer\\\">)</span>\")
-  code = code.replaceAll(\"[\",\"<span class=\\\"outer\\\">[</span>\")
-  code = code.replaceAll(\"]\",\"<span class=\\\"outer\\\">]</span>\")
-  code = code.replaceAll(\"{\",\"<span class=\\\"outer\\\">{</span>\")
-  code = code.replaceAll(\"}\",\"<span class=\\\"outer\\\">}</span>\")
-  code = code.replaceAll(\",\",\"<span class=\\\"outer\\\">,</span>\")
-  document.getElementsByTagName(\"code\")[0].innerHTML = code
-
-  window.print()
   </script>
   "
+}
+
+fn trigger_pdf() {
+  script(
+    [],
+    "
+  // const font = new FontFace(\"CaskaydiaCove-Regular\", \"url(https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/otf/CaskaydiaCove-Regular.otf)\");
+  // font.load()
+
+  // const { jsPDF } = window.jspdf;
+  // const { html2canvas } = window.html2canvas;
+
+  document.body.addEventListener('htmx:afterSwap', function(evt) {
+    // var doc = new jsPDF();
+    // doc.html(evt.detail.elt, {
+    //   callback: (pdf) => {pdf.save('code.pdf')},
+    //   x: 0,
+    //   y: 0,
+    //   width: 200,
+    //   windowWidth: 800,
+    //   fontFaces: [font]
+    // });
+    window.print()
+  });
+  ",
+  )
 }
