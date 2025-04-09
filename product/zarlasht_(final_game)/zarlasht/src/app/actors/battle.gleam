@@ -3,18 +3,21 @@
 import app/actors/actor_types.{
   type BattleActorMessage, type BattleActorState, type BattleType,
   type CustomWebsocketMessage, AddUpdate, Ambush, BattleActorState, BattleEnded,
-  Cemetary, Demon, EnemyDied, EnemyGotHit, EnemyHit, EnemyTribe, MakeActions,
-  PlayerDied, PlayerGotHit, PlayerHit, Ravine, SetupBattle, SetupEnemy,
-  ShutdownEnemy, YourEnemyDied,
+  Cemetary, Demon, End, EnemyActionStarted, EnemyDied, EnemyGotHit, EnemyHit,
+  EnemyTribe, MakeActions, PlayerActionStarted, PlayerDied, PlayerGotHit,
+  PlayerHit, Ravine, ResetEnemyHit, ResetHit, SetupBattle, SetupEnemy,
+  ShutdownEnemy, Start, YourEnemyDied,
 }
 
 import app/actors/enemy
+import birl
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang/process.{type Subject}
 import gleam/float
 import gleam/function
 import gleam/int
 import gleam/io
+import gleam/list
 import gleam/option.{None, Some}
 import gleam/otp/actor.{type Next}
 import gleam/string
@@ -43,6 +46,8 @@ pub fn start(
           battle_subject,
           player_subject,
           None,
+          [],
+          [],
         ),
         selector,
       )
@@ -92,13 +97,46 @@ fn handle_message(
     EnemyHit(action, strength) -> {
       let remove_health = calculate_remove_health(action, strength)
       process.send(state.player_subject, PlayerGotHit(remove_health))
-      //todo
-      //racing action - decide who got hit first
-      state |> actor.continue
+
+      let enemy_action = End(birl.now())
+      //could be start or end of hit
+      let player_action = state.player_timestamps |> list.first()
+      case player_action {
+        Ok(Start(_time)) -> {
+          //interrupt - player's action back to 0
+          process.send(state.player_subject, ResetHit)
+          process.send(
+            state.player_subject,
+            AddUpdate(
+              "Your enemy hit you while you were making your move!\nYou must now restart your move",
+            ),
+          )
+        }
+        // if action is an end (or there isn't one), then nothing - can hit
+        _ -> Nil
+      }
+
+      BattleActorState(
+        ..state,
+        enemy_timestamps: state.enemy_timestamps |> list.append([enemy_action]),
+      )
+      |> actor.continue
     }
     PlayerHit(action, strength) -> {
       let assert Some(enemy_subject) = state.enemy
       let remove_health = calculate_remove_health(action, strength)
+      process.send(enemy_subject, EnemyGotHit(remove_health))
+
+      let player_action = End(birl.now())
+      //could be start or end of hit
+      let enemy_action = state.enemy_timestamps |> list.first()
+      case enemy_action {
+        Ok(Start(_time)) -> {
+          //interrupt - enemy's action back to 0
+          process.send(enemy_subject, ResetEnemyHit)
+        }
+        _ -> Nil
+      }
       process.send(
         state.player_subject,
         AddUpdate(
@@ -107,8 +145,12 @@ fn handle_message(
           <> " hearts",
         ),
       )
-      process.send(enemy_subject, EnemyGotHit(remove_health))
-      state |> actor.continue
+      BattleActorState(
+        ..state,
+        player_timestamps: state.player_timestamps
+          |> list.append([player_action]),
+      )
+      |> actor.continue
     }
     EnemyDied -> {
       let assert Some(game) = state.game
@@ -123,6 +165,20 @@ fn handle_message(
       process.send(game, BattleEnded(state.id))
       actor.Stop(process.Normal)
     }
+    PlayerActionStarted ->
+      BattleActorState(
+        ..state,
+        player_timestamps: state.player_timestamps
+          |> list.append([Start(birl.now())]),
+      )
+      |> actor.continue
+    EnemyActionStarted ->
+      BattleActorState(
+        ..state,
+        enemy_timestamps: state.enemy_timestamps
+          |> list.append([Start(birl.now())]),
+      )
+      |> actor.continue
   }
 }
 

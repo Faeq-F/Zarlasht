@@ -2,8 +2,9 @@
 
 import app/actors/actor_types.{
   type GameActorMessage, type GameActorState, AddPlayer, AddedName, BattleEnded,
-  GameActorState, GameState, GetState, HitEnemy, IDied, PlayerDied, PlayerHit,
-  PlayerMoved, PrepareGame, SwapColors, UpdateState, UserDisconnected,
+  GameActorState, GameState, GetState, HitEnemy, IDied, PlayerActionStarted,
+  PlayerDied, PlayerHit, PlayerMoved, PlayerStartedHit, PrepareGame, SwapColors,
+  UpdateState, UserDisconnected,
 }
 
 import gleam/dict
@@ -95,6 +96,14 @@ fn handle_message(
         state.participants
         |> list.filter(fn(p) { { p.0 }.number != player_num })
       GameActorState(..state, participants: new_participants) |> actor.continue
+    }
+
+    PlayerStartedHit(player_num) -> {
+      let assert Ok(battle) =
+        state.battles
+        |> list.find(fn(battle) { battle.2 == player_num })
+      process.send(battle.1, PlayerActionStarted)
+      state |> actor.continue
     }
 
     PrepareGame ->

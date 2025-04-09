@@ -61,6 +61,9 @@ pub type CustomWebsocketMessage {
   /// Adds information to their list of updates on the main page of the game
   ///
   AddUpdate(message: String)
+  /// The player is in battle and the enemy hit them while they were trying to hit
+  ///
+  ResetHit
 }
 
 /// A wrapper for a player's WebSocket Actor state and their connection
@@ -272,9 +275,14 @@ pub type GameActorMessage {
   /// A player has died in battle
   ///
   IDied(player: Int)
+  /// Intemediary for PlayerActionStarted
+  ///
+  PlayerStartedHit(player: Int)
 }
 
 //----------------------------------------------------------------------
+
+import birl
 
 /// The state for the battle actor
 ///
@@ -288,7 +296,16 @@ pub type BattleActorState {
     myself: Subject(BattleActorMessage),
     player_subject: Subject(CustomWebsocketMessage),
     enemy: Option(Subject(EnemyActorMessage)),
+    player_timestamps: List(HitTimestamps),
+    enemy_timestamps: List(HitTimestamps),
   )
+}
+
+/// The timestamps for hit actions in a battle
+///
+pub type HitTimestamps {
+  Start(timestamp: birl.Time)
+  End(timestamp: birl.Time)
 }
 
 /// Messages for the battle actor
@@ -305,6 +322,8 @@ pub type BattleActorMessage {
   PlayerHit(action: #(Int, Int, Int), strength: Int)
   EnemyDied
   PlayerDied
+  PlayerActionStarted
+  EnemyActionStarted
 }
 
 //----------------------------------------------------------------------
@@ -337,6 +356,7 @@ pub type EnemyActorMessage {
   MakeActions
   ShutdownEnemy
   EnemyGotHit(remove_health: Int)
+  ResetEnemyHit
 }
 
 /// The different types of enemys

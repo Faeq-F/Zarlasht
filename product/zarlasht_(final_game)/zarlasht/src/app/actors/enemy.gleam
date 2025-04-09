@@ -1,8 +1,9 @@
 //// The enemy actor - the 'player' that the user may be fighting against in a battle
+
 import app/actors/actor_types.{
   type BattleActorMessage, type EnemyActorMessage, type EnemyActorState,
-  EnemyActorState, EnemyDied, EnemyGotHit, EnemyHit, ExpertSwordsman,
-  MakeActions, SetupEnemy, ShutdownEnemy,
+  EnemyActionStarted, EnemyActorState, EnemyDied, EnemyGotHit, EnemyHit,
+  ExpertSwordsman, MakeActions, ResetEnemyHit, SetupEnemy, ShutdownEnemy,
 }
 
 import gleam/erlang/process.{type Subject}
@@ -55,7 +56,10 @@ fn handle_message(
         number -> number
       }
       let new_state = case state.action {
-        #(0, _, _) -> EnemyActorState(..state, action: #(roll, 0, 0))
+        #(0, _, _) -> {
+          process.send(state.battle, EnemyActionStarted)
+          EnemyActorState(..state, action: #(roll, 0, 0))
+        }
         #(_, 0, _) ->
           EnemyActorState(..state, action: #(state.action.0, roll, 0))
         #(x, y, _) if x < 4 && y < 4 ->
@@ -93,6 +97,10 @@ fn handle_message(
         }
         _ -> EnemyActorState(..state, health: new_health) |> actor.continue()
       }
+    }
+    ResetEnemyHit -> {
+      EnemyActorState(..state, action: #(0, 0, 0))
+      |> actor.continue
     }
     SetupEnemy(myself) -> {
       EnemyActorState(..state, myself: Some(myself)) |> actor.continue

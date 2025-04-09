@@ -1,8 +1,7 @@
 /// The handler for rolling dice when in battle
-
 import app/actors/actor_types.{
   type BattleType, type WebsocketActorState, Battle, HitEnemy, Player,
-  WebsocketActorState,
+  PlayerStartedHit, WebsocketActorState,
 }
 
 import gleam/erlang/process
@@ -26,6 +25,7 @@ pub fn roll_battle(
   state: WebsocketActorState,
   conn: mist.WebsocketConnection,
 ) {
+  let assert Some(game) = state.game_subject
   // TODO - battle features
   // TODO - let game/battle know
   case a_type == 0 || damage == 0 || defence == 0 {
@@ -45,7 +45,10 @@ pub fn roll_battle(
         mist.send_text_frame(conn, rolled_die(roll) |> element.to_string)
 
       let action = case a_type, damage, defence {
-        0, _, _ -> Battle(btype, roll, damage, defence)
+        0, _, _ -> {
+          process.send(game, PlayerStartedHit(state.player.number))
+          Battle(btype, roll, damage, defence)
+        }
         _, 0, _ -> Battle(btype, a_type, roll, defence)
         x, y, _ if x < 4 && y < 4 -> Battle(btype, a_type, roll + y, defence)
         _, _, _ -> Battle(btype, a_type, damage, roll)
@@ -62,7 +65,6 @@ pub fn roll_battle(
     }
     _ -> {
       //Hit
-      let assert Some(game) = state.game_subject
       let assert Battle(b_type, a_type, a_damage, ds) = state.player.action
       process.send(
         game,

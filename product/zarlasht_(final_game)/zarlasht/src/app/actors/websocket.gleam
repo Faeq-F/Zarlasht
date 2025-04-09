@@ -5,8 +5,8 @@
 import app/actors/actor_types.{
   type DirectorActorMessage, type PlayerSocket, type WebsocketActorState,
   AddUpdate, Battle, DequeueParticipant, GetStateWS, IDied, JoinGame, Move,
-  Player, PlayerGotHit, PlayerSocket, SendToClient, StateWS, UpdatePlayerState,
-  UserDisconnected, WebsocketActorState, YourEnemyDied,
+  Player, PlayerGotHit, PlayerSocket, ResetHit, SendToClient, StateWS,
+  UpdatePlayerState, UserDisconnected, WebsocketActorState, YourEnemyDied,
 }
 import birl
 import gleam/dict
@@ -246,6 +246,15 @@ fn handle_ws_message(state, conn, message) {
           ..state.player,
           updates: state.player.updates |> list.append([update]),
         ),
+      )
+      |> actor.continue()
+    }
+
+    mist.Custom(ResetHit) -> {
+      let assert Battle(battle_type, _, _, _) = state.player.action
+      WebsocketActorState(
+        ..state,
+        player: Player(..state.player, action: Battle(battle_type, 0, 0, 0)),
       )
       |> actor.continue()
     }
