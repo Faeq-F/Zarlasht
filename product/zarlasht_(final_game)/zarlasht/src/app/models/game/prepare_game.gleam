@@ -1,24 +1,11 @@
-import app/actors/actor_types.{
-  type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddPlayer, AddedName, Battle, GameActorState, GameState, GetState,
-  Home, JoinGame, Move, Player, PlayerMoved, PrepareGame, SendToClient,
-  SetupBattle, SwapColors, UpdatePlayerState, UpdateState, UserDisconnected,
-  Wait,
-}
+//// The handler for preparing a game to start
+
+import app/actors/actor_types.{type GameActorState, GameActorState, Home}
 import gleam/dict
-import gleam/erlang/process.{type Subject}
-import gleam/int
-import gleam/io
 import gleam/list
-import gleam/option.{None}
-import gleam/otp/actor.{type Next}
-import gleam/otp/static_supervisor as sup
-import logging.{Info}
-import lustre/element
 
-import app/actors/battle
-import app/pages/created_game.{created_game_page, get_color, player_container}
-
+/// The handler for the PrepareGame message
+///
 pub fn prepare_game(state: GameActorState) {
   //setup chats
   let setup_player_chats =

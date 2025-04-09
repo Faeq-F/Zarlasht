@@ -1,21 +1,17 @@
+//// The handler for starting a game
+
 import app/actors/actor_types.{
-  type GameActorState, type PlayerSocket, type WebsocketActorState, AddedName,
-  Chat, Dice, GameActorState, GameStarted, GameState, GetParticipants, GetState,
-  GetStateWS, Home, Map, Message, Participants, Player, SendToClient, StateWS,
-  UpdateState, WebsocketActorState,
+  type PlayerSocket, GameStarted, GetParticipants, Participants,
 }
-import app/pages/chat.{chat, chat_messages, chat_section, send_message_section}
+
 import app/pages/created_game.{info_error_player_count, info_error_setting_name}
-import birl
-import gleam/dict
 import gleam/erlang/process
 import gleam/list
-import gleam/option.{Some}
-import gleam/otp/actor
-import juno
 import lustre/element
 import mist
 
+/// The handler for the starting a game
+///
 pub fn start_game(player: PlayerSocket) {
   let assert Participants(participants) =
     process.call_forever(player.state.director_subject, GetParticipants(

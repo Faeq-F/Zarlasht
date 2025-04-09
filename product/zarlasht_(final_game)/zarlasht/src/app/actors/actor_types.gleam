@@ -58,6 +58,9 @@ pub type CustomWebsocketMessage {
   /// The battle has ended, their enemy has died and the player can continue moving on the trail
   ///
   YourEnemyDied
+  /// Adds information to their list of updates on the main page of the game
+  ///
+  AddUpdate(message: String)
 }
 
 /// A wrapper for a player's WebSocket Actor state and their connection
@@ -74,14 +77,33 @@ pub type PlayerSocket {
 ///
 pub type Player {
   Player(
+    /// The player's number
+    ///
     number: Int,
+    /// The player's name
+    ///
     name: String,
+    /// The player's identifying color
+    ///
     color: String,
+    /// The player's health
+    ///
     health: Int,
+    /// The player's strength
+    ///
     strength: Int,
+    /// The player's current position
+    ///
     position: #(Int, Int),
+    /// A list of all of the places the player has been
+    ///
     old_positions: List(#(Int, Int)),
+    /// Whether the player should be moving or battling
+    ///
     action: Action,
+    /// Information to show the player on the main page
+    ///
+    updates: List(String),
   )
 }
 
@@ -101,6 +123,8 @@ pub type Action {
   Move(amount_to_move: Int)
 }
 
+/// The areas in which the player is battling, along with their enemy type
+///
 pub type BattleType {
   EnemyTribe(warrior_type: String)
   Cemetary
@@ -173,12 +197,14 @@ pub type GameActorState {
     player_chats: Dict(#(Int, Int), List(Message)),
     ally_chats: Dict(List(Int), List(Message)),
     pages_in_view: Dict(Int, Page),
-    ///id, battle_actor, player_number, optional second player number
+    /// id, battle_actor, player_number, optional second player number
     ///
     battles: List(#(Int, Subject(BattleActorMessage), Int, Option(Int))),
   )
 }
 
+/// A screen in the game
+///
 pub type Page {
   Home
   Chat(chatting_to: Int)
@@ -250,6 +276,10 @@ pub type GameActorMessage {
 
 //----------------------------------------------------------------------
 
+/// The state for the battle actor
+///
+/// Contains the battle type, and battling parties
+///
 pub type BattleActorState {
   BattleActorState(
     id: Int,
@@ -261,7 +291,11 @@ pub type BattleActorState {
   )
 }
 
+/// Messages for the battle actor
+///
 pub type BattleActorMessage {
+  /// Must be sent to start battles
+  ///
   SetupBattle(id: Int, game: Subject(GameActorMessage))
   /// Action tuple represents attack_type, attack_damage, defence_strategy
   ///
@@ -275,7 +309,9 @@ pub type BattleActorMessage {
 
 //----------------------------------------------------------------------
 
-/// Action tuple represents attack_type, attack_damage, defence_strategy
+/// The state for the Enemy actor
+///
+/// Contains the enemy type, health and strength of the enemy
 ///
 pub type EnemyActorState {
   EnemyActorState(
@@ -284,17 +320,27 @@ pub type EnemyActorState {
     me: EnemyType,
     health: Int,
     strength: Int,
+    /// Action tuple represents attack_type, attack_damage, defence_strategy
+    ///
     action: #(Int, Int, Int),
   )
 }
 
+/// Messages for the enemy actor
+///
 pub type EnemyActorMessage {
+  /// Must be called to start the enemy attacks
+  ///
   SetupEnemy(myself: Subject(EnemyActorMessage))
+  /// Loop, making actions like rolling a dice and attacking
+  ///
   MakeActions
   ShutdownEnemy
   EnemyGotHit(remove_health: Int)
 }
 
+/// The different types of enemys
+///
 pub type EnemyType {
   ExpertSwordsman
   DemonicSpirit

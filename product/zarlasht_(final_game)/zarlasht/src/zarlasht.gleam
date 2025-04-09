@@ -4,7 +4,7 @@ import app/actors/director
 import app/router
 import app/web.{Context}
 import carpenter/table
-import gleam/erlang/process.{type Subject}
+import gleam/erlang/process
 import gleam/otp/supervisor
 import glenvy/dotenv
 import logging

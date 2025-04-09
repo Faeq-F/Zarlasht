@@ -1,11 +1,14 @@
+//// The chats page
+
 import app/actors/actor_types.{
-  type GameActorState, type Player, type WebsocketActorState, GameState,
-  GetState,
+  type GameActorState, type WebsocketActorState, GameState, GetState,
 }
+
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{
   circle_x, dices, map, send_horizontal, users_round,
 }
+
 import app/pages/layout.{stats as info_stats}
 import gleam/dict
 import gleam/erlang/process
@@ -13,12 +16,14 @@ import gleam/int
 import gleam/list
 import gleam/option.{Some}
 import gleam/string.{join}
-import lustre/attribute.{attribute, class, id, name, role, style, type_}
-import lustre/element.{type Element}
+import lustre/attribute.{attribute, class, id, name, style}
+import lustre/element
 import lustre/element/html.{br, button, div, h1, label, p, span, text, textarea}
 
 //TODO notification icon
 
+/// The chats page in the game
+///
 pub fn chat(player: WebsocketActorState) {
   let assert Some(game_subject) = player.game_subject
   let assert GameState(game_state) =
@@ -43,6 +48,8 @@ pub fn chat(player: WebsocketActorState) {
   |> element.to_string
 }
 
+/// Produces a list of buttons the user can click on to switch to a different chat
+///
 fn participants_to_chat_to(
   player: WebsocketActorState,
   game_state: GameActorState,
@@ -74,6 +81,8 @@ fn participants_to_chat_to(
   })
 }
 
+/// The information to place in the bottom bar
+///
 fn info(player: WebsocketActorState, game_state: GameActorState) {
   div([class("flex")], [
     div(
@@ -145,6 +154,8 @@ fn info(player: WebsocketActorState, game_state: GameActorState) {
   ])
 }
 
+/// The buttons to place in the bottom bar
+///
 fn buttons() {
   [
     button(
@@ -198,12 +209,16 @@ fn buttons() {
   ]
 }
 
+/// The current chat header
+///
 fn header(chat: String) {
   div([id("Header")], [
     h1([class("font-subheader !text-4xl text-center !mt-8")], [text(chat)]),
   ])
 }
 
+/// The section of the page that holds the chat
+///
 pub fn chat_section(
   to_chat_to: Int,
   player: WebsocketActorState,
@@ -236,6 +251,8 @@ pub fn chat_section(
   )
 }
 
+/// The messages in a chat
+///
 pub fn chat_messages(
   to_chat_to: Int,
   player: WebsocketActorState,
@@ -254,6 +271,8 @@ pub fn chat_messages(
   )
 }
 
+/// Fixes the formatting of a message in a string
+///
 fn format_message(message: String) {
   list.intersperse(
     list.map(string.split(string.trim_end(message), "\n"), fn(x) { text(x) }),
@@ -261,6 +280,8 @@ fn format_message(message: String) {
   )
 }
 
+/// COnstructs a message for the left hand side of the screen
+///
 fn message_left(
   message: String,
   author: String,
@@ -284,6 +305,8 @@ fn message_left(
   )
 }
 
+/// Constructs a message for the right hand side of the screen
+///
 fn message_right(
   message: String,
   author: String,
@@ -307,6 +330,8 @@ fn message_right(
   )
 }
 
+/// The section of the page that holds the message input
+///
 pub fn send_message_section(to_chat_to: Int) {
   div(
     [
@@ -356,6 +381,8 @@ pub fn send_message_section(to_chat_to: Int) {
   )
 }
 
+/// helper to determine which messages to show in the chat
+///
 fn messages(
   to_chat_to: Int,
   player: WebsocketActorState,

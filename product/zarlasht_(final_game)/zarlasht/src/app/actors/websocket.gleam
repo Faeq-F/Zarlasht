@@ -1,16 +1,21 @@
-//// All Websocket related functions for the app
+//// The player in the game
+////
+//// Also containas all Websocket related functions for the app
 
 import app/actors/actor_types.{
-  type DirectorActorMessage, type PlayerSocket, type WebsocketActorState, Battle,
-  DequeueParticipant, GetStateWS, IDied, JoinGame, Move, Player, PlayerGotHit,
-  PlayerSocket, SendToClient, StateWS, UpdatePlayerState, UserDisconnected,
-  WebsocketActorState, YourEnemyDied,
+  type DirectorActorMessage, type PlayerSocket, type WebsocketActorState,
+  AddUpdate, Battle, DequeueParticipant, GetStateWS, IDied, JoinGame, Move,
+  Player, PlayerGotHit, PlayerSocket, SendToClient, StateWS, UpdatePlayerState,
+  UserDisconnected, WebsocketActorState, YourEnemyDied,
 }
+import birl
 import gleam/dict
 import gleam/erlang/process.{type Subject}
 import gleam/function
 import gleam/http/request.{type Request, Request}
+import gleam/int
 import gleam/io
+import gleam/list
 import gleam/option.{None, Some}
 import gleam/otp/actor
 import gleam/string
@@ -56,7 +61,7 @@ pub fn new(req: Request(Connection), director: Subject(DirectorActorMessage)) {
       #(
         WebsocketActorState(
           game_code: 0,
-          player: Player(0, "", "", 10, 1, #(1, 21), [], Move(0)),
+          player: Player(0, "", "", 10, 1, #(1, 21), [], Move(0), []),
           ws_subject: ws_subject,
           game_subject: None,
           director_subject: director,
@@ -187,6 +192,11 @@ fn handle_ws_message(state, conn, message) {
     }
 
     mist.Custom(PlayerGotHit(health_to_remove)) -> {
+      let message =
+        birl.now() |> birl.to_naive_time_string()
+        <> ": You got hit and lost "
+        <> int.to_string(health_to_remove)
+        <> " hearts"
       let new_health = state.player.health - health_to_remove
       case new_health {
         x if x < 1 -> {
@@ -199,22 +209,45 @@ fn handle_ws_message(state, conn, message) {
         _ ->
           WebsocketActorState(
             ..state,
-            player: Player(..state.player, health: new_health),
+            player: Player(
+              ..state.player,
+              health: new_health,
+              updates: state.player.updates |> list.append([message]),
+            ),
           )
           |> actor.continue
       }
     }
 
     mist.Custom(YourEnemyDied) -> {
+      let message =
+        birl.now() |> birl.to_naive_time_string()
+        <> ": You killed your enemy! You can now progress 'round the mountain"
       WebsocketActorState(
         ..state,
-        player: Player(..state.player, action: Move(0)),
+        player: Player(
+          ..state.player,
+          action: Move(0),
+          updates: state.player.updates |> list.append([message]),
+        ),
       )
       |> actor.continue
     }
 
     mist.Custom(UpdatePlayerState(player_state)) -> {
       actor.continue(WebsocketActorState(..state, player: player_state))
+    }
+
+    mist.Custom(AddUpdate(update)) -> {
+      let update = birl.now() |> birl.to_naive_time_string() <> ": " <> update
+      WebsocketActorState(
+        ..state,
+        player: Player(
+          ..state.player,
+          updates: state.player.updates |> list.append([update]),
+        ),
+      )
+      |> actor.continue()
     }
 
     mist.Custom(GetStateWS(asker)) -> {
@@ -242,7 +275,7 @@ fn handle_ws_message(state, conn, message) {
   }
 }
 
-///The JS script to alert the player that the opponent has disconnected, and to disconnect them
+///The JS script to alert the player that the opponent has killed them in battle, and to disconnect them
 ///
 fn disconnect() {
   html.div([attribute.id("page")], [

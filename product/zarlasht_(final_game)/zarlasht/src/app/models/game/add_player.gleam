@@ -1,3 +1,5 @@
+//// The handler for adding a player to a game
+
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
   type Player, GameActorState, Player, SendToClient, UpdatePlayerState,
@@ -8,6 +10,8 @@ import gleam/erlang/process.{type Subject}
 import gleam/list
 import lustre/element
 
+/// The handler for the AddPlayer message
+///
 pub fn add_player(
   player: #(Player, Subject(CustomWebsocketMessage)),
   game_subject: Subject(GameActorMessage),

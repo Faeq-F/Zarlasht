@@ -1,3 +1,5 @@
+//// The leaderboard modal on the page
+
 import app/pages/components/lucide_lustre.{medal, trophy}
 import gleam/int.{to_string}
 import gleam/list.{sort}
@@ -9,6 +11,8 @@ import lustre/element.{fragment}
 import lustre/element/html.{label, p, text}
 import lustre/element/svg
 
+/// The leaderboard modal component
+///
 pub fn leaderboard() {
   fragment([
     html.div([attribute("x-data", "{modalIsOpen: false}")], [
@@ -128,29 +132,6 @@ pub fn leaderboard() {
   ])
 }
 
-fn leaderboard_information() {
-  [
-    LeaderboardInformation("Faeq", 2332),
-    LeaderboardInformation("Mubz", 32_358),
-    LeaderboardInformation("Mahid", 33_348),
-    LeaderboardInformation("Dennis", 43_328),
-    LeaderboardInformation("Hossam", 233_358),
-    LeaderboardInformation("F2aeq", 2332),
-    LeaderboardInformation("M2ubz", 32_358),
-    LeaderboardInformation("M2ahid", 33_348),
-    LeaderboardInformation("D2ennis", 43_328),
-    LeaderboardInformation("H2ossam", 233_358),
-    LeaderboardInformation("F3aeq", 2332),
-    LeaderboardInformation("M3ubz", 32_358),
-    LeaderboardInformation("M3ahid", 33_348),
-    LeaderboardInformation("D3ennis", 43_328),
-    LeaderboardInformation("H3ossam", 233_358),
-    LeaderboardInformation("Faeq4", 2),
-    LeaderboardInformation("Faeq5", 46),
-    LeaderboardInformation("Faeq6", 455),
-  ]
-}
-
 ///All leaderboard rows
 ///
 fn table_rows(information: List(LeaderboardInformation)) {
@@ -195,6 +176,8 @@ fn create_row(information: LeaderboardInformation, index: Int) {
   ])
 }
 
+/// Helper to display times on the leaderboard
+///
 fn merge_time_graphemes(graphemes: List(String), result: String) {
   case graphemes {
     [first, second, ..rest] ->
@@ -239,4 +222,29 @@ pub type LeaderboardInformation {
   /// time is saved as a 6 digit int, e.g., 00:45:56 will be saved as 004556 -> 4556
   ///
   LeaderboardInformation(player_name: String, time: Int)
+}
+
+/// leaderboard information
+///
+fn leaderboard_information() {
+  [
+    LeaderboardInformation("Faeq", 23_320),
+    LeaderboardInformation("Mubz", 32_358),
+    LeaderboardInformation("Mahid", 33_348),
+    LeaderboardInformation("Dennis", 43_328),
+    LeaderboardInformation("Hossam", 233_358),
+    LeaderboardInformation("John", 23_329),
+    LeaderboardInformation("Mubs", 32_358),
+    LeaderboardInformation("reshad", 33_348),
+    LeaderboardInformation("Ali", 43_328),
+    LeaderboardInformation("Yonis", 233_358),
+    LeaderboardInformation("Anas", 23_321),
+    LeaderboardInformation("Sharoz", 32_358),
+    LeaderboardInformation("Asad", 33_348),
+    LeaderboardInformation("Senator", 43_328),
+    LeaderboardInformation("Morris", 23_358),
+    LeaderboardInformation("Babari", 21_256),
+    LeaderboardInformation("Cy", 46_879),
+    LeaderboardInformation("Para", 45_567),
+  ]
 }

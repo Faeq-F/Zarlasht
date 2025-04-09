@@ -1,10 +1,11 @@
-//// The game actor - process to manage a single game being played between two players
+//// The game actor - process to manage a single game being played
 
 import app/actors/actor_types.{
   type GameActorMessage, type GameActorState, AddPlayer, AddedName, BattleEnded,
-  EnemyHit, GameActorState, GameState, GetState, HitEnemy, IDied, PlayerDied,
-  PlayerHit, PlayerMoved, PrepareGame, SwapColors, UpdateState, UserDisconnected,
+  GameActorState, GameState, GetState, HitEnemy, IDied, PlayerDied, PlayerHit,
+  PlayerMoved, PrepareGame, SwapColors, UpdateState, UserDisconnected,
 }
+
 import gleam/dict
 import gleam/erlang/process.{type Subject}
 import gleam/io
@@ -45,7 +46,7 @@ import app/models/game/prepare_game.{prepare_game}
 import app/models/game/swap_colors.{swap_colors}
 import app/models/game/user_disconnected.{user_disconnected}
 
-///Handle all messages  from other Actors
+///Handle all messages from other actors
 ///
 fn handle_message(
   message_for_actor: GameActorMessage,

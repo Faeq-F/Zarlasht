@@ -1,9 +1,13 @@
+//// The page that lets a player set their name
+
 import app/pages/components/bottom_bar.{bottom_bar}
 import gleam/string.{join}
 import lustre/attribute.{attribute, class, id, style}
-import lustre/element.{type Element}
+import lustre/element
 import lustre/element/html.{button, div, h1, text}
 
+/// The set name page
+///
 pub fn set_name_page() {
   div([id("page"), class("h-full w-full")], [
     div(
@@ -29,6 +33,8 @@ pub fn set_name_page() {
   |> element.to_string()
 }
 
+/// The information to show the player
+///
 fn info() {
   div(
     [
@@ -40,6 +46,8 @@ fn info() {
   )
 }
 
+/// The information to show when they input an empty name
+///
 pub fn incorrect_info() {
   div(
     [
@@ -51,6 +59,8 @@ pub fn incorrect_info() {
   )
 }
 
+/// The buttons to show on the bottom bar
+///
 fn buttons() {
   [
     html.form(

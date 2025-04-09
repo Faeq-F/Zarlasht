@@ -1,9 +1,13 @@
+//// The theme switch buttons on the page
+
 import app/pages/components/lucide_lustre.{laptop, moon, sun_medium, sun_moon}
 import gleam/string.{join}
-import lustre/attribute.{attribute, checked, class, for, id, role, style, type_}
+import lustre/attribute.{attribute, class, id, style}
 import lustre/element.{fragment}
-import lustre/element/html.{button, div, input, label, span, text}
+import lustre/element/html.{button, div, label, text}
 
+/// The theme switch component
+///
 pub fn theme_switch() {
   fragment([
     div([class("popover popover-hover contents")], [
@@ -63,6 +67,37 @@ pub fn theme_switch() {
   ])
 }
 
+/// The toggle switch for the background animation
+///
+fn animation_toggle() {
+  html.div([attribute.class("flex items-center ps-4 !mt-1")], [
+    html.label(
+      [
+        attribute.class("w-full ms-2 font-text text-sm"),
+        attribute.for("bordered-checkbox-2"),
+      ],
+      [html.text("Background"), html.br([]), text("Animation")],
+    ),
+    html.input([
+      attribute.class("switch switch-ghost-primary !w-14"),
+      attribute.type_("checkbox"),
+      attribute.checked(True),
+      attribute(
+        "onclick",
+        "document.getElementById('fogWrap').classList.toggle('hidden')",
+      ),
+      style([
+        #("rotate", "270deg"),
+        #("--switch-bg-checked", "black"),
+        #("--switch-border-checked", "black"),
+        #("--switch-border-hover", "black"),
+      ]),
+    ]),
+  ])
+}
+
+/// The JS script to handle the theme switching
+///
 fn functionality() {
   html.script(
     [],
@@ -93,31 +128,4 @@ fn functionality() {
       setSystemTheme();
     ",
   )
-}
-
-fn animation_toggle() {
-  html.div([attribute.class("flex items-center ps-4 !mt-1")], [
-    html.label(
-      [
-        attribute.class("w-full ms-2 font-text text-sm"),
-        attribute.for("bordered-checkbox-2"),
-      ],
-      [html.text("Background"), html.br([]), text("Animation")],
-    ),
-    html.input([
-      attribute.class("switch switch-ghost-primary !w-14"),
-      attribute.type_("checkbox"),
-      attribute.checked(True),
-      attribute(
-        "onclick",
-        "document.getElementById('fogWrap').classList.toggle('hidden')",
-      ),
-      style([
-        #("rotate", "270deg"),
-        #("--switch-bg-checked", "black"),
-        #("--switch-border-checked", "black"),
-        #("--switch-border-hover", "black"),
-      ]),
-    ]),
-  ])
 }

@@ -76,6 +76,10 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
   ])
 }
 
+/// The player's statistics that are normally shown on the bottom bar
+///
+/// Includes their health and strength
+///
 pub fn stats(stats: Player) {
   let hearts =
     heart([class("fill-[red]/40 !inline")]) |> list.repeat(stats.health)
@@ -109,6 +113,8 @@ pub fn stats(stats: Player) {
   span([], list.flatten([hearts, [dot([class("!inline")])], strength]))
 }
 
+/// The background animation
+///
 fn fog_styles() {
   list.map(list.range(0, 100), fn(i) {
     let left = float.floor(float.random() *. 120.0 -. 20.0)

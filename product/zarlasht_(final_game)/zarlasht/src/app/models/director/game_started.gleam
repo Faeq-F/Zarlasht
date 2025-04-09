@@ -1,19 +1,17 @@
-import app/actors/actor_types.{
-  type CustomWebsocketMessage, type DirectorActorMessage,
-  type DirectorActorState, type Player, AddPlayer, DequeueParticipant,
-  DirectorActorState, EnqueueParticipant, GameStarted, GetParticipants, JoinGame,
-  Participants, PrepareGame, SendToClient, UpdateParticipant,
-}
-import gleam/function
+//// The handler for a GameStarted message to the director actor
 
-import app/actors/game
+import app/actors/actor_types.{
+  type DirectorActorState, DirectorActorState, PrepareGame, SendToClient,
+}
+
 import app/pages/game as game_page
 import carpenter/table
-import gleam/dict.{drop, get, insert}
-import gleam/erlang/process.{type Subject}
+import gleam/dict.{drop, get}
+import gleam/erlang/process
 import gleam/list
-import gleam/otp/actor.{type Next}
 
+/// The handler for the GameStarted message
+///
 pub fn game_started(game_code: Int, state: DirectorActorState) {
   let assert Ok(game) = state.games_waiting |> get(game_code)
   //prepare the game

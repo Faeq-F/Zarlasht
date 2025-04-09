@@ -2,34 +2,25 @@
 
 import app/actors/actor_types.{
   type BattleActorMessage, type BattleActorState, type BattleType,
-  type CustomWebsocketMessage, type DirectorActorMessage,
-  type DirectorActorState, type GameActorMessage, AddPlayer, Ambush,
-  BattleActorState, BattleEnded, Cemetary, Demon, DequeueParticipant,
-  DirectorActorState, EnemyDied, EnemyGotHit, EnemyHit, EnemyTribe,
-  EnqueueParticipant, GameStarted, GetParticipants, JoinGame, MakeActions,
-  Participants, PlayerDied, PlayerGotHit, PlayerHit, PrepareGame, Ravine,
-  SendToClient, SetupBattle, SetupEnemy, ShutdownEnemy, UpdateParticipant,
-  YourEnemyDied,
+  type CustomWebsocketMessage, AddUpdate, Ambush, BattleActorState, BattleEnded,
+  Cemetary, Demon, EnemyDied, EnemyGotHit, EnemyHit, EnemyTribe, MakeActions,
+  PlayerDied, PlayerGotHit, PlayerHit, Ravine, SetupBattle, SetupEnemy,
+  ShutdownEnemy, YourEnemyDied,
 }
-import gleam/string
 
-import app/pages/game as game_page
-import carpenter/table
-import gleam/dict.{drop, get, insert}
+import app/actors/enemy
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang/process.{type Subject}
 import gleam/float
 import gleam/function
 import gleam/int
 import gleam/io
-import gleam/list
-import gleam/option.{type Option, None, Some}
+import gleam/option.{None, Some}
 import gleam/otp/actor.{type Next}
-import logging.{Info}
-
-import app/actors/enemy
+import gleam/string
 
 /// Creates the Actor
+///
 pub fn start(
   battle_type: BattleType,
   game_subject: Subject(Subject(BattleActorMessage)),
@@ -108,6 +99,14 @@ fn handle_message(
     PlayerHit(action, strength) -> {
       let assert Some(enemy_subject) = state.enemy
       let remove_health = calculate_remove_health(action, strength)
+      process.send(
+        state.player_subject,
+        AddUpdate(
+          "You hit the enemy; they lost "
+          <> int.to_string(remove_health)
+          <> " hearts",
+        ),
+      )
       process.send(enemy_subject, EnemyGotHit(remove_health))
       state |> actor.continue
     }
@@ -127,6 +126,8 @@ fn handle_message(
   }
 }
 
+/// Calculates the amount of health to remove from a party in a battle, when they get hit
+///
 fn calculate_remove_health(action: #(Int, Int, Int), strength: Int) {
   let multiplier_1 = multipliers(action.0)
   let multiplier_2 = multipliers(action.1)
@@ -141,6 +142,10 @@ fn calculate_remove_health(action: #(Int, Int, Int), strength: Int) {
   remove_health
 }
 
+/// The multiplier for action values in a Hit
+///
+/// (may be swapped out for different multipliers for different values in future)
+///
 fn multipliers(num: Int) {
   case num {
     6 -> 1.5

@@ -1,18 +1,22 @@
+//// The roll dice page
+
 import app/actors/actor_types.{type Action, type Player, Battle, Move}
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{
   circle_x, dice_1, dice_2, dice_3, dice_4, dice_5, dice_6, footprints,
   info as info_icon, map, messages_square, shield, swords,
 }
+
 import app/pages/layout.{stats as info_stats}
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/string.{join}
 import lustre/attribute.{attribute, class, id, style}
-import lustre/element.{type Element}
+import lustre/element
 import lustre/element/html.{button, div, li, p, text, ul}
 
+/// The roll dice page in the game
+///
 pub fn roll_die(stats: Player) {
   div([id("page"), class("h-full w-full")], [
     div(
@@ -34,6 +38,8 @@ pub fn roll_die(stats: Player) {
   |> element.to_string
 }
 
+/// Shows the player stats on the bottom bar
+///
 fn info(stats: Player) {
   div(
     [
@@ -44,6 +50,8 @@ fn info(stats: Player) {
   )
 }
 
+/// The buttons to navigate between pages, on the bottom bar
+///
 fn buttons() {
   [
     button(
@@ -97,6 +105,8 @@ fn buttons() {
   ]
 }
 
+/// The main section of the page
+///
 fn die_section(action: Action) {
   div([class("flex")], [
     div(
@@ -124,6 +134,8 @@ fn die_section(action: Action) {
   ])
 }
 
+/// A list of dice that can be shown on the page
+///
 fn dice() {
   [
     dice_1([class("w-56 h-56"), id("dice_anim")]),
@@ -136,6 +148,8 @@ fn dice() {
   |> list.index_map(fn(svg, i) { #(i + 1, svg) })
 }
 
+/// Produces a random dice to show on the page
+///
 pub fn anim_get_next_dice() {
   let assert Ok(die_to_show) =
     dice()
@@ -144,11 +158,15 @@ pub fn anim_get_next_dice() {
   die_to_show.1 |> element.to_string
 }
 
+/// Provides a specific dice to show on the page
+///
 pub fn rolled_die(rolled: Int) {
   let assert Ok(die) = dice() |> list.find(fn(i_svg) { i_svg.0 == rolled })
   die.1
 }
 
+/// The section of the page that lets the user roll the dice
+///
 pub fn roll_section(action: Action) {
   let icon = case action {
     Move(_) -> footprints([class("!mr-[10px]")])
@@ -208,6 +226,9 @@ pub fn roll_section(action: Action) {
   ])
 }
 
+/// A part of the section that lets the user roll the dice, displaying the
+/// result of the roll
+///
 pub fn dice_result(action: Action) {
   let content = case action {
     Move(rolled) -> [
@@ -270,6 +291,8 @@ pub fn dice_result(action: Action) {
   ])
 }
 
+/// The information to show on the roll button if the player has already rolled
+///
 pub fn already_rolled() {
   button(
     [
@@ -290,6 +313,8 @@ pub fn already_rolled() {
   |> element.to_string
 }
 
+/// A section in the main section of the page that shows details about the current type of dice the player is rolling
+///
 fn info_panel(action: Action) {
   let dice_type = case action {
     Move(_) -> "Movement"

@@ -1,9 +1,13 @@
+//// The information modal on the page
+
 import app/pages/components/lucide_lustre.{github, info}
 import lustre/attribute.{attribute, class, href, rel, target}
 import lustre/element.{fragment}
 import lustre/element/html.{a, br, label, p, text}
 import lustre/element/svg
 
+/// The information modal component
+///
 pub fn info_modal() {
   fragment([
     html.div([attribute("x-data", "{modalIsOpen: false}")], [

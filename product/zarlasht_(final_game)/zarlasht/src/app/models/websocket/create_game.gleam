@@ -1,11 +1,10 @@
-//// Game creation
+//// The handler for creating a game
 
 import app/actors/actor_types.{
   type PlayerSocket, type WebsocketActorState, EnqueueParticipant, Move, Player,
   SwapColors, WebsocketActorState,
 }
 
-import app/pages/created_game
 import carpenter/table
 import gleam/dict
 import gleam/erlang/process
@@ -25,7 +24,7 @@ pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
     player.state.director_subject,
     EnqueueParticipant(
       game_code,
-      Player(1, "", "", 10, 1, #(1, 21), [], Move(0)),
+      Player(1, "", "", 10, 1, #(1, 21), [], Move(0),[]),
       player.state.ws_subject,
     ),
   )
@@ -33,7 +32,7 @@ pub fn on_create_game(player: PlayerSocket) -> WebsocketActorState {
   //   mist.send_text_frame(player.socket, created_game_page(game_code, player))
   WebsocketActorState(
     ..player.state,
-    player: Player(1, "", "", 10, 1, #(1, 21), [], Move(0)),
+    player: Player(1, "", "", 10, 1, #(1, 21), [], Move(0),[]),
     game_code: game_code,
   )
 }
@@ -62,6 +61,8 @@ fn generate_game_code() -> Int {
   }
 }
 
+/// Updates the colors of the players in the game
+///
 pub fn update_colors(message: String, player: PlayerSocket) {
   let assert Ok(juno.Object(message_dict)) = juno.decode(message, [])
   let assert Ok(juno.Array(colors)) = message_dict |> dict.get("colors")

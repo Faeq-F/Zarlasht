@@ -1,19 +1,21 @@
-import lustre/element.{type Element}
+//// The home page when in a game (main game page)
 
-import app/actors/actor_types.{
-  type Action, type Player, Battle, EnemyTribe, Move,
-}
+import app/actors/actor_types.{type Player, Battle, EnemyTribe, Move}
+
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{
   dices, footprints, info as info_icon, map, messages_square, radar, sword,
 }
 
 import app/pages/layout.{stats as info_stats}
+import gleam/list
 import gleam/string.{join}
 import lustre/attribute.{attribute, class, id, style}
-
+import lustre/element
 import lustre/element/html.{button, div, li, p, text, ul}
 
+/// The main game page
+///
 pub fn game(stats: Player) {
   div([id("page"), class("h-full w-full")], [
     div(
@@ -28,13 +30,15 @@ pub fn game(stats: Player) {
         div([class("!w-full z-30 absolute")], [
           bottom_bar(info(stats), buttons()),
         ]),
-        info_section(stats.action),
+        info_section(stats),
       ],
     ),
   ])
   |> element.to_string
 }
 
+/// The information to show on the bottom bar
+///
 fn info(stats: Player) {
   div(
     [
@@ -45,6 +49,8 @@ fn info(stats: Player) {
   )
 }
 
+/// The buttons to show on the bottom bar
+///
 fn buttons() {
   [
     button(
@@ -98,7 +104,9 @@ fn buttons() {
   ]
 }
 
-fn info_section(action: Action) {
+/// The main section of the page that is divided into two
+///
+fn info_section(player: Player) {
   div([class("flex")], [
     div(
       [
@@ -109,7 +117,7 @@ fn info_section(action: Action) {
           #("align-content", "center"),
         ]),
       ],
-      [area_panel(action)],
+      [area_panel(player.action)],
     ),
     div(
       [
@@ -120,11 +128,13 @@ fn info_section(action: Action) {
           #("align-content", "center"),
         ]),
       ],
-      [info_panel()],
+      [info_panel(player.updates)],
     ),
   ])
 }
 
+/// The section in the main section where the player is told where they are in the map and what they are doing
+///
 fn area_panel(action) {
   //TODO - rest of battle types
   let title = case action {
@@ -184,6 +194,8 @@ fn area_panel(action) {
   ])
 }
 
+/// The section to show in the area panel if the player is currently not in battle
+///
 fn traversal_section() {
   div([class("flex")], [
     div(
@@ -246,6 +258,8 @@ fn traversal_section() {
   ])
 }
 
+/// The section to show in the area panel if the player is currently in battle
+///
 fn expert_swordsman_section() {
   div([class("flex")], [
     div(
@@ -304,6 +318,8 @@ fn expert_swordsman_section() {
   ])
 }
 
+/// A button that allows the user to call their allies to help them in battle
+///
 fn call_allies_btn() {
   button(
     [
@@ -321,7 +337,9 @@ fn call_allies_btn() {
   )
 }
 
-fn info_panel() {
+/// The section in the main section that shows updates in the game as it progresses
+///
+fn info_panel(updates: List(String)) {
   div(
     [
       class(
@@ -341,11 +359,8 @@ fn info_panel() {
           ]),
           class("font-text"),
         ],
-        [
-          // li([], [text("Your Ally, John, has been injured badly and retreated")]),
-        // li([], [text("You defeated 4 enemies within your party")]),
-        // li([], [text("Something else")]),
-        ],
+        updates
+          |> list.map(fn(update) { li([], [text(update)]) }),
       ),
     ],
   )

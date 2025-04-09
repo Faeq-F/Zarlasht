@@ -1,7 +1,9 @@
+//// The page to the player sees when they create or join a game that has not started
+
 import app/actors/actor_types.{
-  type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, type PlayerSocket, GameActorState, UpdateState,
+  type GameActorMessage, type GameActorState, GameActorState, UpdateState,
 }
+
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{copy}
 import gleam/erlang/process.{type Subject}
@@ -9,11 +11,13 @@ import gleam/int.{to_string}
 import gleam/list
 import gleam/string.{join}
 import lustre/attribute.{attribute, class, id, name, style, type_, value}
-import lustre/element.{type Element}
+import lustre/element
 import lustre/element/html.{
   button, div, form, input, label, li, p, script, text, ul,
 }
 
+/// The created game page
+///
 pub fn created_game_page(
   state: GameActorState,
   game_subject: Subject(GameActorMessage),
@@ -47,6 +51,8 @@ pub fn created_game_page(
   |> element.to_string
 }
 
+/// The container that shows an individual player in the game
+///
 pub fn player_container(
   state: GameActorState,
   game_subject: Subject(GameActorMessage),
@@ -65,6 +71,8 @@ pub fn player_container(
   ])
 }
 
+/// Randomizes the number for the player image
+///
 fn random_player_image() {
   case int.random(3) {
     0 -> "3"
@@ -72,6 +80,8 @@ fn random_player_image() {
   }
 }
 
+/// Produces a list of all of the players to show on the page
+///
 fn generate_players(state: GameActorState) {
   let items =
     state.participants
@@ -118,6 +128,8 @@ fn generate_players(state: GameActorState) {
   }
 }
 
+/// Produces a list of all of the player's colors
+///
 fn generate_colors(
   state: GameActorState,
   game_subject: Subject(GameActorMessage),
@@ -215,6 +227,8 @@ pub fn get_color(
   }
 }
 
+/// The information to show in the bottom bar
+///
 fn info() {
   div(
     [
@@ -226,6 +240,8 @@ fn info() {
   )
 }
 
+/// The information to show when there are not enough players
+///
 pub fn info_error_player_count() {
   div(
     [
@@ -237,6 +253,8 @@ pub fn info_error_player_count() {
   )
 }
 
+/// The information to show when a player is still setting their name
+///
 pub fn info_error_setting_name() {
   div(
     [
@@ -248,6 +266,8 @@ pub fn info_error_setting_name() {
   )
 }
 
+/// The buttons to show in the bottom bar
+///
 fn buttons(game_code) {
   [
     div([class("popover popover-border contents")], [
@@ -295,6 +315,8 @@ fn buttons(game_code) {
   ]
 }
 
+/// The JS script to handling drag scrolling the players list and sorting the player colors
+///
 fn page_script() {
   let drag_scroll =
     "

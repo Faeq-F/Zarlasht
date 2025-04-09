@@ -1,44 +1,23 @@
+/// The handler for rolling dice when in battle
+
 import app/actors/actor_types.{
-  type BattleType, type DirectorActorMessage, type PlayerSocket,
-  type WebsocketActorState, Ambush, Battle, Cemetary, Chat, Demon,
-  DequeueParticipant, Dice, EnemyGotHit, EnemyTribe, GameActorState, GameState,
-  GetState, GetStateWS, HitEnemy, Home, JoinGame, Map, Move, Player, PlayerMoved,
-  PlayerSocket, Ravine, SendToClient, StateWS, UpdatePlayerState, UpdateState,
-  UserDisconnected, Wait, WebsocketActorState,
+  type BattleType, type WebsocketActorState, Battle, HitEnemy, Player,
+  WebsocketActorState,
 }
-import gleam/dict
-import gleam/erlang/process.{type Subject}
-import gleam/function
-import gleam/http/request.{type Request, Request}
+
+import gleam/erlang/process
 import gleam/int
-import gleam/io
 import gleam/list
-import gleam/option.{None, Some}
-import gleam/otp/actor
-import gleam/otp/supervisor
-import gleam/otp/task
-import gleam/string
-import juno
-import logging.{Alert, Info}
-import lustre/attribute
+import gleam/option.{Some}
 import lustre/element
-import lustre/element/html
-import mist.{type Connection, Custom}
+import mist
 
-import app/models/websocket/messaging.{
-  send_message, switch_chat, update_chat_messages,
-}
-import app/models/websocket/switch_pages.{
-  go_to_chats, go_to_dice_roll, go_to_home, go_to_map,
-}
-
-import app/pages/chat.{chat, chat_section}
-import app/pages/map.{map_grid}
 import app/pages/roll_die.{
-  already_rolled, anim_get_next_dice, dice_result, roll_section, rolled_die,
+  anim_get_next_dice, dice_result, roll_section, rolled_die,
 }
-import app/pages/set_name as sn_pg
 
+/// The handler for rolling dice when in battle
+///
 pub fn roll_battle(
   btype: BattleType,
   a_type: Int,

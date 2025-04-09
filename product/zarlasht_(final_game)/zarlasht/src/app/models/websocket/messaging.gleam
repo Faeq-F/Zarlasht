@@ -1,21 +1,23 @@
+//// In-game messages related handlers
+
 import app/actors/actor_types.{
-  type GameActorState, type PlayerSocket, type WebsocketActorState, AddedName,
-  Chat, Dice, GameActorState, GameStarted, GameState, GetParticipants, GetState,
-  GetStateWS, Home, Map, Message, Participants, Player, SendToClient, StateWS,
-  UpdateState, WebsocketActorState,
+  type GameActorState, type PlayerSocket, type WebsocketActorState, Chat,
+  GameActorState, GameState, GetState, Message, UpdateState, WebsocketActorState,
 }
-import app/pages/chat.{chat, chat_messages, chat_section, send_message_section}
-import app/pages/created_game.{info_error_player_count, info_error_setting_name}
+
+import app/pages/chat.{chat_messages, chat_section, send_message_section}
 import birl
 import gleam/dict
 import gleam/erlang/process
+import gleam/int
 import gleam/list
 import gleam/option.{Some}
-import gleam/otp/actor
 import juno
 import lustre/element
 import mist
 
+/// The handler for sending a message to a player
+///
 pub fn send_message(
   player_to_send_to: String,
   message: String,
@@ -102,39 +104,8 @@ pub fn send_message(
   player.state
 }
 
-// update_chat_messages below is the polling equivalent of this (somewhat broken) event-driven update func
-//TODO - check if handled allies correctly
-// fn update_chat_pages_in_view(player_to_send_to: Int, game_state: GameActorState) {
-//   game_state.pages_in_view
-//   |> dict.keys()
-//   |> list.each(fn(key) {
-//     let assert Ok(page) = game_state.pages_in_view |> dict.get(key)
-//     case page == Chat(player_to_send_to) {
-//       True -> {
-//         let assert Ok(player_viewing) =
-//           game_state.participants
-//           |> list.find(fn(player) { { player.0 }.number == key })
-
-//         //issue - call forever not ending
-//         let assert StateWS(player_viewing_state) =
-//           process.call(player_viewing.1, GetStateWS, 5000)
-
-//         echo player_viewing_state
-
-//         process.send(
-//           player_viewing.1,
-//           SendToClient(
-//             chat_section(player_to_send_to, player_viewing_state, game_state)
-//             |> element.to_string,
-//           ),
-//         )
-//         Nil
-//       }
-//       _ -> Nil
-//     }
-//   })
-// }
-
+/// The handler for updating the chat messages
+///
 pub fn update_chat_messages(
   state: WebsocketActorState,
   conn: mist.WebsocketConnection,
@@ -152,8 +123,8 @@ pub fn update_chat_messages(
   Nil
 }
 
-import gleam/int
-
+/// The handler for switching to a different chat in the game
+///
 pub fn switch_chat(
   player_to_chat_to: String,
   state: WebsocketActorState,

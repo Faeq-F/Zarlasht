@@ -1,22 +1,25 @@
+//// The map page in the game
+
 import app/actors/actor_types.{
-  type Action, type GameActorState, type Player, type WebsocketActorState,
-  GameState, GetState, Move,
+  type Action, type GameActorState, type Player, type WebsocketActorState, Move,
 }
+
 import app/pages/components/bottom_bar.{bottom_bar}
 import app/pages/components/lucide_lustre.{
   circle_user_round, circle_x, dices, messages_square, scan,
 }
+
 import app/pages/layout.{stats as info_stats}
-import gleam/erlang/process
 import gleam/int
 import gleam/list
-import gleam/option.{Some}
 import gleam/result
 import gleam/string.{join}
 import lustre/attribute.{type Attribute, attribute, class, id, style}
 import lustre/element.{type Element}
 import lustre/element/html.{button, div, h1, text}
 
+/// The map page
+///
 pub fn map(player: WebsocketActorState, game_state: GameActorState) {
   div([id("page"), class("h-full w-full")], [
     div(
@@ -38,10 +41,14 @@ pub fn map(player: WebsocketActorState, game_state: GameActorState) {
   |> element.to_string
 }
 
+/// The header for the page
+///
 fn header(chat: String) {
   div([], [h1([class("font-header !text-4xl text-center !mt-8")], [text(chat)])])
 }
 
+/// The section that contains the map
+///
 fn map_section(player: WebsocketActorState, game_state: GameActorState) {
   let current_positions =
     game_state.participants
@@ -92,6 +99,8 @@ fn map_section(player: WebsocketActorState, game_state: GameActorState) {
 
 //TODO - tooltips for key
 
+/// The key for the map
+///
 fn key() {
   div([class("flex justify-center !mt-[2.5vh] !mb-[2.5vh]")], [
     div([class("!inline")], [
@@ -164,6 +173,8 @@ fn key() {
   ])
 }
 
+/// The information to show on the bottom bar
+///
 fn info(stats: Player) {
   div(
     [
@@ -174,6 +185,8 @@ fn info(stats: Player) {
   )
 }
 
+/// The buttons to show on the bottom bar
+///
 fn buttons() {
   [
     button(
@@ -227,6 +240,8 @@ fn buttons() {
   ]
 }
 
+/// The function that generates the grid for the map
+///
 fn generate_grid(
   current_position: #(Int, Int),
   covered_positions: List(#(Int, Int)),
@@ -317,6 +332,8 @@ fn generate_grid(
   )
 }
 
+/// The generator for a single cell in the grid for the map
+///
 fn cell(y: Int, clickable: List(Attribute(a)), content: Element(a)) {
   case y {
     1 ->
@@ -378,6 +395,8 @@ fn cell(y: Int, clickable: List(Attribute(a)), content: Element(a)) {
   }
 }
 
+/// generates a list of positions the user should be able to click on, to move to
+///
 fn can_click_on(current_position: #(Int, Int), can_click_around: Int) {
   let right =
     list.range(0, can_click_around)
@@ -408,6 +427,9 @@ fn can_click_on(current_position: #(Int, Int), can_click_around: Int) {
   [right, left, up, down, tl, tr, bl, br] |> list.flatten
 }
 
+/// A list of positions that can be shown to the player (as they have travelled
+/// there and can see that far)
+///
 fn map_grid_to_show(covered_positions: List(#(Int, Int))) {
   covered_positions
   |> list.map(fn(pos) {
@@ -467,6 +489,8 @@ fn map_grid_to_show(covered_positions: List(#(Int, Int))) {
   |> list.flatten
 }
 
+/// The map grid itself, encoded in the type of cells
+///
 pub fn map_grid() {
   [
     [

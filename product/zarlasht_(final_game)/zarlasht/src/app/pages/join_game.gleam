@@ -1,9 +1,13 @@
+//// The page for letting a player join a game
+
 import app/pages/components/bottom_bar.{bottom_bar}
 import gleam/string.{join}
 import lustre/attribute.{attribute, class, id, placeholder, style}
-import lustre/element.{type Element}
+import lustre/element
 import lustre/element/html.{button, div, h1, input, text}
 
+/// The join game page
+///
 pub fn join_game_page() {
   div([id("page"), class("h-full w-full")], [
     div(
@@ -29,6 +33,8 @@ pub fn join_game_page() {
   |> element.to_string()
 }
 
+/// The information to show on the bottom bar
+///
 fn info() {
   div(
     [
@@ -40,6 +46,8 @@ fn info() {
   )
 }
 
+/// The information to show if the game code is incorrect
+///
 pub fn incorrect_info() {
   div(
     [
@@ -51,6 +59,8 @@ pub fn incorrect_info() {
   )
 }
 
+/// The buttons to show on the bottom bar
+///
 fn buttons() {
   [
     html.form(

@@ -1,8 +1,10 @@
+//// The enemy actor - the 'player' that the user may be fighting against in a battle
 import app/actors/actor_types.{
   type BattleActorMessage, type EnemyActorMessage, type EnemyActorState,
   EnemyActorState, EnemyDied, EnemyGotHit, EnemyHit, ExpertSwordsman,
   MakeActions, SetupEnemy, ShutdownEnemy,
 }
+
 import gleam/erlang/process.{type Subject}
 import gleam/int
 import gleam/io

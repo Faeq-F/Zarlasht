@@ -1,10 +1,11 @@
-//// The director actor - process to manage all tasks the server carries out
+//// The director actor - process to manage all games that are being created
 
 import app/actors/actor_types.{
   type DirectorActorMessage, type DirectorActorState, DequeueParticipant,
   DirectorActorState, EnqueueParticipant, GameStarted, GetParticipants,
   Participants, UpdateParticipant,
 }
+
 import gleam/dict.{get}
 import gleam/erlang/process.{type Subject}
 import gleam/function

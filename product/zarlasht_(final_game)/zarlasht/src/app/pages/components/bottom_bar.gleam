@@ -1,3 +1,5 @@
+//// The bottom bar to show controls on the page
+
 import app/pages/components/information_modal.{info_modal}
 import app/pages/components/leaderboard.{leaderboard}
 import app/pages/components/theme_switch.{theme_switch}
@@ -6,6 +8,8 @@ import lustre/attribute.{class, id, style}
 import lustre/element.{fragment}
 import lustre/element/html.{div}
 
+/// The bottom bar component
+///
 pub fn bottom_bar(info, buttons) {
   fragment([
     div(

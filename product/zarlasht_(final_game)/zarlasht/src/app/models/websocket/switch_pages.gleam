@@ -1,24 +1,21 @@
+//// The handlers for switching pages in the game
+
 import app/actors/actor_types.{
-  type GameActorState, type PlayerSocket, type WebsocketActorState, AddedName,
-  Chat, Dice, GameActorState, GameStarted, GameState, GetParticipants, GetState,
-  GetStateWS, Home, Map, Message, Participants, Player, SendToClient, StateWS,
-  UpdateState, WebsocketActorState,
+  type GameActorState, type WebsocketActorState, Chat, Dice, GameActorState,
+  GameState, GetState, Home, Map, UpdateState, WebsocketActorState,
 }
-import app/pages/chat.{chat, chat_messages, chat_section, send_message_section}
-import app/pages/created_game.{info_error_player_count, info_error_setting_name}
+
+import app/pages/chat.{chat}
 import app/pages/game as game_page
 import app/pages/map.{map}
 import app/pages/roll_die.{roll_die}
-import birl
 import gleam/dict
 import gleam/erlang/process
-import gleam/list
 import gleam/option.{Some}
-import gleam/otp/actor
-import juno
-import lustre/element
 import mist
 
+/// The handler for switching to the map page
+///
 pub fn go_to_map(state: WebsocketActorState, conn: mist.WebsocketConnection) {
   let assert Some(game_subject) = state.game_subject
   let assert GameState(game_state) =
@@ -37,6 +34,8 @@ pub fn go_to_map(state: WebsocketActorState, conn: mist.WebsocketConnection) {
   state
 }
 
+/// The handler for switching to the home page
+///
 pub fn go_to_home(state: WebsocketActorState, conn: mist.WebsocketConnection) {
   let assert Some(game_subject) = state.game_subject
   let assert GameState(game_state) =
@@ -55,6 +54,8 @@ pub fn go_to_home(state: WebsocketActorState, conn: mist.WebsocketConnection) {
   state
 }
 
+/// The handler for switching to the chats page
+///
 pub fn go_to_chats(state: WebsocketActorState, conn: mist.WebsocketConnection) {
   let assert Some(game_subject) = state.game_subject
   let assert GameState(game_state) =
@@ -73,6 +74,8 @@ pub fn go_to_chats(state: WebsocketActorState, conn: mist.WebsocketConnection) {
   state
 }
 
+/// The handler for switching to the dice roll page
+///
 pub fn go_to_dice_roll(
   state: WebsocketActorState,
   conn: mist.WebsocketConnection,

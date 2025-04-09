@@ -1,24 +1,19 @@
+//// The handler for a player moving in a game
+
 import app/actors/actor_types.{
-  type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddPlayer, AddedName, Battle, GameActorState, GameState, GetState,
-  Home, JoinGame, Move, Player, PlayerMoved, PrepareGame, SendToClient,
-  SetupBattle, SwapColors, UpdatePlayerState, UpdateState, UserDisconnected,
-  Wait,
+  type GameActorMessage, type GameActorState, type Player, Battle,
+  GameActorState, Move, Player, SetupBattle,
 }
-import gleam/dict
-import gleam/erlang/process.{type Subject}
-import gleam/int
-import gleam/io
-import gleam/list
-import gleam/option.{None}
-import gleam/otp/actor.{type Next}
-import gleam/otp/static_supervisor as sup
-import logging.{Info}
-import lustre/element
 
 import app/actors/battle
-import app/pages/created_game.{created_game_page, get_color, player_container}
+import gleam/erlang/process.{type Subject}
+import gleam/int
+import gleam/list
+import gleam/option.{None}
+import gleam/otp/static_supervisor as sup
 
+/// The handler for the PlayerMoved message
+///
 pub fn player_moved(
   player: Player,
   game: Subject(GameActorMessage),

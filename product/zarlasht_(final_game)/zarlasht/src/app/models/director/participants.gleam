@@ -1,19 +1,18 @@
+//// All participant related handlers for messages the director gets
+
 import app/actors/actor_types.{
-  type CustomWebsocketMessage, type DirectorActorMessage,
-  type DirectorActorState, type Player, AddPlayer, DequeueParticipant,
-  DirectorActorState, EnqueueParticipant, GameStarted, GetParticipants, JoinGame,
-  Participants, PrepareGame, SendToClient, UpdateParticipant,
+  type CustomWebsocketMessage, type DirectorActorState, type Player, AddPlayer,
+  DirectorActorState, JoinGame,
 }
-import gleam/function
 
 import app/actors/game
-import app/pages/game as game_page
 import carpenter/table
 import gleam/dict.{drop, get, insert}
 import gleam/erlang/process.{type Subject}
 import gleam/list
-import gleam/otp/actor.{type Next}
 
+/// The handler for the EnqueueParticipant message
+///
 pub fn enqueue_participant(
   game_code: Int,
   player: Player,
@@ -43,6 +42,8 @@ pub fn enqueue_participant(
   DirectorActorState(games_waiting: new_queue)
 }
 
+/// The handler for the DequeueParticipant message
+///
 pub fn dequeue_participant(
   player: Player,
   game_code: Int,
@@ -77,6 +78,8 @@ pub fn dequeue_participant(
   }
 }
 
+/// The handler for the UpdateParticipant message
+///
 pub fn update_participant(
   player: Player,
   game_code: Int,

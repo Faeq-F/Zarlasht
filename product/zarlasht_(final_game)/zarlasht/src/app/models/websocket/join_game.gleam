@@ -57,7 +57,7 @@ pub fn on_join_game(
             ))
           let num = { participants |> list.length() } + 1
           let player_state =
-            Player(num, "Setting name...", "", 10, 1, #(2, 21), [], Move(0))
+            Player(num, "Setting name...", "", 10, 1, #(2, 21), [], Move(0),[])
           //enqueue
           process.send(
             player.state.director_subject,
