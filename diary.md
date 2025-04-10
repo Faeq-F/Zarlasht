@@ -2,7 +2,169 @@
 
 <details><summary>Term 2</summary>
 
+<details><summary>Week 13</summary>
+
+### 10/04/2025 - 11/04/2025
+
+Completed racing actions and time-based actions in the game (aim 4; goal 12).
+Recorded my demo video and completed the report.
+
+### 07/04/2025 - 09/04/2025
+
+Completed the enemy actor for battles with an AI in the game (aim 4; goal 12).
+Also added updates to the main page to help the user know what is happening in the game (aim 6; goals 10 & 11).
+
+</details>
+
+<details><summary>Week 12</summary>
+
+### 03/04/2025 - 06/04/2025
+
+Started to fix formatting issues within my report (there are many!).
+Also send a draft to my supervisor for feedback while I complete the last few bits of the game.
+
+### 31/03/2025 - 02/04/2025
+
+Started going back through my report, fixing any issues - almost completed the literature review.
+
+</details>
+
+<details><summary>Week 11</summary>
+
+### 27/03/2025 - 30/03/2025
+
+Completed movement in the map, with the map only showing covered areas and displaying all players in view (real-time updates) (aim 4; goal 12).
+Also added a section on EDA to my report.
+
+### 24/03/2025 - 26/03/2025
+
+Completed messaging in the game (goal 11) and added the microservices and saga interactions section to my report.
+
+</details>
+
+<details><summary>Week 10</summary>
+
+### 20/03/2025 - 23/03/2025
+
+Completed the professional issues section in my report and started writing up the research I conducted on distribution for my literature review.
+
+### 17/03/2025 - 19/03/2025
+
+Added animations and toggles in settings for accessibility (aim 6; goal 10) and setup actors to manage game state correctly (for this game specifically)
+
+</details>
+
+<details><summary>Week 9</summary>
+
+### 13/03/2025 - 16/03/2025
+
+Completed the roll dice page and continued with the report, planning out further actions and any information provided by my supervisor.
+Also added some preliminary text for my rationale section.
+
+### 10/03/2025 - 12/03/2025
+
+Completed the map and chat pages with partial dynamic generation of content - started the roll dice page (goal 10 & 11).
+
+</details>
+
+<details><summary>Week 8</summary>
+
+### 06/03/2025 - 09/03/2025
+
+Added the goals I had for this term to the report and expanded that section.
+Also made changes to the chat page so that it is appropriate for this game (aim 3; goal 11).
+
+### 03/03/2025 - 05/03/2025
+
+Updated the ReadMe files for all projects to include the directory descriptions and noted the interesting files, as suggested in the feedback.
+(goal 14)
+
+</details>
+
+<details><summary>Week 7</summary>
+
+### 27/02/2025 - 02/03/2025
+
+Started producing the final report in anticipation of there being lots to add. Started adding detailed notes to sections that need improvment / creating, about what those sections need to say.
+Started to focus on the final report. Laid out what I wish to write about in the new sections and how I will add what was suggested in my feedback to pre-existing sections.
+
+### 24/02/2025 - 26/02/2025
+
+Produced the created_game, join_game and set_name pages, alongside transplanting the leaderboard from the Pong prototype.
+Made the leaderboard suitable for the game, modifying the construction functions to accept and use the game data correctly.
+Tested it with sample data. (aim 3, 6 & 7; goals 10 & 11)
+
+</details>
+
+<details><summary>Week 6</summary>
+
+### 20/02/2025 - 23/02/2025
+
+Concluded the creation of the bottom bar & will now shift focus to quickly creating the rest of the pages for the game so that I can move onto more advanced functionalities.
+(aim 6 & 7; goal 10)
+Completed the functionality of the `created_game` page, with color swapping that overrides actions (goals 12; aim 4).
+
+### 17/02/2025 - 19/02/2025
+
+Added Alpine.js as a dependency for client-side only functionality like the display of modals.
+Added Alpine.js to help with producing the UI, ensuring it is only used for a single client's local state 
+(like whether or not they are looking at the information modal - processing for the game should be done on the server) 
+Continued to produce the bottom bar and related UI that requires its use.
+(aim 6 & 7; goal 10)
+
+Made the home screen functional, with all necessary components on the bottom bar (goals 10 & 11; aim 3).
+Other assignments are delaying some work, but I should be able to catch up in the coming weeks.
+
+</details>
+
+<details><summary>Week 5</summary>
+
+### 14/02/2025 - 16/02/2025
+
+Continued to fix the issues with the UI. Focusing on the bottom bar - has all of the functionality for the user to play the game (input fields, buttons, etc.)
+(aim 6 & 7; goal 10)
+
+Further implementation of the designs for the usability of the screens (goals 10 & 11; aim 3).
+Also added an information modal to attribute the creators of graphics, icons, fonts and other elements I am using; this will link to a description to all that I have used, as to help avoid accidental plagiarism.
+
+### 10/02/2025 - 13/02/2025
+
+Ran into some hurdles creating the pages in a reusable, modular way. Switched back to the screen_designs project to help simplify the process.
+Continued to produce the pages and refactor old ones so that elements are separated into components that are reusable.
+(aim 6 & 7; goal 10)
+
+Decided to seperate code into components, like modern JS frameworks, for reusability and modularity. (goals 10 & 11; aim 3)
+Also created a bottom bar component, on which most UI interactions will occur for consistency during the game (otherwise it can be confusing)
+
+</details>
+
+<details><summary>Week 4</summary>
+
+### 06/02/2025 - 09/02/2025
+
+Continued improving the layout of the pages to improve reusability (aim 3) and polishing the GUI (aim 6, goal 10).
+Continued to adapt old screen designs to produce usable pages that can display all that is needed for the game (like a map, chat, etc.)
+(aim 6; goal 10)
+
+### 03/02/2025 - 05/02/2025
+
+Transplanted old components from other projects (the prototypes) into the final game.
+(aim 7; goal 8) Also started to finish off the screen designs from last term.
+
+Started to produce the final game; and added the reusable architecture from the prototypes.
+Adapted parts of this to be tailored to the new game, instead of the old ones (e.g., the leaderboard) (goals 10 & 11; aim 3)
+
+</details>
+
 <details><summary>Week 3</summary>
+
+### 30/01/2025 - 02/02/2025
+Refactored the game page and game actor to help with readability and reusability - 
+will be helpful for reproducing the use of the text field in messages in the final game, if needed. (aim 7; goal 8)
+Also setup the project for the final game.
+
+Continued testing, adding chrobot tests - had to fix tests on https server within the same project. Also documented the code 
+and improved this diary to incorporate feedback from my interim submission. (goal 8)
 
 ### 27/01/2025 - 29/01/2025
 
