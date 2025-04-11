@@ -7,14 +7,15 @@ import gleam/list
 import gleam/result
 import gleam/string.{join}
 import layout.{stats}
-import lustre/attribute.{attribute, class, id, name, role, style, type_}
+
+import lustre/attribute.{attribute, class, id, style}
 import lustre/element.{type Element}
-import lustre/element/html.{br, button, div, h1, label, p, span, text, textarea}
+import lustre/element/html.{button, div, h1, text}
 
 pub fn map() -> Element(t) {
   div(
     [
-      class("!text-left !absolute"),
+      class("!text-left !absolute !z-[999]"),
       style([#("width", "calc(100% - 2rem)"), #("height", "calc(100% - 2rem)")]),
     ],
     [

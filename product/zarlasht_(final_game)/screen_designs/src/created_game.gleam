@@ -12,6 +12,7 @@ pub fn created_game() -> Element(t) {
   div(
     [
       class("!text-left !absolute"),
+      class("!text-left !absolute !z-[999]"),
       style([#("width", "calc(100% - 2rem)"), #("height", "calc(100% - 2rem)")]),
     ],
     [
