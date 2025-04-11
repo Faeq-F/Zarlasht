@@ -1,9 +1,8 @@
 //// The page seen when the user has entered the game
 
-import app/actors/actor_types
 import lustre/attribute.{attribute}
-import lustre/element
-import lustre/element/html.{text}
+import lustre/element.{fragment}
+import lustre/element/html
 
 /// The game page - where users play the game
 ///
@@ -12,95 +11,248 @@ import lustre/element/html.{text}
 ///
 /// Returns stringified HTML to send to the websocket
 ///
-pub fn game_page() -> String {
+pub fn game_page(player1name: String, player2name: String) -> String {
   html.div([attribute.class("bg-base-100 min-h-full"), attribute.id("page")], [
+    htmx_elements(),
     html.div(
       [
         attribute.class(
-          "divider lg:divider-horizontal absolute min-w-full left-0 top-1/2 -translate-y-1/2 h-96",
+          "divider lg:divider-horizontal absolute min-w-full left-0 top-1/2 -translate-y-1/2 h-96 m-0",
         ),
       ],
       [],
     ),
     html.div(
+      [attribute.class(" border border-current"), attribute.id("board")],
       [
-        attribute.class(
-          "hero-content text-center absolute top-1/2 -translate-y-1/2 min-w-full h-screen pt-16 pb-12 left-0",
+        html.div([attribute.class("bg-base-content"), attribute.id("ball")], []),
+        html.div(
+          [
+            attribute.class(" paddle bg-secondary border border-neutral"),
+            attribute.id("paddle_1"),
+          ],
+          [],
         ),
-      ],
-      [
-        html.div([attribute.class("grid grid-cols-2 gap-10 w-full h-full")], [
-          html.div([attribute.class("card text-center h-full")], [
-            html.div(
-              [
-                attribute.class("w-4/6 h-1/7 rounded-3xl p-4 pl-36 text-left"),
-                attribute.id("player1"),
-              ],
-              [],
-            ),
-            html.div(
-              [
-                attribute.class(
-                  "m-auto w-4/6 h-full mx-auto my-0 p-4 grid grid-cols-3 gap-4 h-full",
-                ),
-                attribute.id("game"),
-              ],
-              [],
-            ),
-          ]),
-          html.div([attribute.class("card text-center h-full")], [
-            html.div(
-              [
-                attribute.class(
-                  "m-auto w-4/6 h-full mx-auto my-0 p-4 grid grid-cols-3 gap-4 h-full",
-                ),
-                attribute.id("game"),
-              ],
-              [],
-            ),
-            html.div(
-              [
-                attribute.class(
-                  "w-4/6 h-1/7 rounded-3xl p-4 mr-0 ml-0 pr-36 text-right",
-                ),
-                attribute.id("player2"),
-              ],
-              [],
-            ),
-          ]),
-        ]),
+        html.div(
+          [
+            attribute.class("  paddle bg-accent border border-neutral"),
+            attribute.id("paddle_2"),
+          ],
+          [],
+        ),
+        player_1(player1name),
+        player_2(player2name),
+        instruction(True),
+        hint(),
       ],
     ),
-    //hx-trigger="click, keyup[altKey&&shiftKey&&key=='D'] from:body"
-    html.div([attribute.class("board")], [
-      html.div([attribute.class("ball")], [
-        html.div([attribute.class("ball_effect")], []),
+    inject_js(""),
+    html.script([], elements_values() <> htmx_info() <> move_ball()),
+  ])
+  |> element.to_string
+}
+
+/// The extra elements that facilitate messaging through htmx when the user is playing the game
+///
+fn htmx_elements() {
+  fragment([
+    html.div(
+      [
+        attribute.id("Enter"),
+        attribute("ws-send", ""),
+        attribute("hx-trigger", "pageLoaded, keyup[key=='Enter'] from:body"),
+        attribute("hx-include", "[name='extraInfo']"),
+      ],
+      [],
+    ),
+    html.div(
+      [
+        attribute.id("Wkey"),
+        attribute("ws-send", ""),
+        attribute("hx-trigger", "keyup[key=='w'] from:body"),
+        attribute("hx-include", "[name='extraInfo']"),
+      ],
+      [],
+    ),
+    html.div(
+      [
+        attribute.id("Skey"),
+        attribute("ws-send", ""),
+        attribute("hx-trigger", "keyup[key=='s'] from:body"),
+        attribute("hx-include", "[name='extraInfo']"),
+      ],
+      [],
+    ),
+    html.div(
+      [
+        attribute.id("UpArrowKey"),
+        attribute("ws-send", ""),
+        attribute("hx-trigger", "keyup[key=='ArrowUp'] from:body"),
+        attribute("hx-include", "[name='extraInfo']"),
+      ],
+      [],
+    ),
+    html.div(
+      [
+        attribute.id("DownArrowKey"),
+        attribute("ws-send", ""),
+        attribute("hx-trigger", "keyup[key=='ArrowDown'] from:body"),
+        attribute("hx-include", "[name='extraInfo']"),
+      ],
+      [],
+    ),
+    html.div([attribute.class("hidden")], [
+      html.input([attribute.type_("text"), attribute.name("extraInfo")]),
+    ]),
+  ])
+}
+
+/// Information for Player 1
+///
+fn player_1(name: String) {
+  html.div(
+    [
+      attribute.class(
+        "fixed left-1/4 mt-[30px]  grid grid-cols-3 grid-rows-2 gap-0",
+      ),
+    ],
+    [
+      html.div([attribute.class("col-span-2")], [html.p([], [html.text(name)])]),
+      html.div([attribute.class("col-span-2 col-start-1 row-start-2")], [
+        html.kbd([attribute.class("kbd mr-1")], [html.text("W")]),
+        html.kbd([attribute.class("kbd")], [html.text("S")]),
       ]),
-      html.div([attribute.class("paddle_1 paddle")], []),
-      html.div([attribute.class("paddle_2  paddle")], []),
-      html.h1([attribute.class("player_1_score")], [html.text("0")]),
-      html.h1([attribute.class("player_2_score")], [html.text("0")]),
+      html.div(
+        [
+          attribute.class(
+            "row-span-2 col-start-3 row-start-1 ml-4 text-6xl pl-4",
+          ),
+        ],
+        [html.p([attribute.id("player_1_score")], [html.text("0")])],
+      ),
+    ],
+  )
+}
+
+/// Information for Player 2
+///
+fn player_2(name: String) {
+  html.div(
+    [
+      attribute.class(
+        "fixed right-1/4 mt-[30px]   grid grid-cols-3 grid-rows-2 gap-0",
+      ),
+    ],
+    [
+      html.div([attribute.class("col-span-2")], [html.p([], [html.text(name)])]),
+      html.div([attribute.class("col-span-2 col-start-1 row-start-2")], [
+        html.kbd([attribute.class("kbd mr-1")], [html.text("↑")]),
+        html.kbd([attribute.class("kbd")], [html.text("↓")]),
+      ]),
+      html.div(
+        [
+          attribute.class(
+            "row-span-2 col-start-3 row-start-1 ml-4 text-6xl pl-4",
+          ),
+        ],
+        [html.p([attribute.id("player_2_score")], [html.text("0")])],
+      ),
+    ],
+  )
+}
+
+/// The instruction for the user to start the game
+///
+pub fn instruction(show: Bool) {
+  case show {
+    True -> {
       html.h1(
         [
           attribute.class(
-            "message absolute left-0 -translate-y-1/2 min-w-full text-center",
+            " absolute left-0 -translate-y-1/2 min-w-full text-center top-10",
           ),
+          attribute.id("instruction"),
         ],
         [html.text("Press Enter to Start")],
-      ),
-    ]),
-    html.script(
-      [],
-      "
-    let gameState = 'start';
-    let paddle_1 = document.querySelector('.paddle_1');
-    let paddle_2 = document.querySelector('.paddle_2');
-    let board = document.querySelector('.board');
-    let initial_ball = document.querySelector('.ball');
-    let ball = document.querySelector('.ball');
-    let score_1 = document.querySelector('.player_1_score');
-    let score_2 = document.querySelector('.player_2_score');
-    let message = document.querySelector('.message');
+      )
+    }
+    _ -> {
+      html.h1(
+        [
+          attribute.class(
+            " absolute left-0 -translate-y-1/2 min-w-full text-center top-10",
+          ),
+          attribute.id("instruction"),
+        ],
+        [html.text("")],
+      )
+    }
+  }
+}
+
+/// The hint for playing the game
+///
+fn hint() {
+  html.h1(
+    [
+      attribute.class("absolute left-0 min-w-full text-center bottom-10"),
+      attribute.id("hint"),
+    ],
+    [html.text("hint: hit the ball on the edges of the paddle to add spin")],
+  )
+}
+
+/// The script element used to update the client DOM, based off server events
+///
+/// updates to the DOM via this function, occurs by running JS that manipulates the DOM
+///
+pub fn inject_js(script: String) {
+  html.script([attribute.id("inject_js")], script)
+}
+
+/// The scripting required to send extra information with htmx messages
+///
+fn htmx_info() {
+  "
+    function extraInfoFill(simulateKeyHit){
+      document.getElementsByName('extraInfo')[0].value = JSON.stringify(
+        {
+board_coord: board_coord,
+window_innerHeight: window.innerHeight,
+paddle_1_coord: paddle_1_coord,
+paddle_2_coord: paddle_2_coord,
+paddle_common: paddle_common,
+player_1_score: score_1.innerHTML,
+player_2_score: score_2.innerHTML,
+        }
+      );
+      if (simulateKeyHit){
+        htmx.trigger(\"#Enter\", \"pageLoaded\")
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key == 'Enter' || e.key == 'w' || e.key == 's' || e.key == 'ArrowUp' || e.key == 'ArrowDown'){
+        extraInfoFill(false);
+      }
+    });
+  "
+}
+
+/// All of the elements and values required to make the client-side scripting work
+///
+fn elements_values() {
+  "
+    let paddle_1 = document.querySelector('#paddle_1');
+    let paddle_2 = document.querySelector('#paddle_2');
+
+    let board = document.querySelector('#board');
+    let initial_ball = document.querySelector('#ball');
+    let ball = document.querySelector('#ball');
+
+    let score_1 = document.querySelector('#player_1_score');
+    let score_2 = document.querySelector('#player_2_score');
+
     let paddle_1_coord = paddle_1.getBoundingClientRect();
     let paddle_2_coord = paddle_2.getBoundingClientRect();
     let initial_ball_coord = ball.getBoundingClientRect();
@@ -113,58 +265,13 @@ pub fn game_page() -> String {
     let dy = Math.floor(Math.random() * 4) + 3;
     let dxd = Math.floor(Math.random() * 2);
     let dyd = Math.floor(Math.random() * 2);
+  "
+}
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key == 'Enter') {
-        gameState = gameState == 'start' ? 'play' : 'start';
-        if (gameState == 'play') {
-          message.innerHTML = '';
-          requestAnimationFrame(() => {
-            dx = Math.floor(Math.random() * 4) + 3;
-            dy = Math.floor(Math.random() * 4) + 3;
-            dxd = Math.floor(Math.random() * 2);
-            dyd = Math.floor(Math.random() * 2);
-            moveBall(dx, dy, dxd, dyd);
-          });
-        }
-      }
-      if (gameState == 'play') {
-        if (e.key == 'w') {
-          paddle_1.style.top =
-            Math.max(
-              board_coord.top,
-              paddle_1_coord.top - window.innerHeight * 0.06
-            ) + 'px';
-          paddle_1_coord = paddle_1.getBoundingClientRect();
-        }
-        if (e.key == 's') {
-          paddle_1.style.top =
-            Math.min(
-              board_coord.bottom - paddle_common.height,
-              paddle_1_coord.top + window.innerHeight * 0.06
-            ) + 'px';
-          paddle_1_coord = paddle_1.getBoundingClientRect();
-        }
-
-        if (e.key == 'ArrowUp') {
-          paddle_2.style.top =
-            Math.max(
-              board_coord.top,
-              paddle_2_coord.top - window.innerHeight * 0.1
-            ) + 'px';
-          paddle_2_coord = paddle_2.getBoundingClientRect();
-        }
-        if (e.key == 'ArrowDown') {
-          paddle_2.style.top =
-            Math.min(
-              board_coord.bottom - paddle_common.height,
-              paddle_2_coord.top + window.innerHeight * 0.1
-            ) + 'px';
-          paddle_2_coord = paddle_2.getBoundingClientRect();
-        }
-      }
-    });
-
+/// The moveBall function for the ball element
+///
+fn move_ball() {
+  "
     function moveBall(dx, dy, dxd, dyd) {
       if (ball_coord.top <= board_coord.top) {
         dyd = 1;
@@ -172,6 +279,7 @@ pub fn game_page() -> String {
       if (ball_coord.bottom >= board_coord.bottom) {
         dyd = 0;
       }
+
       if (
         ball_coord.left <= paddle_1_coord.right &&
         ball_coord.top >= paddle_1_coord.top &&
@@ -181,6 +289,7 @@ pub fn game_page() -> String {
         dx = Math.floor(Math.random() * 4) + 3;
         dy = Math.floor(Math.random() * 4) + 3;
       }
+
       if (
         ball_coord.right >= paddle_2_coord.left &&
         ball_coord.top >= paddle_2_coord.top &&
@@ -190,6 +299,7 @@ pub fn game_page() -> String {
         dx = Math.floor(Math.random() * 4) + 3;
         dy = Math.floor(Math.random() * 4) + 3;
       }
+
       if (
         ball_coord.left <= board_coord.left ||
         ball_coord.right >= board_coord.right
@@ -199,13 +309,12 @@ pub fn game_page() -> String {
         } else {
           score_1.innerHTML = +score_1.innerHTML + 1;
         }
-        gameState = 'start';
-
         ball_coord = initial_ball_coord;
         ball.style = initial_ball.style;
-        message.innerHTML = 'Press Enter to Start';
+        extraInfoFill(true);
         return;
       }
+
       ball.style.top = ball_coord.top + dy * (dyd == 0 ? -1 : 1) + 'px';
       ball.style.left = ball_coord.left + dx * (dxd == 0 ? -1 : 1) + 'px';
       ball_coord = ball.getBoundingClientRect();
@@ -213,37 +322,5 @@ pub fn game_page() -> String {
         moveBall(dx, dy, dxd, dyd);
       });
     }
-  ",
-    ),
-  ])
-  |> element.to_string
-}
-
-/// The name of a player on the game page
-///
-pub fn player(player: actor_types.Player, name: String) -> String {
-  case player {
-    actor_types.One -> {
-      html.div(
-        [
-          attribute.class("w-4/6 h-1/7 rounded-3xl p-4 pl-36 text-left"),
-          attribute.id("player1"),
-        ],
-        [html.p([attribute.class("inline text-lg")], [text(name)])],
-      )
-      |> element.to_string
-    }
-    _ -> {
-      html.div(
-        [
-          attribute.class(
-            "w-4/6 h-1/7 rounded-3xl p-4 mr-0 ml-auto pr-36 text-right",
-          ),
-          attribute.id("player2"),
-        ],
-        [html.p([attribute.class("inline text-lg")], [text(name)])],
-      )
-      |> element.to_string
-    }
-  }
+  "
 }

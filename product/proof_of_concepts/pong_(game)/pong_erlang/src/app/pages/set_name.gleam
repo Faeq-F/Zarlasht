@@ -25,35 +25,45 @@ pub fn set_name_page() -> String {
           ),
         ],
         [
-          html.div([attribute.class("max-w-md")], [
-            html.div([], [
-              html.p([attribute.class("font-bold text-3xl mb-3")], [
-                html.text("What's your name?"),
-              ]),
-              html.div([attribute.id("pageInputs")], [
-                html.form(
-                  [attribute("ws-send", ""), attribute.id("set-name-form")],
-                  [
-                    html.div([attribute.class("join")], [
-                      html.input([
-                        attribute.name("name"),
-                        attribute.placeholder("Your name"),
-                        attribute.class("input input-bordered join-item"),
-                      ]),
-                      html.button(
-                        [
-                          attribute.class(
-                            "btn join-item bg-secondary text-secondary-content hover:bg-accent",
-                          ),
-                        ],
-                        [check([class("w-5 h-5 ")])],
-                      ),
+          html.form([attribute("ws-send", ""), attribute.id("set-name-form")], [
+            html.div(
+              [attribute.class("grid grid-cols-2 gap-10 w-full h-full")],
+              [
+                html.div([attribute.class("card text-center h-full")], [
+                  html.div([attribute.class("max-w-md")], [
+                    html.p([attribute.class("font-bold text-3xl mb-3")], [
+                      html.text("Player 1 name"),
                     ]),
-                  ],
+                    html.input([
+                      attribute.name("name1"),
+                      attribute.placeholder("Your name"),
+                      attribute.class("input input-bordered join-item"),
+                    ]),
+                  ]),
+                ]),
+                html.div([attribute.class("card text-center h-full")], [
+                  html.div([attribute.class("max-w-md")], [
+                    html.p([attribute.class("font-bold text-3xl mb-3")], [
+                      html.text("Player 2 name"),
+                    ]),
+                    html.input([
+                      attribute.name("name2"),
+                      attribute.placeholder("Your name"),
+                      attribute.class("input input-bordered join-item"),
+                    ]),
+                  ]),
+                ]),
+              ],
+            ),
+            html.button(
+              [
+                attribute.class(
+                  "btn  bg-secondary text-secondary-content hover:bg-accent",
                 ),
-                html.div([attribute.id("waiting")], []),
-              ]),
-            ]),
+              ],
+              [check([class("w-5 h-5 ")])],
+            ),
+            html.div([attribute.id("waiting")], []),
           ]),
         ],
       ),

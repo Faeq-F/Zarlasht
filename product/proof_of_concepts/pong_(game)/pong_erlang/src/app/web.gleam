@@ -31,7 +31,6 @@ pub fn middleware(
   _ctx: Context,
   handle_request: fn(Request(Connection)) -> Response(ResponseData),
 ) -> Response(ResponseData) {
-  // add server rescue
   use <- log_request(req)
   use <- default_responses
   handle_request(req)

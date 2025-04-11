@@ -1,19 +1,25 @@
 //// The director actor - process to manage all tasks the server carries out
 
 import app/actors/actor_types.{
-  type DirectorActorMessage, type DirectorActorState, DequeueParticipant,
-  DirectorActorState, EnqueueParticipant,
+  type DirectorActorMessage, type DirectorActorState, AddKey, DirectorActorState,
+  EnqueueUser, Leaderboard, SendToClient,
 }
 import app/actors/game
+import app/pages/leaderboard.{leaderboard}
 import carpenter/table
-import gleam/dict.{drop, get, insert}
 import gleam/erlang/process.{type Subject}
+import gleam/list
 import gleam/otp/actor.{type Next}
+import gleam/set
+import gleam/yielder.{from_list, map, to_list}
 
 /// Creates the Actor
+///
 pub fn start() -> Subject(DirectorActorMessage) {
+  // Todo
+  //need to get keys from db & fill ETS table with info
   let assert Ok(actor) =
-    actor.start(DirectorActorState(dict.new()), handle_message)
+    actor.start(DirectorActorState(set.new()), handle_message)
   actor
 }
 
@@ -24,28 +30,34 @@ fn handle_message(
   state: DirectorActorState,
 ) -> Next(DirectorActorMessage, DirectorActorState) {
   case message {
-    EnqueueParticipant(game_code, player, participant_subject) -> {
-      let participant = #(player, participant_subject)
-      let new_queue = case state.games_waiting |> get(game_code) {
-        Ok(first_participant) -> {
-          //They are joining a Game
-          game.start([participant, ..first_participant])
-          state.games_waiting |> drop([game_code])
-        }
-        _ -> {
-          //They created the game
-          state.games_waiting |> insert(game_code, [participant])
-        }
-      }
-      let new_state = DirectorActorState(games_waiting: new_queue)
-
-      new_state |> actor.continue
-    }
-    DequeueParticipant(game_code) -> {
-      state.games_waiting |> drop([game_code])
-      let assert Ok(waiting_games) = table.ref("waiting_games")
-      waiting_games |> table.delete(game_code)
+    EnqueueUser(participant_subject, director_subject) -> {
+      game.start(participant_subject, director_subject)
       state |> actor.continue
+    }
+    Leaderboard(user) -> {
+      let assert Ok(leaderboard_ets) = table.ref("leaderboard")
+      //create list of infos by grabbing from ETS table
+      let information_list =
+        state.leaderboard_keys
+        |> set.to_list
+        |> from_list
+        |> map(fn(key) {
+          let assert Ok(info) =
+            leaderboard_ets |> table.lookup(key) |> list.first
+          info.1
+        })
+        |> to_list
+      //send the client the leaderboard
+      process.send(user, SendToClient(leaderboard(information_list)))
+      state |> actor.continue
+    }
+    AddKey(key) -> {
+      //save key in db aswell
+      DirectorActorState(set.union(
+        state.leaderboard_keys,
+        set.new() |> set.insert(key),
+      ))
+      |> actor.continue
     }
   }
 }

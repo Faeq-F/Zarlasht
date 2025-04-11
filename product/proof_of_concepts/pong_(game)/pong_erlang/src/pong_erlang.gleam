@@ -11,16 +11,16 @@ import mist
 import valkey.{radish_flush_db, valkey_client}
 
 // TODO
-// Need to check the entire program for load balancing dependencies - e.g., ETS data sharing
+// Need to check the entire program for load balancing dependencies - e.g., ETS data sharing - save to db for long-term & sync using pub/sub
 
 /// The entry-point for the program
 ///
 pub fn main() {
   let director = director.start()
   // Set up and configure a helper ETS table
-  // for holding games that have been created but need a second player
+  // for holding scores that should appear on the leaderboard
   let _ =
-    table.build("waiting_games")
+    table.build("leaderboard")
     |> table.privacy(table.Public)
     |> table.write_concurrency(table.AutoWriteConcurrency)
     |> table.read_concurrency(True)
@@ -37,6 +37,7 @@ pub fn main() {
     router.handle_request(_, ctx, director)
     |> mist.new
     |> mist.port(8000)
+    // Todo
     // could randomize for recovery scenarios (in case new app takes over) & restarting for errors & see wisp recovery - 500 for handler?
     |> mist.start_https("pong.crt", "pong.key")
 
