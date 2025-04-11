@@ -6,8 +6,8 @@ import home.{home}
 import join_game.{join_game}
 import layout.{layout}
 import lustre/element
+import map.{map}
 import mist
-import player.{player}
 import roll_die.{roll_die}
 import set_name.{set_name}
 import wisp.{type Request}
@@ -28,7 +28,7 @@ pub fn main() {
           ["game"] -> game() |> respond()
           ["roll_die"] -> roll_die() |> respond()
           ["chat"] -> chat() |> respond()
-          ["player"] -> player() |> respond()
+          ["map"] -> map() |> respond()
 
           // All the empty responses
           ["internal-server-error"] -> wisp.internal_server_error()
@@ -49,7 +49,7 @@ pub fn main() {
 }
 
 fn respond(page) {
-  page
+  [page]
   |> layout()
   |> element.to_document_string_builder
   |> wisp.html_response(200)

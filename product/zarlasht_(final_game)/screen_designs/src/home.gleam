@@ -1,56 +1,63 @@
-import lustre/attribute.{attribute}
+import components/bottom_bar.{bottom_bar}
+import gleam/string.{join}
+import lustre/attribute.{class, style}
 import lustre/element.{type Element}
-import lustre/element/html
+import lustre/element/html.{button, div, h1, text}
 
 pub fn home() -> Element(t) {
-  html.div([attribute.id("app")], [
-    html.div(
-      [attribute.class("hero bg-base-100 min-h-full"), attribute.id("page")],
+  div(
+    [
+      class("!text-left !absolute !z-[999]"),
+      style([#("width", "calc(100% - 2rem)"), #("height", "calc(100% - 2rem)")]),
+    ],
+    [
+      div([class("!w-full")], [
+        bottom_bar(info(), buttons()),
+        h1([class("!text-9xl font-header p-4")], [text("Zarlasht")]),
+      ]),
+    ],
+  )
+}
+
+fn info() {
+  div(
+    [
+      class("btn !bg-gray-100 font-header !text-lg"),
+      style([#("cursor", "default")]),
+    ],
+    [text("Zarlasht")],
+  )
+}
+
+fn buttons() {
+  [
+    button(
       [
-        html.div(
+        class(join(
           [
-            attribute.class(
-              "hero-content text-left absolute top-1/2 -translate-y-1/2 w-full",
-            ),
+            "btn border font-text !text-xl lg:inline-flex",
+            "bg-black/15 hover:bg-black/30",
+            "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+            "border-black/40 text-current", "transition-all duration-500",
           ],
-          [
-            html.div([attribute.class("w-full")], [
-              html.h1(
-                [attribute.class("text-9xl font-bold mb-3 font-header ")],
-                [html.text("Zarlasht")],
-              ),
-              html.div([attribute.class("w-full join")], [
-                html.button(
-                  [
-                    attribute.class(
-                      "text-2xl dark:hover:text-shadow join-item dark:text-slate-400 text-zinc-700 hover:text-secondary py-2 px-6 duration-700 font-bold bg-[#ffffff44] dark:bg-[#00000044]  border-r border-t border-b border-gray-600 rounded-lg bg-gradient-to-r from-transparent via-[#ffffff44] to-transparent",
-                    ),
-                  ],
-                  [
-                    html.text(
-                      "Create a game
-            ",
-                    ),
-                  ],
-                ),
-                html.button(
-                  [
-                    attribute.class(
-                      "text-2xl dark:hover:text-shadow join-item dark:text-slate-400 text-zinc-700 hover:text-secondary py-2 px-6 duration-700 font-bold  dark:bg-[#00000044]  border-l border-t border-b border-gray-600 rounded-lg bg-gradient-to-r from-transparent via-[#ffffff44] to-transparent",
-                    ),
-                  ],
-                  [
-                    html.text(
-                      "Join a game
-            ",
-                    ),
-                  ],
-                ),
-              ]),
-            ]),
-          ],
-        ),
+          " ",
+        )),
       ],
+      [text("Create a Game")],
     ),
-  ])
+    button(
+      [
+        class(join(
+          [
+            "btn border font-text !text-xl lg:inline-flex !rounded-full !rounded-l-none",
+            "bg-black/15 hover:bg-black/30",
+            "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+            "border-black/40 text-current", "transition-all duration-500",
+          ],
+          " ",
+        )),
+      ],
+      [text("Join a Game")],
+    ),
+  ]
 }
