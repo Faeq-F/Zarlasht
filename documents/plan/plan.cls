@@ -1,4 +1,4 @@
-\ProvidesClass{project_plan}
+\ProvidesClass{plan}
 \LoadClass[11pt, titlepage]{report}
 \usepackage[paperwidth=21cm,paperheight=29.7cm,includehead,headheight=1.5cm,pdftex,hmargin={3cm,2.5cm},vmargin={0cm,2cm},]{geometry}
 \usepackage{fancyhdr}
@@ -122,7 +122,7 @@
 \null
 \vfil
 \begin{center}
-\title{Final Year Project Interim Report}\\[0.25cm]
+\title{Final Year Project Plan}\\[0.25cm]
 \Large \textbf{\fullOrHalfUnit~-~\finalOrInterim}\\[0.5cm]\rule{4cm}{1pt}\\[0.7cm]
 \title{\textbf{\projecttitle}}\\[1cm]
 \author{\LARGE \studentname}\\[0.5cm]\rule{4cm}{1pt}\\[0.5cm]
