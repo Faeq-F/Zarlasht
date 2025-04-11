@@ -5,10 +5,12 @@ Install [Gleam](https://gleam.run/getting-started/installing/)
 Add icons via `gleam run -m lucide_lustre/add_all` and move the file to the components folder in pages
 
 Install [Valkey](https://valkey.io/topics/installation/)<br> and place
+
 ```
 SERVICE_URI='127.0.0.1'
 SERVICE_PORT='6379'
 ```
+
 in a `.env` file in this folder
 
 Within the `static` folder, you will need a `libraries` folder with the
@@ -78,16 +80,16 @@ gleam test -- --glacier
 gleam run & cd ../automated_browser_tests/ && gleam test ; cd ../zarlasht ; pkill deno
 ```
 
-
-
 ### Project structure
 
 #### Interesting files
+
 Files that would likely be more interesting;
+
 - game.gleam
-- director.gleam
-- websocket.gleam
-- those in `lib` for their respective actions<br>(mostly passing messages between the actors)
+- battle.gleam
+- enemy.gleam
+- those in `models/game` for their respective actions<br>(mostly passing messages between the actors)
 
 #### Structure
 
@@ -108,21 +110,18 @@ root
 |   |   |   ├── game.gleam
 |   |   |   |   (The actor that handles an individual game)
 |   |   |   |
+|   |   |   ├── battle.gleam
+|   |   |   |   (The actor that handles an individual battle in a game)
+|   |   |   |
+|   |   |   ├── enemy.gleam
+|   |   |   |   (The actor that fights a player in a battle)
+|   |   |   |
 |   |   |   └── websocket.gleam
 |   |   |       (The actor that handles the connection between the client and 
 |   |   |        server with a websocket, utilizing the handlers in lib)
 |   |   |
-|   |   ├── lib
-|   |   |   | (most pass messages to the director or game actors)
-|   |   |   |
-|   |   |   ├── create_game.gleam
-|   |   |   |   (handles creation of a new game)
-|   |   |   |
-|   |   |   ├── join_game.gleam
-|   |   |   |   (handles joining to a pre-existing game)
-|   |   |   |
-|   |   |   └── name_set.gleam
-|   |   |       (handles setting a user's name & redirection to the game)
+|   |   ├── models
+|   |   |   (handlers for actor messages)
 |   |   |
 |   |   ├── pages
 |   |   |   ├── components
