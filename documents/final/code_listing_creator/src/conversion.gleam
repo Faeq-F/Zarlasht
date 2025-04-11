@@ -1,15 +1,13 @@
-//// The page & conversion logic
+//// The page & the conversion logic
 
-import birl
 import contour
-import file_streams/file_stream
+import gleam/list.{fold, map}
+import gleam/string.{split}
 import gleam/string_tree
-import lustre/attribute.{attribute, href, id, name, rel, src}
+import lustre/attribute.{attribute, href, id, name, rel, src, style}
 import lustre/element/html.{
-  body, button, div, form, head, html, link, script, text, textarea,
+  body, button, div, form, head, html, li, link, p, script, text, textarea, ul,
 }
-
-// ensure backgraound graphics is enabled
 
 /// The home page
 ///
@@ -17,6 +15,7 @@ pub fn home() {
   html([], [
     head([], [
       link([rel("stylesheet"), href("/static/style.css")]),
+      // HTMX for dynamic changes
       script(
         [
           attribute("crossorigin", "anonymous"),
@@ -31,8 +30,19 @@ pub fn home() {
     ]),
     body([], [
       div([id("bodyDiv")], [
+        //tips
+        p([], [text("Use gecko-based browser for text selectability")]),
+        text("Printing options;"),
+        ul([], [
+          li([], [text("Background Graphics")]),
+          li([], [text("Fit to page width")]),
+        ]),
+        //input
         form([], [
-          textarea([name("source")], ""),
+          textarea(
+            [name("source"), style([#("width", " 90vw"), #("height", "80vh")])],
+            "",
+          ),
           button(
             [
               attribute("hx-target", "#bodyDiv"),
@@ -42,37 +52,38 @@ pub fn home() {
           ),
         ]),
       ]),
+      //trigger print to pdf after code is swapped into the DOM
+      script(
+        [],
+        "document.body.addEventListener('htmx:afterSwap', function(evt) {window.print()});",
+      ),
     ]),
   ])
 }
 
+/// Convert to HTML with CSS classes for colours
+///
 pub fn convert(source: String) {
-  // Convert to HTML with CSS classes for colours
   let html =
-    "<body><pre><code>"
+    "<body><pre>"
     <> contour.to_html(source)
-    <> "</code></pre>"
+    |> split("\n")
+    |> map(fn(line) { "<code>" <> line <> "</code>" })
+    |> fold("", fn(old_lines, next_line) { old_lines <> "\n" <> next_line })
+    <> "</pre>"
     <> js()
     <> "</body>"
-  //use chrobot to convert to pdf & save that to disk
-  //save to disk
-  // let assert Ok(stream) =
-  //   file_stream.open_write(birl.now() |> birl.to_iso8601() <> ".pdf")
-  // let assert Ok(Nil) = file_stream.write_bytes(stream, <<"Hello!\n":utf8>>)
-  // let assert Ok(Nil) = file_stream.close(stream)
-  //return val
   string_tree.from_string(html)
 }
 
+/// Further highlighting using the prefixedColon class
+///
 fn js() {
   "
   <script>
   const regex = /(?:[^^.+\\b](\\w+): )/gm;
-
   const str = document.getElementsByTagName(\"code\")[0].innerHTML
-
   let m;
-
   while ((m = regex.exec(str)) !== null) {
       if (m.index === regex.lastIndex) {
           regex.lastIndex++;
@@ -84,18 +95,6 @@ fn js() {
               document.body.innerHTML = document.body.innerHTML.replaceAll(`${match}:`, `<span class=\"prefixedColon\">${match}:</span>`)
       });
   }
-
-  let code = document.getElementsByTagName(\"code\")[0].innerHTML
-  code = code.replaceAll(\"(\",\"<span class=\\\"outer\\\">(</span>\")
-  code = code.replaceAll(\")\",\"<span class=\\\"outer\\\">)</span>\")
-  code = code.replaceAll(\"[\",\"<span class=\\\"outer\\\">[</span>\")
-  code = code.replaceAll(\"]\",\"<span class=\\\"outer\\\">]</span>\")
-  code = code.replaceAll(\"{\",\"<span class=\\\"outer\\\">{</span>\")
-  code = code.replaceAll(\"}\",\"<span class=\\\"outer\\\">}</span>\")
-  code = code.replaceAll(\",\",\"<span class=\\\"outer\\\">,</span>\")
-  document.getElementsByTagName(\"code\")[0].innerHTML = code
-
-  window.print()
   </script>
   "
 }
