@@ -1,9 +1,27 @@
-import app/pages/game.{game_page}
+import app/pages/game.{game_page, instruction}
 import glacier/should
+import lustre/element
 
-pub fn game_page_test() {
-  game_page()
-  |> should.equal(
-    "<div id=\"page\" class=\"bg-base-100 min-h-full\"><div class=\"divider lg:divider-horizontal absolute min-w-full left-0 top-1/2 -translate-y-1/2 h-96\"></div><div class=\"hero-content text-center absolute top-1/2 -translate-y-1/2 min-w-full h-screen pt-16 pb-12 left-0\"><div class=\"grid grid-cols-2 gap-10 w-full h-full\"><div class=\"card text-center h-full\"><div id=\"player1\" class=\"w-4/6 h-1/7 rounded-3xl p-4 pl-36 text-left\"></div><div id=\"game\" class=\"m-auto w-4/6 h-full mx-auto my-0 p-4 grid grid-cols-3 gap-4 h-full\"></div></div><div class=\"card text-center h-full\"><div id=\"game\" class=\"m-auto w-4/6 h-full mx-auto my-0 p-4 grid grid-cols-3 gap-4 h-full\"></div><div id=\"player2\" class=\"w-4/6 h-1/7 rounded-3xl p-4 mr-0 ml-0 pr-36 text-right\"></div></div></div></div><div class=\"board\"><div class=\"ball\"><div class=\"ball_effect\"></div></div><div class=\"paddle_1 paddle\"></div><div class=\"paddle_2  paddle\"></div><h1 class=\"player_1_score\">0</h1><h1 class=\"player_2_score\">0</h1><h1 class=\"message absolute left-0 -translate-y-1/2 min-w-full text-center\">Press Enter to Start</h1></div><script>\n    let gameState = 'start';\n    let paddle_1 = document.querySelector('.paddle_1');\n    let paddle_2 = document.querySelector('.paddle_2');\n    let board = document.querySelector('.board');\n    let initial_ball = document.querySelector('.ball');\n    let ball = document.querySelector('.ball');\n    let score_1 = document.querySelector('.player_1_score');\n    let score_2 = document.querySelector('.player_2_score');\n    let message = document.querySelector('.message');\n    let paddle_1_coord = paddle_1.getBoundingClientRect();\n    let paddle_2_coord = paddle_2.getBoundingClientRect();\n    let initial_ball_coord = ball.getBoundingClientRect();\n    let ball_coord = initial_ball_coord;\n    let board_coord = board.getBoundingClientRect();\n    let paddle_common =\n      document.querySelector('.paddle').getBoundingClientRect();\n\n    let dx = Math.floor(Math.random() * 4) + 3;\n    let dy = Math.floor(Math.random() * 4) + 3;\n    let dxd = Math.floor(Math.random() * 2);\n    let dyd = Math.floor(Math.random() * 2);\n\n    document.addEventListener('keydown', (e) => {\n      if (e.key == 'Enter') {\n        gameState = gameState == 'start' ? 'play' : 'start';\n        if (gameState == 'play') {\n          message.innerHTML = '';\n          requestAnimationFrame(() => {\n            dx = Math.floor(Math.random() * 4) + 3;\n            dy = Math.floor(Math.random() * 4) + 3;\n            dxd = Math.floor(Math.random() * 2);\n            dyd = Math.floor(Math.random() * 2);\n            moveBall(dx, dy, dxd, dyd);\n          });\n        }\n      }\n      if (gameState == 'play') {\n        if (e.key == 'w') {\n          paddle_1.style.top =\n            Math.max(\n              board_coord.top,\n              paddle_1_coord.top - window.innerHeight * 0.06\n            ) + 'px';\n          paddle_1_coord = paddle_1.getBoundingClientRect();\n        }\n        if (e.key == 's') {\n          paddle_1.style.top =\n            Math.min(\n              board_coord.bottom - paddle_common.height,\n              paddle_1_coord.top + window.innerHeight * 0.06\n            ) + 'px';\n          paddle_1_coord = paddle_1.getBoundingClientRect();\n        }\n\n        if (e.key == 'ArrowUp') {\n          paddle_2.style.top =\n            Math.max(\n              board_coord.top,\n              paddle_2_coord.top - window.innerHeight * 0.1\n            ) + 'px';\n          paddle_2_coord = paddle_2.getBoundingClientRect();\n        }\n        if (e.key == 'ArrowDown') {\n          paddle_2.style.top =\n            Math.min(\n              board_coord.bottom - paddle_common.height,\n              paddle_2_coord.top + window.innerHeight * 0.1\n            ) + 'px';\n          paddle_2_coord = paddle_2.getBoundingClientRect();\n        }\n      }\n    });\n\n    function moveBall(dx, dy, dxd, dyd) {\n      if (ball_coord.top <= board_coord.top) {\n        dyd = 1;\n      }\n      if (ball_coord.bottom >= board_coord.bottom) {\n        dyd = 0;\n      }\n      if (\n        ball_coord.left <= paddle_1_coord.right &&\n        ball_coord.top >= paddle_1_coord.top &&\n        ball_coord.bottom <= paddle_1_coord.bottom\n      ) {\n        dxd = 1;\n        dx = Math.floor(Math.random() * 4) + 3;\n        dy = Math.floor(Math.random() * 4) + 3;\n      }\n      if (\n        ball_coord.right >= paddle_2_coord.left &&\n        ball_coord.top >= paddle_2_coord.top &&\n        ball_coord.bottom <= paddle_2_coord.bottom\n      ) {\n        dxd = 0;\n        dx = Math.floor(Math.random() * 4) + 3;\n        dy = Math.floor(Math.random() * 4) + 3;\n      }\n      if (\n        ball_coord.left <= board_coord.left ||\n        ball_coord.right >= board_coord.right\n      ) {\n        if (ball_coord.left <= board_coord.left) {\n          score_2.innerHTML = +score_2.innerHTML + 1;\n        } else {\n          score_1.innerHTML = +score_1.innerHTML + 1;\n        }\n        gameState = 'start';\n\n        ball_coord = initial_ball_coord;\n        ball.style = initial_ball.style;\n        message.innerHTML = 'Press Enter to Start';\n        return;\n      }\n      ball.style.top = ball_coord.top + dy * (dyd == 0 ? -1 : 1) + 'px';\n      ball.style.left = ball_coord.left + dx * (dxd == 0 ? -1 : 1) + 'px';\n      ball_coord = ball.getBoundingClientRect();\n      requestAnimationFrame(() => {\n        moveBall(dx, dy, dxd, dyd);\n      });\n    }\n  </script></div>",
-  )
+pub fn show_instruction_test() {
+  should.equal(instruction(True) |> element.to_string, "")
+}
+
+pub fn hide_instruction_test() {
+  should.equal(instruction(False) |> element.to_string, "")
+}
+
+pub fn empty_page_test() {
+  should.equal(game_page("", ""), "")
+}
+
+pub fn page_1_test() {
+  should.equal(game_page("Faeq", "John"), "")
+}
+
+pub fn page_2_test() {
+  should.equal(game_page("Mubz", "Faeq"), "")
+}
+
+pub fn randomized_page_test() {
+  should.equal(game_page(), "")
 }

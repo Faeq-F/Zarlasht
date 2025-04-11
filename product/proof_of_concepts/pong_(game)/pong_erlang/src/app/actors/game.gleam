@@ -2,36 +2,36 @@
 
 import app/actors/actor_types.{
   type CustomWebsocketMessage, type GameActorMessage, type GameActorState,
-  type Player, AddedName, Disconnect, GameActorState, JoinGame, One,
-  SendToClient, Two, UserDisconnected, Wait,
+  DownHit, EnterHit, GameActorState, JoinGame, LeaderboardInformation, SHit,
+  SendToClient, SetNames, Start, UpHit, UserDisconnected, WHit,
 }
-import app/pages/game.{game_page}
+import app/lib/game_actions
+import app/pages/game
+import carpenter/table
 import gleam/erlang/process.{type Subject}
 import gleam/io
-import gleam/list
 import gleam/otp/actor.{type Next}
 import logging.{Info}
 
 /// Creates the actor
 ///
 pub fn start(
-  participants: List(#(Player, Subject(CustomWebsocketMessage))),
+  user: Subject(CustomWebsocketMessage),
+  director: Subject(actor_types.DirectorActorMessage),
 ) -> Subject(GameActorMessage) {
   let state =
     GameActorState(
-      participants: participants,
-      names_set: 0,
-      player_one_name: "",
-      player_two_name: "",
+      director:,
+      user: user,
+      player1name: "",
+      player2name: "",
+      state: Start,
+      player1score: 0,
+      player2score: 0,
     )
   let assert Ok(actor) = actor.start(state, handle_message)
-
-  //send everyone to the set_name page
-  //(by sending a message that holds the game_actor)
-  list.each(participants, fn(participant) {
-    process.send(participant.1, JoinGame(game_subject: actor))
-  })
-
+  //send them to the set_name page
+  process.send(user, JoinGame(game_subject: actor))
   actor
 }
 
@@ -44,58 +44,66 @@ fn handle_message(
   logging.log(Info, "A Game Actor got the message")
   io.debug(message)
   case message {
-    AddedName(player, ws_subject, name) -> {
-      let assert Ok(first_person) = list.first(state.participants)
-      let new_state = case player {
-        first if first == first_person.0 ->
-          GameActorState(
-            ..state,
-            names_set: state.names_set + 1,
-            player_two_name: name,
-          )
-        _ ->
-          GameActorState(
-            ..state,
-            names_set: state.names_set + 1,
-            player_one_name: name,
-          )
-      }
-      case new_state.names_set {
-        1 -> process.send(ws_subject, Wait)
-        _ -> {
-          list.each(state.participants, fn(p) {
-            // send each participantto the game page
-            process.send(p.1, SendToClient(game_page()))
-            //update player names
-            process.send(
-              p.1,
-              SendToClient(game.player(One, new_state.player_one_name)),
-            )
-            process.send(
-              p.1,
-              SendToClient(game.player(Two, new_state.player_two_name)),
-            )
-          })
-        }
-      }
+    EnterHit(message) -> game_actions.enter_hit(message, state)
+    WHit(message) -> game_actions.w_hit(message, state)
+    SHit(message) -> game_actions.s_hit(message, state)
+    UpHit(message) -> game_actions.up_hit(message, state)
+    DownHit(message) -> game_actions.down_hit(message, state)
+
+    SetNames(player1name, player2name) -> {
+      let new_state =
+        GameActorState(
+          ..state,
+          player1name: player1name,
+          player2name: player2name,
+        )
+      process.send(
+        state.user,
+        SendToClient(game.game_page(player1name, player2name)),
+      )
       new_state |> actor.continue
     }
 
-    UserDisconnected(player) -> {
-      //make other player disconnect
-      list.each(state.participants, fn(participant) {
-        case participant.0 == player {
-          True -> {
-            // they have already disconnected so can't send them a message
-            Nil
-          }
-          _ -> {
-            process.send(participant.1, Disconnect)
-            Nil
+    UserDisconnected -> {
+      io.debug("User disconnected from the game")
+      //save names & scores to ETS table (as cache) and Valkey db (long-term storage)
+      let assert Ok(leaderboard) = table.ref("leaderboard")
+      //check keys as player1name <> player2name and player2name <> player1name -> want to avoid duplicates
+      let key1 = state.player1name <> state.player2name
+      let key2 = state.player2name <> state.player1name
+      let val =
+        LeaderboardInformation(
+          player1name: state.player1name,
+          player2name: state.player2name,
+          player1score: state.player1score,
+          player2score: state.player2score,
+        )
+      case leaderboard |> table.lookup(key1) {
+        [] -> {
+          //check other key
+          case leaderboard |> table.lookup(key2) {
+            [] -> {
+              //save using first key
+              leaderboard
+              |> table.insert([#(key1, val)])
+              process.send(state.director, actor_types.AddKey(key1))
+            }
+            _ -> {
+              //override key
+              leaderboard
+              |> table.insert([#(key2, val)])
+              process.send(state.director, actor_types.AddKey(key2))
+            }
           }
         }
-      })
-      actor.Stop(process.Abnormal("A player disconnected from the game"))
+        _ -> {
+          //override key
+          leaderboard
+          |> table.insert([#(key1, val)])
+          process.send(state.director, actor_types.AddKey(key1))
+        }
+      }
+      actor.Stop(process.Killed)
     }
   }
 }

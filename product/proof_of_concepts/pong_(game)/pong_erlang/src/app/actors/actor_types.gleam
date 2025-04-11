@@ -1,8 +1,8 @@
 //// All types relating to the different actors
 
-import gleam/dict.{type Dict}
 import gleam/erlang/process.{type Subject}
 import gleam/option.{type Option}
+import gleam/set.{type Set}
 import mist
 
 /// The state for a WebSocket Actor
@@ -11,9 +11,6 @@ import mist
 ///
 pub type WebsocketActorState {
   WebsocketActorState(
-    name: String,
-    game_code: Int,
-    player: Player,
     ws_subject: Subject(CustomWebsocketMessage),
     game_subject: Option(Subject(GameActorMessage)),
     director_subject: Subject(DirectorActorMessage),
@@ -23,26 +20,14 @@ pub type WebsocketActorState {
 /// Custom messages for the WebSocket actor
 ///
 pub type CustomWebsocketMessage {
-  /// 2 players have joined
-  ///
-  /// Send the player to the game page
-  ///
-  JoinGame(game_subject: Subject(GameActorMessage))
   ///Send a message to the client
   ///
   /// (usually HTML for htmx)
   ///
   SendToClient(message: String)
-  ///Waiting for the other player to enter their name
+  ///Fills the game_subject filed for the user when they are in a game
   ///
-  /// Sends the player a message to indicate this
-  ///
-  Wait
-  /// The other player has disconnected
-  ///
-  /// Send this player an alert and then disconnect them too
-  ///
-  Disconnect
+  JoinGame(game_subject: Subject(GameActorMessage))
 }
 
 /// A wrapper for a player's WebSocket Actor state and their connection
@@ -51,65 +36,120 @@ pub type PlayerSocket {
   PlayerSocket(socket: mist.WebsocketConnection, state: WebsocketActorState)
 }
 
-/// The player a user is
-///
-pub type Player {
-  One
-  Two
-  Neither
-}
-
 //----------------------------------------------------------------------
 
 /// The state for the Director Actor
 ///
-/// Holds all games managed by this server
+/// Holds all keys for leaderboard rows
 ///
 pub type DirectorActorState {
-  DirectorActorState(
-    games_waiting: Dict(Int, List(#(Player, Subject(CustomWebsocketMessage)))),
-  )
+  DirectorActorState(leaderboard_keys: Set(String))
 }
 
 /// Custom message for the Director actor
 ///
 pub type DirectorActorMessage {
-  ///Adds a Player to a game
+  /// Adds a game for a user
   ///
-  EnqueueParticipant(
-    game_code: Int,
-    player: Player,
+  EnqueueUser(
     participant_subject: Subject(CustomWebsocketMessage),
+    director_subject: Subject(DirectorActorMessage),
   )
-  ///Deletes a Player from a game
+  /// The user wishes to see the leaderboard
   ///
-  DequeueParticipant(game_code: Int)
+  Leaderboard(participant_subject: Subject(CustomWebsocketMessage))
+  /// Add a key to the state
+  ///
+  AddKey(key: String)
 }
 
 //----------------------------------------------------------------------
 
-/// The state for the Game actor
+/// The state for a game
 ///
-/// Contains all participants in the game
+pub type GameState {
+  Start
+  Play
+}
+
+/// The state for the Game actor
 ///
 pub type GameActorState {
   GameActorState(
-    participants: List(#(Player, Subject(CustomWebsocketMessage))),
-    names_set: Int,
-    player_one_name: String,
-    player_two_name: String,
+    director: Subject(DirectorActorMessage),
+    user: Subject(CustomWebsocketMessage),
+    player1name: String,
+    player2name: String,
+    state: GameState,
+    player1score: Int,
+    player2score: Int,
   )
 }
 
 ///Custom message for the Game actor
 ///
 pub type GameActorMessage {
-  /// A player disconnected
+  /// The user disconnected
   ///
-  /// disconnects the other player after alerting them
+  UserDisconnected
+  /// The players have set their names
   ///
-  UserDisconnected(player: Player)
-  /// A player has set their name
+  SetNames(player1name: String, player2name: String)
+  /// User hit the enter key
   ///
-  AddedName(player: Player, ws: Subject(CustomWebsocketMessage), name: String)
+  EnterHit(message: String)
+  /// User hit the W key
+  ///
+  WHit(message: String)
+  /// User hit the S key
+  ///
+  SHit(message: String)
+  /// User hit the Up key
+  ///
+  UpHit(message: String)
+  /// User hit the Down key
+  ///
+  DownHit(message: String)
+}
+
+/// The JSON information appended to websocket messages when the user is playing the game
+///
+pub type ExtraInfo {
+  ExtraInfo(
+    board_coord: Rect,
+    window_inner_height: Float,
+    paddle_1_coord: Rect,
+    paddle_2_coord: Rect,
+    paddle_common: Rect,
+    player_1_score: Int,
+    player_2_score: Int,
+  )
+}
+
+/// The bounding rectangle of a DOM object
+///
+pub type Rect {
+  Rect(
+    x: Float,
+    y: Float,
+    width: Float,
+    height: Float,
+    top: Float,
+    right: Float,
+    bottom: Float,
+    left: Float,
+  )
+}
+
+///Information required for rows on the leaderboard
+///
+pub type LeaderboardInformation {
+  ///Information required for rows on the leaderboard
+  ///
+  LeaderboardInformation(
+    player1name: String,
+    player2name: String,
+    player1score: Int,
+    player2score: Int,
+  )
 }
