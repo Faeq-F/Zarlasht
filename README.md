@@ -3,8 +3,7 @@
 Created during the 2024-2025 CS3821 module 'Final Year Project - Full Unit' at
 Royal Holloway, University of London.
 
-Project Chosen: &nbsp;A concurrency based game environment<br> Project Title:
-&nbsp;&nbsp;TBD
+Project Chosen: &nbsp;A concurrency based game environment
 
 ### Repository Structure
 
