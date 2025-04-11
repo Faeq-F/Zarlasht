@@ -8,3 +8,15 @@ pre code .hl-string   { color: #34db36 }
 pre code .hl-variant  { color: #44de97 }
 pre code .prefixedColon { color: #ffac20 }
 pre code .outer { color: #5d5d5d }
+pre {white-space: pre-wrap;color: #666;font-size: 10pt;}
+pre:before {counter-reset: listing;}
+pre code {counter-increment: listing;}
+pre code:before {
+  content: counter(listing) ". ";
+  width: 8em;
+  padding-left: auto;
+  margin-left: auto;
+  text-align: right;
+  display: inline-grid;
+  color: darkslategray;
+}
