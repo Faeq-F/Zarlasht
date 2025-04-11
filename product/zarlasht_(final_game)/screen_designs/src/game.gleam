@@ -2,25 +2,18 @@ import lustre/element.{type Element}
 
 import components/bottom_bar.{bottom_bar}
 import components/lucide_lustre.{
-  circle_user_round, circle_x, dice_5, dices, info as info_icon, map,
-  messages_square, radar, scan, sword,
+  dices, info as info_icon, map, messages_square, radar, sword,
 }
-import gleam/int
 
-import gleam/list
-import gleam/result
 import gleam/string.{join}
 import layout.{stats}
-import lustre/attribute.{attribute, class, id, name, role, style, type_}
-
-import lustre/element/html.{
-  br, button, div, h1, label, li, p, span, text, textarea, ul,
-}
+import lustre/attribute.{class, style}
+import lustre/element/html.{button, div, li, p, text, ul}
 
 pub fn game() -> Element(t) {
   div(
     [
-      class("!text-left !absolute"),
+      class("!text-left !absolute !z-[999]"),
       style([#("width", "calc(100% - 2rem)"), #("height", "calc(100% - 2rem)")]),
     ],
     [

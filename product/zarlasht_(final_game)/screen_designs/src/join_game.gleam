@@ -7,7 +7,7 @@ import lustre/element/html.{button, div, h1, input, text}
 pub fn join_game() -> Element(t) {
   div(
     [
-      class("!text-left !absolute"),
+      class("!text-left !absolute !z-[999]"),
       style([#("width", "calc(100% - 2rem)"), #("height", "calc(100% - 2rem)")]),
     ],
     [
