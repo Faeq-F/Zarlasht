@@ -1,0 +1,45 @@
+
+
+
+
+.game-container {
+  width: calc(100vw - 2rem);
+  overflow-x: scroll;
+}
+
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(9999, 1fr);
+  width: 90vw;
+}
+
+.grid .row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  overflow-x: scroll;
+}
+
+#player-container {
+  margin: 0 auto;
+
+}
+
+.sortable div,
+.row .item {
+  display: inline-block;
+  width: 15em;
+  border: 1px solid gray;
+  border-radius: 15px;
+  margin: 10px;
+  height: 5em;
+}
+
+.row .item {
+  height: 60vh !important;
+}
+
+.sortable {
+  display: flex;
+}

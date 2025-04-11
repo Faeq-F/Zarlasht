@@ -1,57 +1,74 @@
-//// The home page of the site
+import app/pages/components/bottom_bar.{bottom_bar}
+import gleam/string.{join}
+import lustre/attribute.{attribute, class, id, style}
+import lustre/element.{type Element}
+import lustre/element/html.{button, div, h1, text}
 
-import lustre/attribute.{attribute}
-import lustre/element.{type Element, text}
-import lustre/element/html
+pub fn home() -> Element(t) {
+  div(
+    [
+      class("!text-left !absolute !z-[999]"),
+      style([
+        #("width", "calc(100% - 2rem)"),
+        #("height", "calc(100% - 2rem)"),
+        #("background-image", "url(/static/home.png)"),
+        #("background-size", "cover"),
+        #("background-repeat", "no-repeat"),
+        #("background-position", "right"),
+      ]),
+    ],
+    [
+      div([class("!w-full")], [
+        bottom_bar(info(), buttons()),
+        h1([class("!text-9xl font-header p-4")], [text("Zarlasht")]),
+      ]),
+    ],
+  )
+}
 
-/// The home page of the site
-///
-/// A page with two buttons; one for creating a game and another for joining a game
-///
-pub fn root() -> Element(t) {
-  html.div([attribute.class("hero bg-base-100 min-h-full")], [
-    html.div(
+fn info() {
+  div(
+    [
+      class("btn !bg-gray-100 font-header !text-lg"),
+      style([#("cursor", "default")]),
+    ],
+    [text("Zarlasht")],
+  )
+}
+
+fn buttons() {
+  [
+    button(
       [
-        attribute.class(
-          "hero-content text-center absolute top-1/2 -translate-y-1/2",
-        ),
+        class(join(
+          [
+            "btn border font-text !text-xl lg:inline-flex",
+            "bg-black/15 hover:bg-black/30",
+            "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+            "border-black/40 text-current", "transition-all duration-500",
+          ],
+          " ",
+        )),
+        id("create"),
+        attribute("ws-send", ""),
       ],
-      [
-        html.div([attribute.class("max-w-md")], [
-          html.h1(
-            [
-              attribute.class(
-                "dark:text-white text-5xl font-bold mb-3 font-header",
-              ),
-            ],
-            [element.text("Zarlasht")],
-          ),
-          html.div([attribute.class("join"), attribute.id("pageInputs")], [
-            html.button(
-              [
-                attribute("ws-send", ""),
-                attribute.id("create"),
-                attribute("data-theme", "forest"),
-                attribute.class(
-                  "btn join-item bg-secondary text-secondary-content hover:bg-accent",
-                ),
-              ],
-              [text("Create a game")],
-            ),
-            html.button(
-              [
-                attribute("ws-send", ""),
-                attribute.id("join"),
-                attribute("data-theme", "forest"),
-                attribute.class(
-                  "btn join-item bg-neutral hover:bg-accent hover:text-secondary-content",
-                ),
-              ],
-              [text("Join a game")],
-            ),
-          ]),
-        ]),
-      ],
+      [text("Create a Game")],
     ),
-  ])
+    button(
+      [
+        class(join(
+          [
+            "btn border font-text !text-xl lg:inline-flex !rounded-full !rounded-l-none",
+            "bg-black/15 hover:bg-black/30",
+            "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+            "border-black/40 text-current", "transition-all duration-500",
+          ],
+          " ",
+        )),
+        id("join"),
+        attribute("ws-send", ""),
+      ],
+      [text("Join a Game")],
+    ),
+  ]
 }
