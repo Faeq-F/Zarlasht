@@ -2,18 +2,27 @@
 
 Install [Gleam](https://gleam.run/getting-started/installing/)
 
-Add icons via `gleam run -m lucide_lustre/add_all`
+Add icons via `gleam run -m lucide_lustre/add_all` and move the file to the components folder in pages
 
 Install [Valkey](https://valkey.io/topics/installation/)<br> and place
-`SERVICE_URI='127.0.0.1:6379'` in a `.env` file in this folder
+```
+SERVICE_URI='127.0.0.1'
+SERVICE_PORT='6379'
+```
+in a `.env` file in this folder
 
 Within the `static` folder, you will need a `libraries` folder with the
 following:
 
-- `daisyui.min.css`
-- `tailwind.min.js`
+- `rippleuicss`
+- `tailwind.min.js` (tailwind v4)
+- `alpine.min.js`
+- `alpine.focus.min.js`
 - `htmx.min.js`
+- `sortable.min.js`
 - a folder named `htmx-ext` that contains `ws.js`
+
+Alternatively, you can replace the links to these files in `layout.gleam` with CDN links
 
 <details><summary>You will also need a certificate to run the server using HTTPS</summary>
 

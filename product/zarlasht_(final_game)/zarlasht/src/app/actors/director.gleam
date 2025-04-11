@@ -1,21 +1,40 @@
-//// The director actor - process to manage all tasks the server carries out
+//// The director actor - process to manage all games that are being created
 
 import app/actors/actor_types.{
   type DirectorActorMessage, type DirectorActorState, DequeueParticipant,
-  DirectorActorState, EnqueueParticipant,
+  DirectorActorState, EnqueueParticipant, GameStarted, GetParticipants,
+  Participants, UpdateParticipant,
 }
 
-// import app/actors/game
-import carpenter/table
-import gleam/dict.{drop, get, insert}
+import gleam/dict.{get}
 import gleam/erlang/process.{type Subject}
+import gleam/function
 import gleam/otp/actor.{type Next}
 
 /// Creates the Actor
-pub fn start() -> Subject(DirectorActorMessage) {
-  let assert Ok(actor) =
-    actor.start(DirectorActorState(dict.new()), handle_message)
-  actor
+pub fn start(
+  _input: Nil,
+  main_subject: Subject(Subject(DirectorActorMessage)),
+) -> Result(Subject(DirectorActorMessage), actor.StartError) {
+  actor.start_spec(actor.Spec(
+    init: fn() {
+      let director_subject = process.new_subject()
+      process.send(main_subject, director_subject)
+
+      let selector =
+        process.new_selector()
+        |> process.selecting(director_subject, function.identity)
+
+      actor.Ready(DirectorActorState(dict.new()), selector)
+    },
+    init_timeout: 1000,
+    loop: handle_message,
+  ))
+}
+
+import app/models/director/game_started.{game_started}
+import app/models/director/participants.{
+  dequeue_participant, enqueue_participant, update_participant,
 }
 
 /// Handles messages from other actors
@@ -25,27 +44,25 @@ fn handle_message(
   state: DirectorActorState,
 ) -> Next(DirectorActorMessage, DirectorActorState) {
   case message {
-    EnqueueParticipant(game_code, player, participant_subject) -> {
-      let participant = #(player, participant_subject)
-      let new_queue = case state.games_waiting |> get(game_code) {
-        Ok(first_participant) -> {
-          //They are joining a Game
-          // game.start([participant, ..first_participant])
-          state.games_waiting |> drop([game_code])
-        }
-        _ -> {
-          //They created the game
-          state.games_waiting |> insert(game_code, [participant])
-        }
-      }
-      let new_state = DirectorActorState(games_waiting: new_queue)
+    EnqueueParticipant(game_code, player, participant_subject) ->
+      enqueue_participant(game_code, player, participant_subject, state)
+      |> actor.continue
 
-      new_state |> actor.continue
-    }
-    DequeueParticipant(game_code) -> {
-      state.games_waiting |> drop([game_code])
-      // let assert Ok(waiting_games) = table.ref("waiting_games")
-      // waiting_games |> table.delete(game_code)
+    DequeueParticipant(player, game_code) ->
+      dequeue_participant(player, game_code, state) |> actor.continue
+
+    UpdateParticipant(player, game_code) ->
+      update_participant(player, game_code, state)
+      |> actor.continue
+
+    GameStarted(game_code) -> game_started(game_code, state) |> actor.continue
+
+    GetParticipants(asker, game_code) -> {
+      let participants = case state.games_waiting |> get(game_code) {
+        Ok(game) -> game.1
+        _ -> []
+      }
+      process.send(asker, Participants(participants))
       state |> actor.continue
     }
   }
