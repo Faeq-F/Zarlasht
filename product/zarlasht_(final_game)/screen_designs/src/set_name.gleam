@@ -1,62 +1,56 @@
-import lustre/attribute.{attribute}
+import components/bottom_bar.{bottom_bar}
+import gleam/string.{join}
+import lustre/attribute.{class, style}
 import lustre/element.{type Element}
-import lustre/element/html
+import lustre/element/html.{button, div, h1, text}
 
 pub fn set_name() -> Element(t) {
-  html.div([attribute.id("app")], [
-    html.div(
-      [attribute.class("hero bg-base-100 min-h-full"), attribute.id("page")],
+  div(
+    [
+      class("!text-left !absolute !z-[999]"),
+      style([#("width", "calc(100% - 2rem)"), #("height", "calc(100% - 2rem)")]),
+    ],
+    [
+      div([class("!w-full")], [
+        bottom_bar(info(), buttons()),
+        h1([class("!text-9xl font-header p-4")], [text("Zarlasht")]),
+      ]),
+    ],
+  )
+}
+
+fn info() {
+  div(
+    [
+      class("btn !bg-gray-100  font-text !text-lg"),
+      style([#("cursor", "default")]),
+    ],
+    [text("Please enter your name")],
+  )
+}
+
+fn buttons() {
+  [
+    html.input([
+      attribute.class(
+        "input input-bordered bg-transparent join-item text-xl  w-full !border-0 font-text !text-xl",
+      ),
+      attribute.placeholder("Your name"),
+    ]),
+    button(
       [
-        html.div(
+        class(join(
           [
-            attribute.class(
-              "hero-content text-center absolute top-1/2 -translate-y-1/2",
-            ),
+            "btn border lg:inline-flex !rounded-full !rounded-l-none w-40",
+            "bg-black/15 hover:bg-black/30",
+            "dark:bg-white/20  dark:hover:bg-white/40 dark:border-white/40",
+            "border-black/40 text-current font-text !text-xl",
+            "transition-all duration-500",
           ],
-          [
-            html.div([attribute.class("max-w-md")], [
-              html.h1(
-                [attribute.class("text-7xl font-bold mb-3 font-header ")],
-                [html.text("Zarlasht")],
-              ),
-              html.div([attribute.class("w-full")], [
-                html.div([attribute.id("pageInputs")], [
-                  html.form([], [
-                    html.div([attribute.class("join w-full")], [
-                      html.input([
-                        attribute.class(
-                          "input input-bordered bg-transparent join-item text-xl  w-full",
-                        ),
-                        attribute.placeholder(" Your Name"),
-                      ]),
-                      html.button(
-                        [
-                          attribute.class(
-                            "btn join-item bg-transparent hover:bg-transparent text-secondary-content hover:text-accent text-xl  text-shadow",
-                          ),
-                        ],
-                        [
-                          html.span([attribute.class("tick font-header ")], [
-                            html.text("L"),
-                          ]),
-                        ],
-                      ),
-                    ]),
-                  ]),
-                  html.div([attribute.id("waiting")], [
-                    html.p([attribute.class("mt-1  w-full text-info text-xl")], [
-                      html.text(
-                        "Waiting for the other
-                  player...",
-                      ),
-                    ]),
-                  ]),
-                ]),
-              ]),
-            ]),
-          ],
-        ),
+          " ",
+        )),
       ],
+      [text("Set Name")],
     ),
-  ])
+  ]
 }
