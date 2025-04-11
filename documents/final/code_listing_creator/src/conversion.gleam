@@ -55,7 +55,10 @@ pub fn home() {
       //trigger print to pdf after code is swapped into the DOM
       script(
         [],
-        "document.body.addEventListener('htmx:afterSwap', function(evt) {window.print()});",
+        "document.body.addEventListener('htmx:afterSwap', function(evt) {
+          "<> js()<>"
+          window.print()
+        });",
       ),
     ]),
   ])
@@ -71,7 +74,6 @@ pub fn convert(source: String) {
     |> map(fn(line) { "<code>" <> line <> "</code>" })
     |> fold("", fn(old_lines, next_line) { old_lines <> "\n" <> next_line })
     <> "</pre>"
-    <> js()
     <> "</body>"
   string_tree.from_string(html)
 }
@@ -80,21 +82,22 @@ pub fn convert(source: String) {
 ///
 fn js() {
   "
-  <script>
+
   const regex = /(?:[^^.+\\b](\\w+): )/gm;
-  const str = document.getElementsByTagName(\"code\")[0].innerHTML
+  Array.from(document.getElementsByTagName(\"code\")).forEach((x)=>{
+  let str = x.innerHTML
   let m;
   while ((m = regex.exec(str)) !== null) {
-      if (m.index === regex.lastIndex) {
-          regex.lastIndex++;
-      }
+        if (m.index === regex.lastIndex) {
+            regex.lastIndex++;
+        }
 
-      // The result can be accessed through the `m`-variable.
-      m.forEach((match, groupIndex) => {
-          if (groupIndex == 1)
-              document.body.innerHTML = document.body.innerHTML.replaceAll(`${match}:`, `<span class=\"prefixedColon\">${match}:</span>`)
-      });
-  }
-  </script>
+        // The result can be accessed through the `m`-variable.
+        m.forEach((match, groupIndex) => {
+            if (groupIndex == 1)
+                document.body.innerHTML = document.body.innerHTML.replaceAll(`${match}:`, `<span class=\"prefixedColon\">${match}:</span>`)
+        });
+    }
+  })
   "
 }
